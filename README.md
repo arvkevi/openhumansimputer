@@ -57,22 +57,41 @@ This repository is a template for, and working example of an Open Humans data so
 
 This template is a [Django](https://www.djangoproject.com/)/[Celery](http://www.celeryproject.org/) app that enables the end user - an Open Humans member - to add dummy data to an Open Humans project. The user arrives on the app's landing page (`index.html`), and clicks a button which takes them to Open Humans where they can log in (and create an account if necessary). Once logged in to the Open Humans site, the user clicks another button to authorize this app to add data to their Open Humans account, they are then returned to this app (to `complete.html`) which notifies them that their data has been added and provides a link to the project summary page in Open Humans.
 
+<<<<<<< HEAD
 So let's get that demo working on your machine, and you should be able to complete those steps as a user by running the app, before moving on to edit the code so it adds your custom data source instead of a dummy file.
 
 <<<<<<< HEAD
 #### This gif shows the completed app being used to add dummy data to an Open Humans project:
 =======
 1. Foreman https://github.com/ddollar/foreman
+=======
+Django, and thus this project are built on top of `python2.7`, if you are using `python3` as your default system, you will most definately need a `virtualenv` to work with this code.
+
+### Local requirements.
+
+1. Foreman https://github.com/ddollar/foreman (This package may be installed with a simple `gem install foreman`)
+>>>>>>> Clairfy Readme
 2. RabbitMQ https://www.rabbitmq.com/download.html
 3. pip https://pip.pypa.io/en/stable/installing/
 >>>>>>> Fix foreman reference
 
+<<<<<<< HEAD
 ![](https://cl.ly/0s2i2J3i191d/demo-gif.gif)
 
+=======
+### Install Python 2.7 requirements.
+
+**Strongly recommend you use [virtualenv](https://virtualenv.pypa.io/en/stable/).**
+**Be advised you need to use a name other than the default `.env` for the python environment; we suggest `.env_$YOURPROJECT`**
+>>>>>>> Clairfy Readme
 
 ## Cloning this template
 
+<<<<<<< HEAD
 In your terminal, navigate to the folder in which you want to store this repo, and enter the command
+=======
+### Set up `.env` for `foreman`
+>>>>>>> Clairfy Readme
 
 `$ git clone git@github.com:OpenHumans/oh-data-demo-template.git`
 
