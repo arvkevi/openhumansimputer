@@ -59,7 +59,13 @@ This template is a [Django](https://www.djangoproject.com/)/[Celery](http://www.
 
 So let's get that demo working on your machine, and you should be able to complete those steps as a user by running the app, before moving on to edit the code so it adds your custom data source instead of a dummy file.
 
+<<<<<<< HEAD
 #### This gif shows the completed app being used to add dummy data to an Open Humans project:
+=======
+1. Foreman https://github.com/ddollar/foreman
+2. RabbitMQ https://www.rabbitmq.com/download.html
+3. pip https://pip.pypa.io/en/stable/installing/
+>>>>>>> Fix foreman reference
 
 ![](https://cl.ly/0s2i2J3i191d/demo-gif.gif)
 
