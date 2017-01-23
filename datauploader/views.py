@@ -1,4 +1,12 @@
 import logging
+<<<<<<< HEAD:datauploader/views.py
+=======
+import os
+
+from django.conf import settings
+from django.contrib.auth import login
+from django.shortcuts import redirect, render
+>>>>>>> Fix login, add logging setup:oh_data_source/views.py
 import requests
 
 from django.contrib.auth import login
@@ -11,12 +19,18 @@ from .models import OpenHumansMember
 logger = logging.getLogger(__name__)
 
 
+<<<<<<< HEAD:datauploader/views.py
 def index(request):
     """
     Starting page for app.
     """
     context = {'client_id': settings.OH_CLIENT_ID,
                'oh_proj_page': settings.OH_ACTIVITY_PAGE}
+=======
+# Set up logging.
+logger = logging.getLogger(__name__)
+
+>>>>>>> Fix login, add logging setup:oh_data_source/views.py
 
     return render(request, 'datauploader/index.html', context=context)
 
@@ -104,6 +118,7 @@ def oh_get_member_data(token):
     """
     Exchange OAuth2 token for member data.
     """
+<<<<<<< HEAD:datauploader/views.py
     req = requests.get(
         '{}/api/direct-sharing/project/exchange-member/'
         .format(settings.OH_BASE_URL),
@@ -113,3 +128,28 @@ def oh_get_member_data(token):
         return req.json()
     raise Exception('Status code {}'.format(req.status_code))
     return None
+=======
+    logger.debug("Received user returning from Open Humans.")
+
+    # Exchange code for token.
+    # This creates an OpenHumansMember and associated User account.
+    code = request.GET.get('code', '')
+    oh_member = oh_code_to_member(code=code)
+
+    if oh_member:
+
+        # Log in the user.
+        # (You may want this if connecting user with another OAuth process.)
+        user = oh_member.user
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+
+        # Initiate a data transfer task, then render 'complete.html'.
+        xfer_to_open_humans.delay(oh_id=oh_member.oh_id)
+        context = {'oh_id': oh_member.oh_id,
+                   'oh_proj_page': settings.OH_ACTIVITY_PAGE}
+        return render(request, 'oh_data_source/complete.html',
+                      context=context)
+
+    logger.debug('Invalid code exchange. User returned to starting page.')
+    return redirect('/')
+>>>>>>> Fix login, add logging setup:oh_data_source/views.py

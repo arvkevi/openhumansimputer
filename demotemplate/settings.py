@@ -156,6 +156,28 @@ LOGGING = {
 }
 
 
+# Configure logging.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'oh_data_source': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+        }
+    },
+}
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
