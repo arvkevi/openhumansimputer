@@ -33,7 +33,6 @@ REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 if REMOTE:
     ALLOWED_HOSTS = ['*']
     print('REMOTE True')
-    #APP_BASE_URL = 'https://oh-datauploader.herokuapp.com'
 else:
     ALLOWED_HOSTS = []
     print('REMOTE False')
@@ -176,15 +175,8 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
-<<<<<<< HEAD:demotemplate/settings.py
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-=======
-# Simplified static file serving.
-# https://warehouse.python.org/project/whitenoise/
-# See also https://devcenter.heroku.com/articles/django-assets
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
->>>>>>> Fix whitenoise static files:oh_data_source/settings.py
