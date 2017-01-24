@@ -16,7 +16,11 @@ CELERY_BROKER_URL = os.getenv('CLOUDAMQP_URL', 'amqp://')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE',
                       'demotemplate.settings')
 
+<<<<<<< HEAD:datauploader/celery.py
 app = Celery('datauploader', broker=CELERY_BROKER_URL)
+=======
+app = Celery('oh_data_source', broker=CELERY_BROKER_URL)
+>>>>>>> Fix celery setup:oh_data_source/celery.py
 # Set up Celery with Heroku CloudAMQP (or AMQP in local dev).
 app.conf.update({
     'BROKER_URL': CELERY_BROKER_URL,
