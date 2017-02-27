@@ -10,6 +10,7 @@ __pycache__
 =======
 *.pyc
 .env
+.env*
 db.sqlite3
 >>>>>>> Add .gitignore
 staticfiles/*

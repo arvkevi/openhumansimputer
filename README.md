@@ -57,28 +57,79 @@ This repository is a template for, and working example of an Open Humans data so
 
 This template is a [Django](https://www.djangoproject.com/)/[Celery](http://www.celeryproject.org/) app that enables the end user - an Open Humans member - to add dummy data to an Open Humans project. The user arrives on the app's landing page (`index.html`), and clicks a button which takes them to Open Humans where they can log in (and create an account if necessary). Once logged in to the Open Humans site, the user clicks another button to authorize this app to add data to their Open Humans account, they are then returned to this app (to `complete.html`) which notifies them that their data has been added and provides a link to the project summary page in Open Humans.
 
+<<<<<<< HEAD
 So let's get that demo working on your machine, and you should be able to complete those steps as a user by running the app, before moving on to edit the code so it adds your custom data source instead of a dummy file.
+=======
+Django, and thus this project are built on top of `python2.7`, if you are using `python3` as your default system, you will most definitely need a `virtualenv` to work with this code.
+>>>>>>> Update .gitignore for environmental variables, and add codumentation to README.md
 
 #### This gif shows the completed app being used to add dummy data to an Open Humans project:
 
 ![](https://cl.ly/0s2i2J3i191d/demo-gif.gif)
 
 
+<<<<<<< HEAD
 ## Cloning this template
 
 In your terminal, navigate to the folder in which you want to store this repo, and enter the command
+=======
+**It is Strongly recommend you use [virtualenv](https://virtualenv.pypa.io/en/stable/).**
+**Be advised you need to use a name other than the default `.env` for the python environment; we suggest `.env_$YOURPROJECT`**
+To create your 'virtualenv' run:
+  `virtualenv -v --python=python2.7 .env_$YOURPROJECT`
+  The two flags we are using `-v` makes the setup verbose, allowing easier debugging.
+  The second flag `--python=python2.7` guarantees that no matter how many versions of python you have on your system the 'virtualenv' will be built with the 'Django' standard `python2.7`.
+
+To activate your 'virtualenv' you need to run:
+  `source .env_$YOURPROJECT/bin/activate`
+
+Next install all of the required python dependancies with:
+  `pip install -r requirements.txt`
+
+---
+>>>>>>> Update .gitignore for environmental variables, and add codumentation to README.md
 
 `$ git clone git@github.com:OpenHumans/oh-data-demo-template.git`
 
 This should create a new folder named `oh-data-demo-template` which contains all the code to create the working demo.
 
+<<<<<<< HEAD
 ## Setting up local environment
+=======
+This file contains secrets and other configurations for running the app.
+When you use foreman to run this app, it will load `.env` to be environment
+variables.
+**Keep your version SECRET! Never commit it to git.**
+
+### Install `RabbitMQ` for your system
+
+Documentation for supported systems includes [Linux (apr&rpm), OS X/macOS, and Other Unixes (including BSDs), as well as Windows](https://www.rabbitmq.com/platforms.html)
+
+### Make sure that `RabbitMQ` is started
+
+This is distribution dependent, both in syntax and name.
+- With the very popular Ubuntu and other Debian based systems, it will likely be started for you after you install the package, but can also start it manually with: `sudo rabbitmq-server start`
+- With Homebrew on OS X/macOS run `brew services rabbitmq start`
+- [RabbitMQ](https://www.rabbitmq.com/) has it's control system similar to `apachectl`, The documentation is online if you would like to learn more about [rabbitmqctl](https://www.rabbitmq.com/man/rabbitmqctl.1.man.html)
+If you have other questions please refer to your [distribution reference page at `RabbitMQ`](https://www.rabbitmq.com/platforms.html)
+>>>>>>> Update .gitignore for environmental variables, and add codumentation to README.md
 
 ### Installing Heroku CLI
 
 The [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install) is a local command line tool that helps us run and eventually deploy our application to Heroku. To install:
 
+<<<<<<< HEAD
 **macOS:**
+=======
+This is what members join and authorize. Some recommended settings:
+1. **Fill out the "Description of data you plan to upload".** This identifies
+  your project as a data source. If it's left blank, Open Humans assumes
+  your project doesn't plan to add data.
+2. **Set the enrollment URL to http://127.0.0.1:5000**
+  **The default development setup automatically sets the Redirect URL to http://127.0.0.1:5000/complete**
+
+---
+>>>>>>> Update .gitignore for environmental variables, and add codumentation to README.md
 
 if you have [Homebrew](https://brew.sh/) installed (recommended):
 
@@ -86,19 +137,53 @@ if you have [Homebrew](https://brew.sh/) installed (recommended):
 
 otherwise follow [these instructions](https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
 
+<<<<<<< HEAD
 **Linux:**
+=======
+### Initialize the database and static assets.
+>>>>>>> Update .gitignore for environmental variables, and add codumentation to README.md
 
 `$ wget -qO- https://cli-assets.heroku.com/install-ubuntu.sh | sh`
 
 **Windows:**
 
+<<<<<<< HEAD
 [Click the link](https://devcenter.heroku.com/articles/heroku-cli#download-and-install) and choose an installer to download
+=======
+In the project directory, run the `collectstatic` command with foreman:
+`foreman run python manage.py collectstatic`
+**You will receive a warning message similar to:**
+```
+You have requested to collect static files at the destination
+location as specified in your settings:
+
+    development:~/your_project/staticfiles
+
+This will overwrite existing files!
+Are you sure you want to do this?
+```
+
+This is normal! You **WILL** want to overwrite the files, theres is likely no folder even created yet, so nothing stored there currently in any case.
+
+---
+>>>>>>> Update .gitignore for environmental variables, and add codumentation to README.md
 
 ### Installing RabbitMQ
 
+<<<<<<< HEAD
 [RabbitMQ](http://www.rabbitmq.com) is an open source [message broker](https://en.wikipedia.org/wiki/Message_broker) used by this application.
 
 To install RabbitMQ you can follow [these instructions](https://www.rabbitmq.com/download.html), or to install and then set it running in the background:
+=======
+You can now start `foreman` in the foreground with: `foreman start`
+   Note you will receive the warning: `warnings.warn('Using settings.DEBUG leads to a memory leak, never '`. This is normal, and sadly part of the debugging process of Django.
+
+If you're curious as to the root cause of this [StackOverflow has a full writeup](http://stackoverflow.com/questions/4806314/disable-django-debugging-for-celery)
+
+Now point your browser to (http://127.0.0.1:5000/) you should be greated with a fairly generic openhumans page, with some of your `project` information that you added in the `foreman` .env file.
+
+---
+>>>>>>> Update .gitignore for environmental variables, and add codumentation to README.md
 
 `$ brew install rabbitmq`
 `$ brew services start rabbitmq`
