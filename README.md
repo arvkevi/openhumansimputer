@@ -4,6 +4,7 @@
 
 ## Table of Contents
 
+<<<<<<< HEAD
 - [Getting help](#getting-help)
 - [About this repo](#about-this-repo)
 - [Introduction](#introduction)
@@ -27,6 +28,31 @@
 - [Next steps](#next-steps)
     + [Under the hood](#under-the-hood)
     + [Editing the template](#editing-the-template)
+=======
+### What does it do?
+
+When fully set up (i.e. running and connected to Open Humans as a project),
+this app can be used to do the following:
+
+* An Open Humans member authorizes the app via OAuth2
+* The app uploads a "lorem ipsum" text file to the member's Open Humans account
+
+### Why is this helpful?
+
+If you're interested in adding your own data source, this app is a functioning
+set of code to start from that accomplishes common tasks you'll face,
+including:
+
+* OAuth2 connection to Open Humans
+* Using the APIs to upload data to Open Humans
+* Using celery to asynchronously perform tasks
+
+(This last item, asynchronous processing, is useful because many data sources
+will take time to complete, e.g. a data source that must query a third party
+API to retrieve and assemble a data set.)
+
+### Why Django instead of Flask?
+>>>>>>> Update README.md
 
 
 ## Getting help
@@ -58,10 +84,14 @@ This repository is a template for, and working example of an Open Humans data so
 This template is a [Django](https://www.djangoproject.com/)/[Celery](http://www.celeryproject.org/) app that enables the end user - an Open Humans member - to add dummy data to an Open Humans project. The user arrives on the app's landing page (`index.html`), and clicks a button which takes them to Open Humans where they can log in (and create an account if necessary). Once logged in to the Open Humans site, the user clicks another button to authorize this app to add data to their Open Humans account, they are then returned to this app (to `complete.html`) which notifies them that their data has been added and provides a link to the project summary page in Open Humans.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 So let's get that demo working on your machine, and you should be able to complete those steps as a user by running the app, before moving on to edit the code so it adds your custom data source instead of a dummy file.
 =======
 Django, and thus this project are built on top of `python2.7`, if you are using `python3` as your default system, you will most definitely need a `virtualenv` to work with this code.
 >>>>>>> Update .gitignore for environmental variables, and add codumentation to README.md
+=======
+This project was created to work with `python2.7`. In general we recommend using a `virtualenv`, and if you are using `python3` as your default system, you will definitely need a `virtualenv` to work with this code.
+>>>>>>> Update README.md
 
 #### This gif shows the completed app being used to add dummy data to an Open Humans project:
 
