@@ -18,6 +18,10 @@ from .models import OpenHumansMember
 # Set up logging.
 logger = logging.getLogger(__name__)
 
+<<<<<<< HEAD:datauploader/views.py
+=======
+APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://127.0.0.1:5000')
+>>>>>>> Update views.py:oh_data_source/views.py
 
 <<<<<<< HEAD:datauploader/views.py
 def index(request):
