@@ -1,9 +1,14 @@
+<<<<<<< HEAD
 # Template and working demo for adding data to an Open Humans project. Python 3; Django 2.
+=======
+# Open Humans Data Source template and working demo
+>>>>>>> Rewrite of readme after working through
 
 > Work through this guide to add a data source to Open Humans
 
 ## Table of Contents
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 - [Getting help](#getting-help)
 - [About this repo](#about-this-repo)
@@ -30,27 +35,44 @@
     + [Editing the template](#editing-the-template)
 =======
 ### What does it do?
+=======
+- [Getting help](#getting-help)
+- [About this repo](#about-this-repo)
+  - [Introduction](#introduction)
+  - [Workflow overview](#workflow-overview)
+  - [How does an Open Humans data source work?](#how-does-an-open-humans-data-source-work)
+- [Cloning this template](#cloning-this-template)
+- [Setting up local environment](#setting-up-local-environment)
+  - [Installing Foreman](#installing-foreman)
+  - [Installing RabbitMQ](#installing-rabbitmq)
+  - [Python](#python)
+  - [pip](#pip)
+  - [Virtual environments](#virtual-environments)
+  - [Installing dependancies](#installing-dependancies)
+- [Creating an Open Humans project](#creating-an-open-humans-project)
+- [Final steps of app setup](#final-steps-of-app-setup)
+- [Heroku deployment](#heroku-deployment)
+  - [Heroku setup](#heroku-setup)
+  - [Creating a Heroku application](#creating-a-heroku-application)
+  - [App configuration](#app-configuration)
+- [Adding dummy data](#adding-dummy-data)
+- [Next steps](#next-steps)
+  - [Under the hood](#under-the-hood)
+  - [Editing the template](#editing-the-template)
+>>>>>>> Rewrite of readme after working through
 
-When fully set up (i.e. running and connected to Open Humans as a project),
-this app can be used to do the following:
 
-* An Open Humans member authorizes the app via OAuth2
-* The app uploads a "lorem ipsum" text file to the member's Open Humans account
+## Getting help
 
-### Why is this helpful?
+If you have any questions or suggestions, or run into any issues with this demo/template, please let us know, either over in [Github issues](http://github.com/OpenHumans/oh-data-source-template/issues), or at our [Slack channel](http://openhumans.slack.com) where our growing community hangs out.
 
-If you're interested in adding your own data source, this app is a functioning
-set of code to start from that accomplishes common tasks you'll face,
-including:
+## About this repo
 
-* OAuth2 connection to Open Humans
-* Using the APIs to upload data to Open Humans
-* Using celery to asynchronously perform tasks
+### Introduction
 
-(This last item, asynchronous processing, is useful because many data sources
-will take time to complete, e.g. a data source that must query a third party
-API to retrieve and assemble a data set.)
+This repository is a template for, and working example of an Open Humans data source. If you want to add a data source to Open Humans, we strongly recommend following the steps in this document to work from this template repo.
 
+<<<<<<< HEAD
 ### Why Django instead of Flask?
 >>>>>>> Update README.md
 
@@ -105,23 +127,66 @@ In your terminal, navigate to the folder in which you want to store this repo, a
 =======
 **It is Strongly recommend you use [virtualenv](https://virtualenv.pypa.io/en/stable/).**
 **Be advised you need to use a name other than the default `.env` for the python environment; we suggest `.env_$YOURPROJECT`**
+=======
+### Workflow overview
 
-To create your 'virtualenv' run:
+- First get this demo project working. Detailed instructions can be found below, but this involves the following steps:
+  - clone this template repo to your own machine
+  - set up your local development environment
+  - create a project on OH
+  - finalise local app setup and remote Heroku deployment
+  - try out adding dummy data as a user
+- When you have successfully created an Open Humans project and added dummy data using this template, you can start to customise the code to to add your desired data source. This will vary depending on your project needs, but the following hints may help you to get started:
+  - the template text in `index.html` can be edited for your specific project, but mostly this file can remain as it is, to enable user authentication
+  - data should be added after the user is directed back from Open Humans to `complete.html`
+  - we recommend starting by looking at the function `add_data_to_open_humans` in the `tasks.py` file
 
-  `virtualenv -v --python=python2.7 .env_$YOURPROJECT`
 
-  The two flags we are using `-v` makes the setup verbose, allowing easier debugging.
+### How does an Open Humans data source work?
 
-  The second flag `--python=python2.7` guarantees that no matter how many versions of python you have on your system the 'virtualenv' will be built with the 'Django' standard `python2.7`.
+This template is a [Django](https://www.djangoproject.com/)/[Celery](http://www.celeryproject.org/) app that enables the end user - an Open Humans member - to add dummy data to an Open Humans project. The user arrives on the landing page (`index.html`), and clicks a button which takes them to Open Humans where they can log in (and create an account if necessary). Once logged in to the Open Humans site, the user clicks another button to authorize this app to add data to their Open Humans account, then they return to this app (to `complete.html`) which notifies them that their data has been added and provides a link to the project summary page in Open Humans.
 
-To activate your 'virtualenv' you need to run:
+So let's get that demo working on your machine, and you should be able to complete those steps as a user by running the app, before moving on to edit the code so it adds your custom data source instead of a dummy file.
 
-  `source .env_$YOURPROJECT/bin/activate`
+*** screenshots of steps
 
-Next install all of the required python dependancies with:
 
-  `pip install -r requirements.txt`
+## Cloning this template
 
+In your terminal, navigate to the folder in which you want to store this repo, and enter the command
+
+`git clone git@github.com:OpenHumans/oh-data-source-template.git`
+
+This should create a new folder named `oh-data-source-template` which contains all the code to create the working demo.
+
+## Setting up local environment
+
+### Installing foreman
+
+[Foreman](https://ddollar.github.io/foreman/) is a manager for running [procfile-based applications](https://devcenter.heroku.com/articles/procfile). It will no longer be required in future versions of this code since latest versions of Heroku now have a built-in manager.
+
+To install Foreman, you can use `gem install foreman`. If you have trouble with this or do not have a Ruby gem installer, you can follow the Foreman installation instructions [here](https://theforeman.org/manuals/1.16/index.html#3.InstallingForeman).
+
+### Installing RabbitMQ
+>>>>>>> Rewrite of readme after working through
+
+[RabbitMQ](http://www.rabbitmq.com) is an open source [message broker](https://en.wikipedia.org/wiki/Message_broker) used by this application.
+
+To install RabbitMQ you can follow [https://www.rabbitmq.com/download.html](these instructions), or if you are using a Mac and have [Homebrew](https://brew.sh/) installed, you can simply type `brew install rabbitmq`, followed by `brew services start rabbitmq`, to set it running in the background. To set it running on very popular Ubuntu and other Debian based systems, it will likely be started for you after you install the package, but can also start it manually with: `sudo rabbitmq-server start`.
+
+### Python
+
+For the current version of this template, you will need [Python 2](https://www.python.org/downloads/). We are working on an updated version to run on Python 3.
+
+Please note that if you are working on a Mac, it is strongly advised that you install a fresh version of Python. The version that ships with OSX is not suitable for development and use with third party packages. Instructions for setting up your Python environment properly in OSX can be found [here](http://docs.python-guide.org/en/latest/starting/install/osx/).
+
+You will need to ensure that the `python` alias points to a good Python 2 interpreter, and not Python 3 or the default OSX Python 2. First check that Python 2 opens when you type the command `python`. You can change the alias, if necessary, by adding this line `alias python=python2` to your, `.profile`, `.bash_profile`, or `.bashrc` file.
+
+### pip
+
+[pip](https://pypi.python.org/pypi/pip) is a package management system used to install and manage software packages written in Python. It is available [here](https://pip.pypa.io/en/stable/installing/). If you are working on a Mac and have followed the above instructions for installing a fresh `Python2`, make sure to use the command `pip2`.
+
+<<<<<<< HEAD
 ---
 >>>>>>> Update .gitignore for environmental variables, and add codumentation to README.md
 
@@ -136,13 +201,24 @@ This file contains secrets and other configurations for running the app.
 When you use foreman to run this app, it will load `.env` to be environment
 variables.
 **Keep your version SECRET! Never commit it to git.**
+=======
+### Virtual environments
 
-### Install `RabbitMQ` for your system
+Virtual environments are useful when developing apps with lots of dependancies since they enable us to install software locally for a specific project, without it being present globally. Using a virtual environment allows us to use specific versions of each program and/or package for this project only, without affecting the versions that are used elsewhere on your machine.
 
-Documentation for supported systems includes [Linux (apt&rpm), OS X/macOS, and Other Unixes (including BSDs), as well as Windows](https://www.rabbitmq.com/platforms.html)
+We will set up the virtual environment here, and then work from within it for the remainder of this guide.
 
-### Make sure that `RabbitMQ` is started
+1. install the Python package  [virtualenv](https://virtualenv.pypa.io/en/stable/), using pip: `pip install virtualenv` or `pip2 install virtualenv`
+2. navigate to your project folder for this template repo, and enter the command `virtualenv -v --python=python2.7 .env_oh_project`
+>>>>>>> Rewrite of readme after working through
 
+This creates a folder named `.env_oh_project` in the project directory which will contain the Python executable files and a copy of the pip library.
+
+*Make sure to add this folder to the `.gitignore` so it does not get uploaded when you push your changes*.
+
+This virtual environment will be used for the remainder of this tutorial. To use it, we first need to activate, by entering the command `source oh_project/bin/activate`.
+
+<<<<<<< HEAD
 This is distribution dependent, both in syntax and name.
 - With the very popular Ubuntu and other Debian based systems, it will likely be started for you after you install the package, but can also start it manually with: `sudo rabbitmq-server start`
 - With Homebrew on OS X/macOS run `brew services rabbitmq start`
@@ -187,20 +263,61 @@ otherwise follow [these instructions](https://devcenter.heroku.com/articles/hero
 [Click the link](https://devcenter.heroku.com/articles/heroku-cli#download-and-install) and choose an installer to download
 =======
 In the project directory, run the `collectstatic` command with foreman:
+=======
+***Note that whenever you open a new terminal tab or window, you will need to activate the virtual environment again. If you are unsure whether you are working within the virtual environment, you can check by entering the command `echo $VIRTUAL_ENV`, this should return the name of the virtual environment that you are working in, or a blank line if you are not in a virtual environment.***
+
+Virtual environments can be deactivated by simply entering the command `deactivate`. To learn more about virtual environments and tools for managing them, check out [the Python docs](http://docs.python-guide.org/en/latest/dev/virtualenvs/#virtualenvironments-ref).
+
+### Installing dependancies
+
+First make sure that you are inside your virtual environment for this project (try `echo $VIRTUAL_ENV`), and that you have navigated to the project folder. Next you can install all dependancies with:
+
+`pip install -r requirements.txt`
+
+*Note: open the `requirements.txt` file, and check the list of dependancies against the output in the terminal window. If you get any errors in the terminal and/or the process does not complete installation of the full list of dependancies, you can delete the one(s) which are throwing errors, and re-run the command `pip install -r requirements.txt`. Finally make sure to manually add the package(s) that was/were throwing an error - in this case you may need to specify a different version, and please do let us know by [raising an issue on Github](http://github.com/OpenHumans/oh-data-source-template/issues)*.
+
+### Foreman environment
+
+The Foreman environment contains configurations for running the application. It **should never be committed to git** and should be kept private as it contains secrets.  First copy the contents of the template environment file, `env.example`, paste into a new file, and save with the filename `.env` we will go back and alter the contents after creating a project on the Open Humans site. The `.env` filename should already be in your `.gigignore`, but it is worth double-checking to make sure.
+
+## Creating an Open Humans project
+
+Head to http://openhumans.org/direct-sharing/projects/manage to create an OAuth2 project in Open Humans. If you do not yet have an Open Humans account, you will need to create one first.
+
+1. Click the button to `Create a new OAuth2 data request project`
+  *** add screenshot 0-oh-screen-createproject
+2. Fill out the form for your project description. All of this information can be edited later, so don't worry if you aren't sure about it all just yet. However do make sure you fill out the following fields:
+  **Description of data you plan to upload to member accounts** - if you leave this field blank, Open Humans will assume that your project doesn't plan to add data
+  **Enrollment URL** - set this to `http://127.0.0.1:5000`, this should then automatically set the redirect URL to `http://127.0.0.1:5000/complete`
+
+When you have created the project, you'll be able to click on its name in the `project management page` to show its information. From here, get the `activity page`, `client ID`, and `client secret` and set them in your `.env` file. The ID and secret identify and authorize your app. They are used for user authorization and data management.
+
+*Keep your client secret private*, it should not be committed to a repository. In Heroku it will be kept private as an environment variable, and locally it will be available from the `.env` file which should not be committed to git.
+
+## Final steps of app setup
+
+Finally we need to initialize the database and static assets to be able to get the app running. Django will use [SQLite3](http://www.sqlite.org) by default if you do not specify a `DATABASE_URL` in `.env`. For more information on databases you can check out the [Django docs](http://docs.djangoproject.com/en/2.0/ref/databases).
+
+In the main project directory, run the `migrate` command followed by `collectstatic` as follows:
+
+`foreman run python manage.py migrate`
+
+>>>>>>> Rewrite of readme after working through
 `foreman run python manage.py collectstatic`
-**You will receive a warning message similar to:**
-```
-You have requested to collect static files at the destination
-location as specified in your settings:
 
-    development:~/your_project/staticfiles
+*Please note you can ignore the following warning message:*
+ > You have requested to collect static files at the destination location as specified in your settings:
 
-This will overwrite existing files!
-Are you sure you want to do this?
-```
+ > > development:~/your_project/staticfiles
 
-This is normal! You **WILL** want to overwrite the files, theres is likely no folder even created yet, so nothing stored there currently in any case.
+ > This will overwrite existing files!
+   
+ > Are you sure you want to do this?
 
+
+Now we are ready to run the app locally. Enter the command `foreman start`, and don't worry if you see the following warning:
+
+<<<<<<< HEAD
 ---
 >>>>>>> Update .gitignore for environmental variables, and add codumentation to README.md
 
@@ -213,11 +330,19 @@ To install RabbitMQ you can follow [these instructions](https://www.rabbitmq.com
 =======
 You can now start `foreman` in the foreground with: `foreman start`
    Note you will receive the warning: `warnings.warn('Using settings.DEBUG leads to a memory leak, never '`. This is normal, and sadly part of the debugging process of Django.
+=======
+ > warnings.warn('Using settings.DEBUG leads to a memory leak, never')
 
-If you're curious as to the root cause of this [StackOverflow has a full writeup](http://stackoverflow.com/questions/4806314/disable-django-debugging-for-celery)
+If you are curious, the cause of this warning is outlined [here](http://stackoverflow.com/questions/4806314/disable-django-debugging-for-celery).
 
-Now point your browser to (http://127.0.0.1:5000/) you should be greated with a fairly generic openhumans page, with some of your `project` information that you added in the `foreman` .env file.
+Now head over to http://127.0.0.1:5000 in your browser to see your app running. It should look like this:
+>>>>>>> Rewrite of readme after working through
 
+** add screenshot
+
+Now you have your application built and running locally, we'll head over to Heroku where the app will be deployed remotely.
+
+<<<<<<< HEAD
 ---
 >>>>>>> Update .gitignore for environmental variables, and add codumentation to README.md
 
@@ -411,3 +536,102 @@ Now you have worked through to create a working demo, and should understand roug
 You are likely to want to start making changes in the `tasks.py` file, which is where much of the logic is stored. Instead of generating a dummy data file you will want to think about how to get your own data into the app, whether it is a previously downloaded file, which needs to be processed and/or vetted by the app, or you are working from an external API.
 
 Good luck, and please do [get in touch]((http://github.com/OpenHumans/oh-data-source-template/issues)) to ask questions, give suggestions, or join in with our [community chat](http://slackin.openhumans.org)!
+=======
+If you have hit any problems so far, please do let us know in [Github issues](http://github.com/OpenHumans/oh-data-source-template/issues) or come and chat with us over at our [Slack channel](http://openhumans.slack.com).
+
+## Heroku deployment
+
+### Heroku setup
+
+If you don't already have a Heroku account, head to http://www.heroku.com/ to create a free account now. If you are new to app development, you may also want to go through their [getting started with Heroku/Python guide](https://devcenter.heroku.com/articles/getting-started-with-python#introduction) before continuing with your Open Humans app.
+
+### Creating a Heroku application
+
+Make sure you have installed the [Heroku command line interface](https://devcenter.heroku.com/articles/heroku-cli), then, from your terminal, you can log in and create your app with the following commands:
+
+`heroku login`
+
+> *you will be asked for your Heroku credentials*
+
+`heroku apps:create your-app-name`
+
+If you use Heroku's free default domain, this will be set by the name you choose here, i.e. you will have
+
+`https://your-app-name.herokuapp.com`
+
+### App configuration
+
+In your browser, head over to http://.dashboard.heroku.com/apps and log in to see the app your just created.
+
+Go to the `resources` tab, and add:
+
+1. `CloudAMQP` - a message queuing service
+2. `Heroku Postgres`
+
+Next go to the `settings` tab and add the environment variables as in the `.env` file.
+
+1. `OH_CLIENT_ID`
+2. `OH_CLIENT_SECRET`
+3. `OH_ACTIVITY_PAGE`
+4. `APP_BASE_URL` (e.g. https://your-app-name.herokuapp.com - no trailing dash!)
+5. `SECRET_KEY`
+6. `DEBUG` = true when needed
+
+Head back over to your terminal and run the following command to initialize and update your code remotely in Heroku:
+
+`git push heroku master`
+
+You can watch logs with the command `heroku logs -t`.
+
+## Adding dummy data
+
+To test out the app as a user, you can add dummy data to your project. First go to the url for your app (https://your-app-name.herokuapp.com), you should see the following page:
+
+*** screenshot of app
+
+Click the button which will take you to Open Humans where you may have to log in. You should reach a page like this:
+
+** screenshot of open humans auth
+
+Click the button to authorize the demo app to add data to your Open Humans account. You will be directed back to your app which will complete the data transfer, this should look like this:
+
+** screenshot of complete page
+
+You can then click to return to Open Humans to check that the demo data has been successfully added.
+
+## Next steps
+
+### Under the hood
+
+Before starting to edit the code in this demo to create your own project, it may be useful to understand what the existing code is doing.
+
+- Upon arrival at the app, the user sees the homepage (the `index.html` file), on this page is a button which transfers the user to Open Humans for authorization
+- The user logs in to their Open Humans account, and clicks to authorize the app to add data, this directs them back to the `complete.html` file
+- The `complete` function in the file `views.py` receives a code from Open Humans, exchanges it for a token, and uses this token to retrieve the project member ID which is stored in the `OpenHumansMember` model
+- As this page is loaded, an automatic, asynchronous data upload to Open Humans is triggered via the method `xfer_to_open_humans`
+  - `xfer_to_open_humans` takes the member ID (which was retrieved during authentication over at the Open Humans site), and runs the method `add_data_to_open_humans`
+  - `add_data_to_open_humans` runs with three steps:
+    - creates a dummy data file, for demo purposes only (using `make_example_datafile` method)
+    - deletes any previous files uploaded with this name (using `delete_oh_file_by_name` method)
+    - takes the file path, metadata, and user ID, and uploads to Open Humans (using `upload_file_to_oh` method)
+  - `upload_file_to_oh` performs the following steps:
+    - gets S3 target for storage
+    - performs data upload to this target
+    - notifies when the upload is complete
+    
+***A note on asynchronosity***:
+
+*The `celery.py` file sets up asynchronous tasks for the app. The function `xfer_to_open_humans` in `tasks.py` is called (from `complete` function in `views.py`) asynchronously, by the presence of `.delay` in the function call:*
+
+>         xfer_to_open_humans.delay(oh_id=oh_member.oh_id)
+
+*Sometimes uploads can take a long time so we advise using the delay so that this does not prevent the app from processing other events. However if you wish to run your app without asynchronosity, you can simply remove the `.delay` component from this function call.*
+
+## Editing the template
+
+Now you have worked through to create a working demo, and should understand roughly how the demo works, you are ready to customise the code to create your own Open Humans data source. Use the code you have in this repository as a template for your app.
+
+You are likely to want to start making changes in the `tasks.py` file, which is where much of the logic is stored. Intead of generating a dummy data file you will want to think about how to get your own data into the app, whether it is a previously downloaded file, which needs to be processed and/or vetted by the app, or you are working from an external api.
+
+Good luck, and please do [get in touch]((http://github.com/OpenHumans/oh-data-source-template/issues)) to ask questions, give suggestions, or join in with our [community chat](http://openhumans.slack.com!
+>>>>>>> Rewrite of readme after working through
