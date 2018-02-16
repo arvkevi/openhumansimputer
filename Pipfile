@@ -8,6 +8,8 @@ name = "pypi"
 [packages]
 
 django = "*"
+dj-database-url = "*"
+celery = "*"
 
 
 [dev-packages]
