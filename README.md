@@ -148,7 +148,7 @@ This template is a [Django](https://www.djangoproject.com/)/[Celery](http://www.
 
 So let's get that demo working on your machine, and you should be able to complete those steps as a user by running the app, before moving on to edit the code so it adds your custom data source instead of a dummy file.
 
-*** screenshots of steps
+![](https://cl.ly/1d3z110I0K0k/Screen%20Recording%202018-02-16%20at%2002.43%20AM.gif)
 
 
 ## Cloning this template
@@ -285,10 +285,10 @@ The Foreman environment contains configurations for running the application. It 
 Head to http://openhumans.org/direct-sharing/projects/manage to create an OAuth2 project in Open Humans. If you do not yet have an Open Humans account, you will need to create one first.
 
 1. Click the button to `Create a new OAuth2 data request project`
-  *** add screenshot 0-oh-screen-createproject
+  ![](https://cl.ly/0J0s3w1y3R2b/Image%202018-02-15%20at%204.53.51%20PM.png) 
 2. Fill out the form for your project description. All of this information can be edited later, so don't worry if you aren't sure about it all just yet. However do make sure you fill out the following fields:
-  **Description of data you plan to upload to member accounts** - if you leave this field blank, Open Humans will assume that your project doesn't plan to add data
-  **Enrollment URL** - set this to `http://127.0.0.1:5000`, this should then automatically set the redirect URL to `http://127.0.0.1:5000/complete`
+    - **Description of data you plan to upload to member accounts** - if you leave this field blank, Open Humans will assume that your project doesn't plan to add data
+    - **Enrollment URL** - set this to `http://127.0.0.1:5000`, this should then automatically set the redirect URL to `http://127.0.0.1:5000/complete`
 
 When you have created the project, you'll be able to click on its name in the `project management page` to show its information. From here, get the `activity page`, `client ID`, and `client secret` and set them in your `.env` file. The ID and secret identify and authorize your app. They are used for user authorization and data management.
 
@@ -338,7 +338,7 @@ If you are curious, the cause of this warning is outlined [here](http://stackove
 Now head over to http://127.0.0.1:5000 in your browser to see your app running. It should look like this:
 >>>>>>> Rewrite of readme after working through
 
-** add screenshot
+![](https://cl.ly/1J3X35170e0s/Image%202018-02-16%20at%202.35.57%20AM.png)
 
 Now you have your application built and running locally, we'll head over to Heroku where the app will be deployed remotely.
 
@@ -587,17 +587,19 @@ You can watch logs with the command `heroku logs -t`.
 
 To test out the app as a user, you can add dummy data to your project. First go to the url for your app (https://your-app-name.herokuapp.com), you should see the following page:
 
-*** screenshot of app
+![](https://cl.ly/1J3X35170e0s/Image%202018-02-16%20at%202.35.57%20AM.png)
 
 Click the button which will take you to Open Humans where you may have to log in. You should reach a page like this:
 
-** screenshot of open humans auth
+![](https://cl.ly/1T2l1w2t2y0t/Image%202018-02-16%20at%202.37.17%20AM.png)
 
 Click the button to authorize the demo app to add data to your Open Humans account. You will be directed back to your app which will complete the data transfer, this should look like this:
 
-** screenshot of complete page
+![](https://cl.ly/04040F1g2k1X/Image%202018-02-16%20at%202.38.37%20AM.png)
 
-You can then click to return to Open Humans to check that the demo data has been successfully added.
+You can then click to return to Open Humans to check that the demo data has been successfully added:
+
+![](https://cl.ly/1r0M1U2d2B1s/Image%202018-02-16%20at%202.40.26%20AM.png)
 
 ## Next steps
 
