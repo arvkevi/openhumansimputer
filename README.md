@@ -55,7 +55,7 @@
     + [Heroku setup](#heroku-setup)
     + [Creating a Heroku application](#creating-a-heroku-application)
     + [App configuration](#app-configuration)
-- [Adding dummy data](#addinƒg-dummy-data)
+- [Adding dummy data](#adding-dummy-data)
 - [Next steps](#next-steps)
 <<<<<<< HEAD
   - [Under the hood](#under-the-hood)
