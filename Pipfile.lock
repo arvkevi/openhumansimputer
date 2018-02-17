@@ -1,6 +1,7 @@
 {
     "_meta": {
         "hash": {
+<<<<<<< HEAD
             "sha256": "58528d2bbf7fc9dfbd49c80a657a7aeef55201f11661d8c76787bd5fe369ef5e"
         },
         "host-environment-markers": {
@@ -14,11 +15,30 @@
             "platform_version": "Darwin Kernel Version 17.4.0: Sun Dec 17 09:19:54 PST 2017; root:xnu-4570.41.2~1/RELEASE_X86_64",
             "python_full_version": "3.6.3",
             "python_version": "3.6",
+=======
+            "sha256": "ec6f9d42313a18349685f9ecc7ebd244dc553f15260c74b8adf289cee8388f00"
+        },
+        "host-environment-markers": {
+            "implementation_name": "cpython",
+            "implementation_version": "0",
+            "os_name": "posix",
+            "platform_machine": "x86_64",
+            "platform_python_implementation": "CPython",
+            "platform_release": "16.7.0",
+            "platform_system": "Darwin",
+            "platform_version": "Darwin Kernel Version 16.7.0: Thu Jun 15 17:36:27 PDT 2017; root:xnu-3789.70.16~2/RELEASE_X86_64",
+            "python_full_version": "2.7.14",
+            "python_version": "2.7",
+>>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits
             "sys_platform": "darwin"
         },
         "pipfile-spec": 6,
         "requires": {
+<<<<<<< HEAD
             "python_version": "3.6"
+=======
+            "python_version": "2.7"
+>>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits
         },
         "sources": [
             {
@@ -31,6 +51,7 @@
     "default": {
         "amqp": {
             "hashes": [
+<<<<<<< HEAD
                 "sha256:4e28d3ea61a64ae61830000c909662cb053642efddbe96503db0e7783a6ee85b",
                 "sha256:cba1ace9d4ff6049b190d8b7991f9c1006b443a5238021aca96dd6ad2ac9da22"
             ],
@@ -117,6 +138,77 @@
                 "sha256:4249d9dd9dbf1fcec471d1c2def20653c9310dd1a217272d77e4844f9d5273cb"
             ],
             "version": "==4.1.0"
+=======
+                "sha256:5e0871a93433f941e444c2b859da095f05034d2ac1b7c084529cfd0b6f8eef18",
+                "sha256:1378cc14afeb6c2850404f322d03dec0082d11d04bdcb0360e1b10d4e6e77ef9"
+            ],
+            "version": "==2.1.4"
+        },
+        "argparse": {
+            "hashes": [
+                "sha256:ddaf4b0a618335a32b6664d4ae038a1de8fbada3b25033f9021510ed2b3941a4"
+            ],
+            "version": "==1.2.1"
+        },
+        "arrow": {
+            "hashes": [
+                "sha256:805906f09445afc1f0fc80187db8fe07670e3b25cdafa09b8d8ac264a8c0c722"
+            ],
+            "version": "==0.10.0"
+        },
+        "billiard": {
+            "hashes": [
+                "sha256:82478ebdd3cd4d357613cb4735eb828014364c5e02d3bba96ea6c1565a2c0172",
+                "sha256:a93c90d59fca62ad63f92b3d2bf1d752c154dde90a3100dba4c8e439386e534c",
+                "sha256:d8df4b276b11b3e2fe25652e411487bda6e5bac4f8fd236a278a2bfe300f7c43",
+                "sha256:e740e352bbf7b6c8cc92a2596cc2da2bfb4ab1009aeb68bf844456af4e924278",
+                "sha256:52c2e01c95c6edae9ca1f48d83503e6ceeafbf28c19929a1e917fe951a83adb1",
+                "sha256:03f669755f1d6b7dbe528fe615a3164b0d8efca095382c514dd7026dfb79a9c6",
+                "sha256:3eb01a8fe44116aa6d63d2010515ef1526e40caee5f766f75b2d28393332dcaa"
+            ],
+            "version": "==3.5.0.2"
+        },
+        "celery": {
+            "hashes": [
+                "sha256:0e5b7e0d7f03aa02061abfd27aa9da05b6740281ca1f5228a54fbf7fe74d8afa",
+                "sha256:e3d5a6c56a73ff8f2ddd4d06dc37f4c2afe4bb4da7928b884d0725ea865ef54d"
+            ],
+            "version": "==4.0.2"
+        },
+        "dj-database-url": {
+            "hashes": [
+                "sha256:e16d94c382ea0564c48038fa7fe8d9c890ef1ab1a8ec4cb48e732c124b9482fd",
+                "sha256:a6832d8445ee9d788c5baa48aef8130bf61fdc442f7d9a548424d25cd85c9f08"
+            ],
+            "version": "==0.4.2"
+        },
+        "django": {
+            "hashes": [
+                "sha256:4541a60834f28f308ee7b6e96400feca905fb0de473eb9dad6847e98a36d86d4",
+                "sha256:0db89374b691b9c8b057632a6cd64b18d08db2f4d63b4d4af6024267ab965f8b"
+            ],
+            "version": "==1.10.5"
+        },
+        "gunicorn": {
+            "hashes": [
+                "sha256:723234ea1fa8dff370ab69830ba8bc37469a7cba13fd66055faeef24085e6530",
+                "sha256:813f6916d18a4c8e90efde72f419308b357692f81333cb1125f80013d22fb618"
+            ],
+            "version": "==19.6.0"
+        },
+        "kombu": {
+            "hashes": [
+                "sha256:385bf38e6de7f3851f674671dbfe24572ce999608d293a85fb8a630654d8bd9c",
+                "sha256:d0fc6f2a36610a308f838db4b832dad79a681b516ac1d1a1f9d42edb58cc11a2"
+            ],
+            "version": "==4.0.2"
+        },
+        "postgres": {
+            "hashes": [
+                "sha256:202e3004dd9993549f7a7cf35f5e137a9b0acf0488bcaa892f8b02ceb1140ff1"
+            ],
+            "version": "==2.2.1"
+>>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits
         },
         "psycopg2": {
             "hashes": [
@@ -152,6 +244,7 @@
         },
         "python-dateutil": {
             "hashes": [
+<<<<<<< HEAD
                 "sha256:6c0e72580272b561d8594362ab0e6b5b2191c703982150fc06ed45f7fae725be",
                 "sha256:14eb44faa298942c6385636bfd76bd5c21361632cf8ebc9c20d63fd00f6a069f"
             ],
@@ -177,6 +270,38 @@
                 "sha256:9c443e7324ba5b85070c4a818ade28bfabedf16ea10206da1132edaa6dda237e"
             ],
             "version": "==2.18.4"
+=======
+                "sha256:537bf2a8f8ce6f6862ad705cd68f9e405c0b5db014aa40fa29eab4335d4b1716",
+                "sha256:62a2f8df3d66f878373fd0072eacf4ee52194ba302e00082828e0d263b0418d2",
+                "sha256:3acbef017340600e9ff8f2994d8f7afd6eacb295383f286466a6df3961e486f0"
+            ],
+            "version": "==2.6.0"
+        },
+        "pytz": {
+            "hashes": [
+                "sha256:c9bd582ebc202972182dc254541c7bd29195648d798feaffb0480fb679c347ec",
+                "sha256:a707e2a9c825aa5b4798f2368dc65a85966ccd6a2a42e14fc93364c614bc0e77",
+                "sha256:25a1432f18051c5f8b00419795bbd824ad2c02a948c48adf785b0bb8e74fbbb4",
+                "sha256:7d94af5a3ee62616da36f4a5d0138bbfb1cd52d987a8274c45e0c78167837e17",
+                "sha256:a1ea35e87a63c7825846d5b5c81d23d668e8a102d3b1b465ce95afe1b3a2e065",
+                "sha256:dc221460e0264cb274fbb328936f509ba53d912669cb9ef6244e434c910be138",
+                "sha256:4c6f3e3f2e8bcd49bbb0f6031f77c3a99a54733ad330cb022d64cf406cf1bcb2",
+                "sha256:44daacdf5bb50c1fa3bc2b6c4c1f5afd78217e1478fe10585fc7ce5e383b6669",
+                "sha256:40c443019f389a93055d2c43a6a425aa10fd0047506e95747197a5a0423e58f8",
+                "sha256:c6fc91277aafa1031f9acddb701298549b96fa5ccc621f61425ca98d15f5935c",
+                "sha256:7016b2c4fa075c564b81c37a252a5fccf60d8964aa31b7f5eae59aeb594ae02b",
+                "sha256:9a43e20aa537cfad8fe7a1715165c91cb4a6935d40947f2d070e4c80f2dcd22b",
+                "sha256:aafbf066975fe217ed49d7d197b26903d3b43e9ca2aa6ba0a211081f13c41917"
+            ],
+            "version": "==2016.10"
+        },
+        "requests": {
+            "hashes": [
+                "sha256:000748df49e087784441b2621c50fb81046c5c8e80e0d91674ffad65b9e13844",
+                "sha256:ed98431a0631e309bb4b63c81d561c1654822cb103de1ac7b47e45c26be7ae34"
+            ],
+            "version": "==2.12.4"
+>>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits
         },
         "six": {
             "hashes": [
@@ -185,6 +310,7 @@
             ],
             "version": "==1.11.0"
         },
+<<<<<<< HEAD
         "tini": {
             "hashes": [
                 "sha256:8062be51e6766c15ec402579fff422d8c2fb46bdb3f0b22bd009f32d8dd79c81",
@@ -212,6 +338,29 @@
                 "sha256:9d81515f2b5b27051910996e1e860b1332e354d9e7bcf30c98f21dcb6713e0dd"
             ],
             "version": "==3.3.1"
+=======
+        "vine": {
+            "hashes": [
+                "sha256:739b19304065de99bd1f4665abe461b449b1022c1e4f89a7925db9d50e9741ea",
+                "sha256:87b95da19249373430a8fafca36f1aecb7aa0f1cc78545877857afc46aea2441"
+            ],
+            "version": "==1.1.3"
+        },
+        "whitenoise": {
+            "hashes": [
+                "sha256:e76bf2d44158ed2e85c512cec1595b34680ea76337f77ea635da3668b852d7fd",
+                "sha256:4d98104c5704a88fdeb7c06ef6bba515a79ded41cd2b3967e20591b4fdbd2908"
+            ],
+            "version": "==3.2.3"
+        },
+        "wsgiref": {
+            "hashes": [
+                "sha256:5e41d89a25465ec65f0f8caf09a2225cf71cfa78b208418177fc2a9420eb51f2",
+                "sha256:a8fb9fc452e52b175bb2e0f03f6a640d5efbec2ee23d23464590b1b86d324d4b",
+                "sha256:c7e610c800957046c04c8014aab8cce8f0b9f0495c8cd349e57c1f7cabf40e79"
+            ],
+            "version": "==0.1.2"
+>>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits
         }
     },
     "develop": {}

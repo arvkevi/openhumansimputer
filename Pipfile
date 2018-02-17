@@ -5,6 +5,7 @@ verify_ssl = true
 name = "pypi"
 
 
+<<<<<<< HEAD
 [packages]
 
 django = "*"
@@ -21,8 +22,37 @@ env_tools="*"
 
 [dev-packages]
 
+=======
+[dev-packages]
+
+
+
+[packages]
+
+django = "*"
+amqp = "*"
+argparse = "*"
+arrow = "*"
+billiard = "*"
+celery = "*"
+dj-database-url = "*"
+gunicorn = "*"
+kombu = "*"
+postgres = "*"
+"psycopg2" = "*"
+python-dateutil = "*"
+pytz = "*"
+requests = "*"
+vine = "*"
+whitenoise = "*"
+wsgiref = "*"
+>>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits
 
 
 [requires]
 
+<<<<<<< HEAD
 python_version = "3.6"
+=======
+python_version = "2.7"
+>>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits

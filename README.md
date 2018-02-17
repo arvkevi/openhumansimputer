@@ -38,28 +38,33 @@
 =======
 - [Getting help](#getting-help)
 - [About this repo](#about-this-repo)
-  - [Introduction](#introduction)
-  - [Workflow overview](#workflow-overview)
-  - [How does an Open Humans data source work?](#how-does-an-open-humans-data-source-work)
+- [Introduction](#introduction)
+    + [Workflow overview](#workflow-overview)
+    + [How does an Open Humans data source work?](#how-does-an-open-humans-data-source-work)
 - [Cloning this template](#cloning-this-template)
 - [Setting up local environment](#setting-up-local-environment)
-  - [Installing Foreman](#installing-foreman)
-  - [Installing RabbitMQ](#installing-rabbitmq)
-  - [Python](#python)
-  - [pip](#pip)
-  - [Virtual environments](#virtual-environments)
-  - [Installing dependancies](#installing-dependancies)
+    + [Installing Heroku CLI](#installing-heroku-cli)
+    + [Installing RabbitMQ](#installing-rabbitmq)
+    + [Python](#python)
+    + [pip](#pip)
+    + [Virtual environments](#virtual-environments)
+    + [Installing dependencies](#installing-dependencies)
 - [Creating an Open Humans project](#creating-an-open-humans-project)
 - [Final steps of app setup](#final-steps-of-app-setup)
 - [Heroku deployment](#heroku-deployment)
-  - [Heroku setup](#heroku-setup)
-  - [Creating a Heroku application](#creating-a-heroku-application)
-  - [App configuration](#app-configuration)
-- [Adding dummy data](#adding-dummy-data)
+    + [Heroku setup](#heroku-setup)
+    + [Creating a Heroku application](#creating-a-heroku-application)
+    + [App configuration](#app-configuration)
+- [Adding dummy data](#addinƒg-dummy-data)
 - [Next steps](#next-steps)
+<<<<<<< HEAD
   - [Under the hood](#under-the-hood)
   - [Editing the template](#editing-the-template)
 >>>>>>> Rewrite of readme after working through
+=======
+    + [Under the hood](#under-the-hood)
+    + [Editing the template](#editing-the-template)
+>>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits
 
 
 ## Getting help
@@ -161,11 +166,21 @@ This should create a new folder named `oh-data-source-template` which contains a
 
 ## Setting up local environment
 
-### Installing foreman
+### Installing Heroku CLI
 
-[Foreman](https://ddollar.github.io/foreman/) is a manager for running [procfile-based applications](https://devcenter.heroku.com/articles/procfile). It will no longer be required in future versions of this code since latest versions of Heroku now have a built-in manager.
+The [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install) is a local command line tool that helps us run and eventually deploy our application to Heroku. To install:
 
-To install Foreman, you can use `gem install foreman`. If you have trouble with this or do not have a Ruby gem installer, you can follow the Foreman installation instructions [here](https://theforeman.org/manuals/1.16/index.html#3.InstallingForeman).
+**macOS:**
+
+`brew install heroku/brew/heroku`
+
+**Linux:**
+
+`wget -qO- https://cli-assets.heroku.com/install-ubuntu.sh | sh`
+
+**Windows:**
+
+[Click the link](https://devcenter.heroku.com/articles/heroku-cli#download-and-install) and choose an installer to download
 
 ### Installing RabbitMQ
 >>>>>>> Rewrite of readme after working through
@@ -208,6 +223,7 @@ Virtual environments are useful when developing apps with lots of dependancies s
 
 We will set up the virtual environment here, and then work from within it for the remainder of this guide.
 
+<<<<<<< HEAD
 1. install the Python package  [virtualenv](https://virtualenv.pypa.io/en/stable/), using pip: `pip install virtualenv` or `pip2 install virtualenv`
 2. navigate to your project folder for this template repo, and enter the command `virtualenv -v --python=python2.7 .env_oh_project`
 >>>>>>> Rewrite of readme after working through
@@ -265,20 +281,26 @@ otherwise follow [these instructions](https://devcenter.heroku.com/articles/hero
 In the project directory, run the `collectstatic` command with foreman:
 =======
 ***Note that whenever you open a new terminal tab or window, you will need to activate the virtual environment again. If you are unsure whether you are working within the virtual environment, you can check by entering the command `echo $VIRTUAL_ENV`, this should return the name of the virtual environment that you are working in, or a blank line if you are not in a virtual environment.***
+=======
+1. install the Python package  [pipenv](http://pipenv.readthedocs.io/en/latest/), using pip: `pip install pipenv` or `pip2 install pipenv`
+2. navigate to your project folder for this template repo, and enter the command `pipenv --python 2.7.14`
 
-Virtual environments can be deactivated by simply entering the command `deactivate`. To learn more about virtual environments and tools for managing them, check out [the Python docs](http://docs.python-guide.org/en/latest/dev/virtualenvs/#virtualenvironments-ref).
+This command should output some information about how it's creating a virtual environment for us with some path information about it.
+>>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits
 
-### Installing dependancies
+Whenever we use pip or python commands, this virtual environment will be used for the remainder of this tutorial.
 
-First make sure that you are inside your virtual environment for this project (try `echo $VIRTUAL_ENV`), and that you have navigated to the project folder. Next you can install all dependancies with:
+### Installing dependencies
 
-`pip install -r requirements.txt`
+You can install all dependancies with:
 
-*Note: open the `requirements.txt` file, and check the list of dependancies against the output in the terminal window. If you get any errors in the terminal and/or the process does not complete installation of the full list of dependancies, you can delete the one(s) which are throwing errors, and re-run the command `pip install -r requirements.txt`. Finally make sure to manually add the package(s) that was/were throwing an error - in this case you may need to specify a different version, and please do let us know by [raising an issue on Github](http://github.com/OpenHumans/oh-data-source-template/issues)*.
+`pipenv install`
 
-### Foreman environment
+*Note: This will install the dependencies for this project from the Pipfile and Pipfile.lock. If you have issues with installing all of the requirements at once, read the error(s) as there may be some other requirement missing locally (such as Postgres). If you still have problems, [raise an issue on Github](http://github.com/OpenHumans/oh-data-source-template/issues)*.
 
-The Foreman environment contains configurations for running the application. It **should never be committed to git** and should be kept private as it contains secrets.  First copy the contents of the template environment file, `env.example`, paste into a new file, and save with the filename `.env` we will go back and alter the contents after creating a project on the Open Humans site. The `.env` filename should already be in your `.gigignore`, but it is worth double-checking to make sure.
+### Environment file
+
+The environment file contains configurations for running the application, which both `pipenv` and `heroku` will use when running the application. It **should never be committed to git** and should be kept private as it contains secrets.  First copy the contents of the template environment file, `env.example`, paste into a new file, and save with the filename `.env` we will go back and alter the contents after creating a project on the Open Humans site. The `.env` filename should already be in your `.gitignore`, but it is worth double-checking to make sure.
 
 ## Creating an Open Humans project
 
@@ -300,10 +322,14 @@ Finally we need to initialize the database and static assets to be able to get t
 
 In the main project directory, run the `migrate` command followed by `collectstatic` as follows:
 
-`foreman run python manage.py migrate`
+`pipenv run python manage.py migrate`
 
+<<<<<<< HEAD
 >>>>>>> Rewrite of readme after working through
 `foreman run python manage.py collectstatic`
+=======
+`pipenv run python manage.py collectstatic`
+>>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits
 
 *Please note you can ignore the following warning message:*
  > You have requested to collect static files at the destination location as specified in your settings:
@@ -315,7 +341,7 @@ In the main project directory, run the `migrate` command followed by `collectsta
  > Are you sure you want to do this?
 
 
-Now we are ready to run the app locally. Enter the command `foreman start`, and don't worry if you see the following warning:
+Now we are ready to run the app locally. Enter the command `pipenv run heroku local`, and don't worry if you see the following warning:
 
 <<<<<<< HEAD
 ---
