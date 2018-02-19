@@ -17,16 +17,21 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '2$l_w#h*5*jjj5lls$(5&eu*7sd7p8ae$dkdmdwbj3_n%*z^(d'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False if os.getenv('DEBUG', '').lower() == 'false' else True
 
-ALLOWED_HOSTS = []
+HEROKU_APP = True if os.getenv('HEROKU_APP', '').lower() == 'true' else False
+
+# Allow all host headers if this is running as a Heroku app.
+if HEROKU_APP:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = []
+
+
 
 
 # Application definition
