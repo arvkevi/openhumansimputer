@@ -38,8 +38,7 @@ OH_ACTIVITY_PAGE = os.getenv('OH_ACTIVITY_PAGE')
 OH_BASE_URL = 'https://www.openhumans.org'
 APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://127.0.0.1:5000')
 
-# Application definition
-
+# Applications installed
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,6 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Local apps. Update these if you add or change app names!
+    'datauploader',
 ]
 
 MIDDLEWARE = [
@@ -82,6 +84,8 @@ WSGI_APPLICATION = 'demotemplate.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
+# https://devcenter.heroku.com/articles/django-app-configuration
+
 
 DATABASES = {
     'default': {
@@ -112,6 +116,23 @@ AUTH_PASSWORD_VALIDATORS = [
                  NumericPasswordValidator',
     },
 ]
+
+# Configure logging to print Django logs to the console.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
 
 
 # Internationalization
