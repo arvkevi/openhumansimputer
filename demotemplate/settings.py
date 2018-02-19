@@ -31,8 +31,12 @@ if HEROKU_APP:
 else:
     ALLOWED_HOSTS = []
 
-
-
+# Open Humans configuration
+OH_CLIENT_ID = os.getenv('OH_CLIENT_ID')
+OH_CLIENT_SECRET = os.getenv('OH_CLIENT_SECRET')
+OH_ACTIVITY_PAGE = os.getenv('OH_ACTIVITY_PAGE')
+OH_BASE_URL = 'https://www.openhumans.org'
+APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://127.0.0.1:5000')
 
 # Application definition
 
