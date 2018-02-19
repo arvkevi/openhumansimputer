@@ -153,7 +153,7 @@ This template is a [Django](https://www.djangoproject.com/)/[Celery](http://www.
 
 So let's get that demo working on your machine, and you should be able to complete those steps as a user by running the app, before moving on to edit the code so it adds your custom data source instead of a dummy file.
 
-![](https://cl.ly/1d3z110I0K0k/Screen%20Recording%202018-02-16%20at%2002.43%20AM.gif)
+![](https://cl.ly/0s2i2J3i191d/demo-gif.gif)
 
 
 ## Cloning this template
