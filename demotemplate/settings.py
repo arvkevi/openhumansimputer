@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Local apps. Update these if you add or change app names!
-    'datauploader',
+    'datauploader.apps.DatauploaderConfig',
 ]
 
 MIDDLEWARE = [
