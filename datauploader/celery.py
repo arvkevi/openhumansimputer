@@ -1,6 +1,17 @@
+"""
+Celery set up, as recommended by celery
+http://celery.readthedocs.org/en/latest/django/first-steps-with-django.html
+
+Celery will automatically discover and use methods within INSTALLED_APPs that
+have the @shared_task decorator.
+"""
+# absolute_import prevents conflicts between project celery.py file
+# and the celery package.
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
+from django.conf import settings
+
 
 CELERY_BROKER_URL = os.getenv('CLOUDAMQP_URL', 'amqp://')
 
