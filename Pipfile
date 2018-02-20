@@ -7,9 +7,10 @@ name = "pypi"
 
 [packages]
 
-Django = "*"
+django = "*"
 celery = "*"
 arrow = "*"
+requests = "*"
 
 
 [dev-packages]
