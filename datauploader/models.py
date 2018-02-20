@@ -1,4 +1,12 @@
 from django.contrib.auth.models import User
+from django.db import models
+
+
+class OpenHumansMember(models.Model):
+    """
+    Store OAuth2 data for Open Humans member.
+    A user account is created for this Open Humans member.
+    """
 
 
 def make_unique_username(base):
