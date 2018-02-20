@@ -95,6 +95,8 @@ def delete_oh_file_by_name(oh_member, filename):
         params={'access_token': oh_member.get_access_token()},
         data={'project_member_id': oh_member.oh_id,
               'file_basename': filename})
+    req.raise_for_status()
+
 
 
 def upload_file_to_oh(oh_member, filepath, metadata):
@@ -116,16 +118,12 @@ def upload_file_to_oh(oh_member, filepath, metadata):
         data={'project_member_id': oh_member.oh_id,
               'filename': os.path.basename(filepath),
               'metadata': json.dumps(metadata)})
-    if req1.status_code != 200:
-        raise HTTPError(code=req1.status_code,
-                        text='Bad response when starting file upload.')
+    req1.raise_for_status()
 
     # Upload to S3 target.
     with open(filepath, 'rb') as fh:
         req2 = requests.put(url=req1.json()['url'], data=fh)
-    if req2.status_code != 200:
-        raise HTTPError(code=req2.status_code,
-                        text='Bad response when uploading to target.')
+    req2.raise_for_status()
 
     # Report completed upload to Open Humans.
     complete_url = ('{}?access_token={}'.format(
@@ -134,9 +132,7 @@ def upload_file_to_oh(oh_member, filepath, metadata):
         complete_url,
         data={'project_member_id': oh_member.oh_id,
               'file_id': req1.json()['id']})
-    if req3.status_code != 200:
-        raise HTTPError(code=req2.status_code,
-                        text='Bad response when uploading to target.')
+    req3.raise_for_status()
 
     print('Upload done: "{}" for member {}.'.format(
         os.path.basename(filepath), oh_member.oh_id))
