@@ -6,6 +6,7 @@ This example task:
   2. adds a data file
 """
 import os
+import json
 import shutil
 import tempfile
 import textwrap
@@ -94,3 +95,48 @@ def delete_oh_file_by_name(oh_member, filename):
         params={'access_token': oh_member.get_access_token()},
         data={'project_member_id': oh_member.oh_id,
               'file_basename': filename})
+
+
+def upload_file_to_oh(oh_member, filepath, metadata):
+    """
+    This demonstrates using the Open Humans "large file" upload process.
+
+    The small file upload process is simpler, but it can time out. This
+    alternate approach is required for large files, and still appropriate
+    for small files.
+
+    This process is "direct to S3" using three steps: 1. get S3 target URL from
+    Open Humans, 2. Perform the upload, 3. Notify Open Humans when complete.
+    """
+    # Get the S3 target from Open Humans.
+    upload_url = '{}?access_token={}'.format(
+        settings.OH_DIRECT_UPLOAD, oh_member.get_access_token())
+    req1 = requests.post(
+        upload_url,
+        data={'project_member_id': oh_member.oh_id,
+              'filename': os.path.basename(filepath),
+              'metadata': json.dumps(metadata)})
+    if req1.status_code != 200:
+        raise HTTPError(code=req1.status_code,
+                        text='Bad response when starting file upload.')
+
+    # Upload to S3 target.
+    with open(filepath, 'rb') as fh:
+        req2 = requests.put(url=req1.json()['url'], data=fh)
+    if req2.status_code != 200:
+        raise HTTPError(code=req2.status_code,
+                        text='Bad response when uploading to target.')
+
+    # Report completed upload to Open Humans.
+    complete_url = ('{}?access_token={}'.format(
+        settings.OH_DIRECT_UPLOAD_COMPLETE, oh_member.get_access_token()))
+    req3 = requests.post(
+        complete_url,
+        data={'project_member_id': oh_member.oh_id,
+              'file_id': req1.json()['id']})
+    if req3.status_code != 200:
+        raise HTTPError(code=req2.status_code,
+                        text='Bad response when uploading to target.')
+
+    print('Upload done: "{}" for member {}.'.format(
+        os.path.basename(filepath), oh_member.oh_id))
