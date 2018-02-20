@@ -10,6 +10,7 @@ name = "pypi"
 django = "*"
 dj-database-url = "*"
 celery = "*"
+arrow = "*"
 
 
 [dev-packages]
