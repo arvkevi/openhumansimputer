@@ -51,7 +51,7 @@ def complete(request):
 
 def oh_code_to_member(code):
     """
-    Exchange code for toek, use this to create and return OpenHumansMember.
+    Exchange code for token, use this to create and return OpenHumansMember.
     If a matching OpenHumansMember exists, update and return it.
     """
     if settings.OH_CLIENT_SECRET and settings.OH_CLIENT_ID and code:
