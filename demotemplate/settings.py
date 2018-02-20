@@ -38,6 +38,11 @@ OH_ACTIVITY_PAGE = os.getenv('OH_ACTIVITY_PAGE')
 OH_BASE_URL = 'https://www.openhumans.org'
 APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://127.0.0.1:5000')
 
+OH_API_BASE = 'https://www.openhumans.org/api/direct-sharing'
+OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
+OH_DIRECT_UPLOAD = OH_API_BASE + '/project/files/upload/direct/'
+OH_DIRECT_UPLOAD_COMPLETE = OH_API_BASE + '/project/files/upload/complete/'
+
 # Applications installed
 INSTALLED_APPS = [
     'django.contrib.admin',
