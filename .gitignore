@@ -3,3 +3,6 @@ db.sqlite3
 *.pyc
 .env
 .env*
+__pycache__
+*.py[cod]
+*$py.class
