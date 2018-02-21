@@ -11,12 +11,11 @@ class OpenHumansMember(models.Model):
     Store OAuth2 data for Open Humans member.
     A user account is created for this Open Humans member.
     """
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.PROTECT)
     oh_id = models.CharField(max_length=16, primary_key=True, unique=True)
     access_token = models.CharField(max_length=256)
     refresh_token = models.CharField(max_length=256)
     token_expires = models.DateTimeField()
-    on_delete = models.CASCADE
 
     @staticmethod
     def get_expiration(expires_in):
