@@ -12,6 +12,7 @@ celery = "*"
 arrow = "*"
 requests = "*"
 amqp = "*"
+gunicorn = "*"
 
 
 [dev-packages]
