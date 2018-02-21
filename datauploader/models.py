@@ -16,6 +16,7 @@ class OpenHumansMember(models.Model):
     access_token = models.CharField(max_length=256)
     refresh_token = models.CharField(max_length=256)
     token_expires = models.DateTimeField()
+    on_delete = models.CASCADE
 
     @staticmethod
     def get_expiration(expires_in):
