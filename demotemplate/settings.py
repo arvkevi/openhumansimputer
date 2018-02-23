@@ -23,20 +23,22 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if os.getenv('DEBUG', '').lower() == 'false' else True
 
-HEROKU_APP = True if os.getenv('HEROKU_APP', '').lower() == 'true' else False
+REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 
 # Allow all host headers if this is running as a Heroku app.
-if HEROKU_APP:
+if REMOTE:
     ALLOWED_HOSTS = ['*', 'oh-datauploader.herokuapp.com']
+    print('REMOTE True')
 else:
     ALLOWED_HOSTS = ['oh-datauploader.herokuapp.com']
+    print('REMOTE False')
 
 # Open Humans configuration
 OH_CLIENT_ID = os.getenv('OH_CLIENT_ID')
 OH_CLIENT_SECRET = os.getenv('OH_CLIENT_SECRET')
 OH_ACTIVITY_PAGE = os.getenv('OH_ACTIVITY_PAGE')
 OH_BASE_URL = 'https://www.openhumans.org'
-APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://127.0.0.1:5000')
+APP_BASE_URL = os.getenv('APP_BASE_URL')
 
 OH_API_BASE = 'https://www.openhumans.org/api/direct-sharing'
 OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
