@@ -29,7 +29,7 @@ REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 if REMOTE:
     ALLOWED_HOSTS = ['*', 'oh-datauploader.herokuapp.com']
     print('REMOTE True')
-    APP_BASE_URL = 'https://oh_datauploader.herokuapp.com'
+    APP_BASE_URL = 'https://oh-datauploader.herokuapp.com'
 else:
     ALLOWED_HOSTS = []
     print('REMOTE False')
