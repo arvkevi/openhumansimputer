@@ -187,7 +187,7 @@ The [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-i
 
 [RabbitMQ](http://www.rabbitmq.com) is an open source [message broker](https://en.wikipedia.org/wiki/Message_broker) used by this application.
 
-To install RabbitMQ you can follow [https://www.rabbitmq.com/download.html](these instructions), or if you are using a Mac and have [Homebrew](https://brew.sh/) installed, you can simply type `brew install rabbitmq`, followed by `brew services start rabbitmq`, to set it running in the background. To set it running on very popular Ubuntu and other Debian based systems, it will likely be started for you after you install the package, but can also start it manually with: `sudo rabbitmq-server start`.
+To install RabbitMQ you can follow [these instructions](https://www.rabbitmq.com/download.html), or if you are using a Mac and have [Homebrew](https://brew.sh/) installed, you can simply type `brew install rabbitmq`, followed by `brew services start rabbitmq`, to set it running in the background. To set it running on very popular Ubuntu and other Debian based systems, it will likely be started for you after you install the package, but can also start it manually with: `sudo rabbitmq-server start`.
 
 ### Python
 
