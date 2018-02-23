@@ -29,16 +29,18 @@ REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 if REMOTE:
     ALLOWED_HOSTS = ['*', 'oh-datauploader.herokuapp.com']
     print('REMOTE True')
+    APP_BASE_URL = 'https://oh_datauploader.herokuapp.com'
 else:
-    ALLOWED_HOSTS = ['oh-datauploader.herokuapp.com']
+    ALLOWED_HOSTS = []
     print('REMOTE False')
+    APP_BASE_URL = os.getenv('APP_BASE_URL')
+
 
 # Open Humans configuration
 OH_CLIENT_ID = os.getenv('OH_CLIENT_ID')
 OH_CLIENT_SECRET = os.getenv('OH_CLIENT_SECRET')
 OH_ACTIVITY_PAGE = os.getenv('OH_ACTIVITY_PAGE')
 OH_BASE_URL = 'https://www.openhumans.org'
-APP_BASE_URL = os.getenv('APP_BASE_URL')
 
 OH_API_BASE = 'https://www.openhumans.org/api/direct-sharing'
 OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
