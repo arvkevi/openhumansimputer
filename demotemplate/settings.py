@@ -27,9 +27,9 @@ HEROKU_APP = True if os.getenv('HEROKU_APP', '').lower() == 'true' else False
 
 # Allow all host headers if this is running as a Heroku app.
 if HEROKU_APP:
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = ['*', 'oh-datauploader.herokuapp.com']
 else:
-    ALLOWED_HOSTS = []
+    ALLOWED_HOSTS = ['oh-datauploader.herokuapp.com']
 
 # Open Humans configuration
 OH_CLIENT_ID = os.getenv('OH_CLIENT_ID')
