@@ -292,7 +292,7 @@ Whenever we use pip or python commands, this virtual environment will be used fo
 
 ### Installing dependencies
 
-You can install all dependancies with:
+You can install all dependencies with:
 
 `pipenv install`
 
@@ -300,7 +300,7 @@ You can install all dependancies with:
 
 ### Environment file
 
-The environment file contains configurations for running the application, which both `pipenv` and `heroku` will use when running the application. It **should never be committed to git** and should be kept private as it contains secrets.  First copy the contents of the template environment file, `env.example`, paste into a new file, and save with the filename `.env` we will go back and alter the contents after creating a project on the Open Humans site. The `.env` filename should already be in your `.gitignore`, but it is worth double-checking to make sure.
+The environment file contains configurations for running the application, which both `pipenv` and `heroku` will use when running the application. It **should never be committed to git** and should be kept private as it contains secrets.  First copy the contents of the template environment file, `env.example`, paste into a new file, and save with the filename `.env`(use `cp env.example .env`) we will go back and alter the contents after creating a project on the Open Humans site. The `.env` filename should already be in your `.gitignore`, but it is worth double-checking to make sure.
 
 ## Creating an Open Humans project
 
@@ -591,9 +591,9 @@ If you use Heroku's free default domain, this will be set by the name you choose
 
 ### App configuration
 
-In your browser, head over to http://.dashboard.heroku.com/apps and log in to see the app your just created.
+In your browser, head over to `http://dashboard.heroku.com/apps` and log in to see the app you just created.
 
-Go to the `resources` tab, and add:
+Go to the `resources` tab, and add the following Add-ons:
 
 1. `CloudAMQP` - a message queuing service
 2. `Heroku Postgres`
@@ -663,7 +663,7 @@ Before starting to edit the code in this demo to create your own project, it may
 
 Now you have worked through to create a working demo, and should understand roughly how the demo works, you are ready to customise the code to create your own Open Humans data source. Use the code you have in this repository as a template for your app.
 
-You are likely to want to start making changes in the `tasks.py` file, which is where much of the logic is stored. Instead of generating a dummy data file you will want to think about how to get your own data into the app, whether it is a previously downloaded file, which needs to be processed and/or vetted by the app, or you are working from an external api.
+You are likely to want to start making changes in the `tasks.py` file, which is where much of the logic is stored. Instead of generating a dummy data file you will want to think about how to get your own data into the app, whether it is a previously downloaded file, which needs to be processed and/or vetted by the app, or you are working from an external API.
 
 <<<<<<< HEAD
 Good luck, and please do [get in touch]((http://github.com/OpenHumans/oh-data-source-template/issues)) to ask questions, give suggestions, or join in with our [community chat](http://openhumans.slack.com!
