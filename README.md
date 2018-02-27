@@ -68,7 +68,7 @@ So let's get that demo working on your machine, and you should be able to comple
 
 In your terminal, navigate to the folder in which you want to store this repo, and enter the command
 
-`git clone git@github.com:OpenHumans/oh-data-demo-template.git`
+`$ git clone git@github.com:OpenHumans/oh-data-demo-template.git`
 
 This should create a new folder named `oh-data-demo-template` which contains all the code to create the working demo.
 
@@ -82,13 +82,13 @@ The [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-i
 
 if you have [Homebrew](https://brew.sh/) installed (recommended):
 
-`brew install heroku/brew/heroku`
+`$ brew install heroku/brew/heroku`
 
 otherwise follow [these instructions](https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
 
 **Linux:**
 
-`wget -qO- https://cli-assets.heroku.com/install-ubuntu.sh | sh`
+`$ wget -qO- https://cli-assets.heroku.com/install-ubuntu.sh | sh`
 
 **Windows:**
 
@@ -100,12 +100,12 @@ otherwise follow [these instructions](https://devcenter.heroku.com/articles/hero
 
 To install RabbitMQ you can follow [these instructions](https://www.rabbitmq.com/download.html), or to install and then set it running in the background:
 
-`brew install rabbitmq`
-`brew services start rabbitmq`
+`$ brew install rabbitmq`
+`$ brew services start rabbitmq`
 
 To set it running on very popular Ubuntu and other Debian based systems, it will likely be started for you after you install the package, but can also start it manually with:
 
-`sudo rabbitmq-server start`.
+`$ sudo rabbitmq-server start`.
 
 ### Python
 
@@ -115,7 +115,7 @@ Please note that if you are working on a Mac, it is strongly advised that you in
 
 ### pip
 
-[pip](https://pypi.python.org/pypi/pip) is a package management system used to install and manage software packages written in Python. It is available [here](https://pip.pypa.io/en/stable/installing/). Check your `pip` version by entering `pip --version` to make sure that it is working with Python 3- you may have to use the command `pip3`.
+[pip](https://pypi.python.org/pypi/pip) is a package management system used to install and manage software packages written in Python. It is available [here](https://pip.pypa.io/en/stable/installing/). Check your `pip` version by entering `$ pip --version` to make sure that it is working with Python 3; you may have to use the command `pip3`.
 
 ### Virtual environments
 
@@ -123,28 +123,28 @@ Virtual environments are useful when developing apps with lots of dependencies s
 
 We will set up the virtual environment here, and then work from within it for the remainder of this guide.
 
-1. install the Python package  [pipenv](http://pipenv.readthedocs.io/en/latest/), using pip: `pip install pipenv` or `pip3 install pipenv`
-2. navigate to your project folder for this template repo, and enter the command `pipenv --python 3.6`
+1. install the Python package  [pipenv](http://pipenv.readthedocs.io/en/latest/), using pip: `$ pip install pipenv` or `$ pip3 install pipenv`
+2. navigate to your project folder for this template repo, and enter the command `$ pipenv --python 3.6`
 
 This command should output some information about how it's creating a virtual environment for us with some path information about it.
 
 Whenever we use pip or python commands, this virtual environment will be used for the remainder of this tutorial.
 
-You can work from within this environment with `pipenv shell`
+You can work from within this environment with `$ pipenv shell`
 
-If you want to run commands from outside of this shell, you can type `pipenv run \_\_\_`, for example, `pipenv run python`.
+If you want to run commands from outside of this shell, you can type `$ pipenv run ___`, for example, `$ pipenv run python`.
 
 ### Installing dependencies
 
 You can install all dependencies with:
 
-`pipenv install`
+`$ pipenv install`
 
 *Note: This will install the dependencies for this project from the Pipfile and Pipfile.lock. If you have issues with installing all of the requirements at once, read the error(s) as there may be some other requirement missing locally (such as Postgres). If you still have problems, [raise an issue on Github](http://github.com/OpenHumans/oh-data-source-template/issues)*.
 
 ### Environment file
 
-The environment file contains configurations for running the application, which both `pipenv` and `heroku` will use when running the application. It **should never be committed to git** and should be kept private as it contains secrets.  First copy the contents of the template environment file, `env.example`, paste into a new file, and save with the filename `.env`(use `cp env.example .env`) we will go back and alter the contents after creating a project on the Open Humans site. The `.env` filename should already be in your `.gitignore`, but it is worth double-checking to make sure.
+The environment file contains configurations for running the application, which both `pipenv` and `heroku` will use when running the application. It **should never be committed to git** and should be kept private as it contains secrets.  First copy the contents of the template environment file, `env.example`, paste into a new file, and save with the filename `.env`(use `$ cp env.example .env`) we will go back and alter the contents after creating a project on the Open Humans site. The `.env` filename should already be in your `.gitignore`, but it is worth double-checking to make sure.
 
 ## Creating an Open Humans project
 
@@ -166,9 +166,9 @@ Finally we need to initialize the database and static assets to be able to get t
 
 In the main project directory, run the `migrate` command followed by `collectstatic` as follows:
 
-`pipenv run python manage.py migrate`
+`$ pipenv run python manage.py migrate`
 
-`pipenv run python manage.py collectstatic`
+`$ pipenv run python manage.py collectstatic`
 
 *Please note you can ignore the following warning message:*
  > You have requested to collect static files at the destination location as specified in your settings:
@@ -180,7 +180,7 @@ In the main project directory, run the `migrate` command followed by `collectsta
  > Are you sure you want to do this?
 
 
-Now we are ready to run the app locally. Enter the command `pipenv run heroku local`, and don't worry if you see the following warning:
+Now we are ready to run the app locally. Enter the command `$ pipenv run heroku local`, and don't worry if you see the following warning:
 
  > warnings.warn('Using settings.DEBUG leads to a memory leak, never')
 
@@ -204,11 +204,11 @@ If you don't already have a Heroku account, head to http://www.heroku.com/ to cr
 
 Make sure you have installed the [Heroku command line interface](https://devcenter.heroku.com/articles/heroku-cli), then, from your terminal, you can log in and create your app with the following commands:
 
-`heroku login`
+`$ heroku login`
 
 > *you will be asked for your Heroku credentials*
 
-`heroku apps:create your-app-name`
+`$ heroku apps:create your-app-name`
 
 If you use Heroku's free default domain, this will be set by the name you choose here, i.e. you will have
 
@@ -234,9 +234,9 @@ Next go to the `settings` tab and add the environment variables as in the `.env`
 
 Head back over to your terminal and run the following command to initialize and update your code remotely in Heroku:
 
-`git push heroku master`
+`$ git push heroku master`
 
-You can watch logs with the command `heroku logs -t`.
+You can watch logs with the command `$ heroku logs -t`.
 
 ## Adding dummy data
 
