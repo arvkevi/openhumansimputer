@@ -55,9 +55,11 @@ This repository is a template for, and working example of an Open Humans data so
 
 ### How does an Open Humans data source work?
 
-This template is a [Django](https://www.djangoproject.com/)/[Celery](http://www.celeryproject.org/) app that enables the end user - an Open Humans member - to add dummy data to an Open Humans project. The user arrives on the landing page (`index.html`), and clicks a button which takes them to Open Humans where they can log in (and create an account if necessary). Once logged in to the Open Humans site, the user clicks another button to authorize this app to add data to their Open Humans account, then they return to this app (to `complete.html`) which notifies them that their data has been added and provides a link to the project summary page in Open Humans.
+This template is a [Django](https://www.djangoproject.com/)/[Celery](http://www.celeryproject.org/) app that enables the end user - an Open Humans member - to add dummy data to an Open Humans project. The user arrives on the app's landing page (`index.html`), and clicks a button which takes them to Open Humans where they can log in (and create an account if necessary). Once logged in to the Open Humans site, the user clicks another button to authorize this app to add data to their Open Humans account, they are then returned to this app (to `complete.html`) which notifies them that their data has been added and provides a link to the project summary page in Open Humans.
 
 So let's get that demo working on your machine, and you should be able to complete those steps as a user by running the app, before moving on to edit the code so it adds your custom data source instead of a dummy file.
+
+#### This gif shows the completed app being used to add dummy data to an Open Humans project:
 
 ![](https://cl.ly/0s2i2J3i191d/demo-gif.gif)
 
@@ -66,9 +68,9 @@ So let's get that demo working on your machine, and you should be able to comple
 
 In your terminal, navigate to the folder in which you want to store this repo, and enter the command
 
-`git clone git@github.com:OpenHumans/oh-data-source-template.git`
+`git clone git@github.com:OpenHumans/oh-data-demo-template.git`
 
-This should create a new folder named `oh-data-source-template` which contains all the code to create the working demo.
+This should create a new folder named `oh-data-demo-template` which contains all the code to create the working demo.
 
 ## Setting up local environment
 
@@ -78,7 +80,11 @@ The [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-i
 
 **macOS:**
 
+if you have [Homebrew](https://brew.sh/) installed (recommended):
+
 `brew install heroku/brew/heroku`
+
+otherwise follow [these instructions](https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
 
 **Linux:**
 
@@ -92,32 +98,41 @@ The [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-i
 
 [RabbitMQ](http://www.rabbitmq.com) is an open source [message broker](https://en.wikipedia.org/wiki/Message_broker) used by this application.
 
-To install RabbitMQ you can follow [these instructions](https://www.rabbitmq.com/download.html), or if you are using a Mac and have [Homebrew](https://brew.sh/) installed, you can simply type `brew install rabbitmq`, followed by `brew services start rabbitmq`, to set it running in the background. To set it running on very popular Ubuntu and other Debian based systems, it will likely be started for you after you install the package, but can also start it manually with: `sudo rabbitmq-server start`.
+To install RabbitMQ you can follow [these instructions](https://www.rabbitmq.com/download.html), or to install and then set it running in the background:
+
+`brew install rabbitmq`
+`brew services start rabbitmq`
+
+To set it running on very popular Ubuntu and other Debian based systems, it will likely be started for you after you install the package, but can also start it manually with:
+
+`sudo rabbitmq-server start`.
 
 ### Python
 
-For the current version of this template, you will need [Python 2](https://www.python.org/downloads/). We are working on an updated version to run on Python 3.
+This version of the template runs on [Python 3](https://www.python.org/downloads/). We recommend that you use this version, but you can still use the [old version](http://github.com/OpenHumans/oh-data-source-template) which requires only Python 2.
 
 Please note that if you are working on a Mac, it is strongly advised that you install a fresh version of Python. The version that ships with OSX is not suitable for development and use with third party packages. Instructions for setting up your Python environment properly in OSX can be found [here](http://docs.python-guide.org/en/latest/starting/install/osx/).
 
-You will need to ensure that the `python` alias points to a good Python 2 interpreter, and not Python 3 or the default OSX Python 2. First check that Python 2 opens when you type the command `python`. You can change the alias, if necessary, by adding this line `alias python=python2` to your, `.profile`, `.bash_profile`, or `.bashrc` file.
-
 ### pip
 
-[pip](https://pypi.python.org/pypi/pip) is a package management system used to install and manage software packages written in Python. It is available [here](https://pip.pypa.io/en/stable/installing/). If you are working on a Mac and have followed the above instructions for installing a fresh `Python2`, make sure to use the command `pip2`.
+[pip](https://pypi.python.org/pypi/pip) is a package management system used to install and manage software packages written in Python. It is available [here](https://pip.pypa.io/en/stable/installing/). Check your `pip` version by entering `pip --version` to make sure that it is working with Python 3- you may have to use the command `pip3`.
 
 ### Virtual environments
 
-Virtual environments are useful when developing apps with lots of dependancies since they enable us to install software locally for a specific project, without it being present globally. Using a virtual environment allows us to use specific versions of each program and/or package for this project only, without affecting the versions that are used elsewhere on your machine.
+Virtual environments are useful when developing apps with lots of dependencies since they enable us to install software locally for a specific project, without it being present globally. Using a virtual environment allows us to use specific versions of each program and/or package for this project only, without affecting the versions that are used elsewhere on your machine.
 
 We will set up the virtual environment here, and then work from within it for the remainder of this guide.
 
-1. install the Python package  [pipenv](http://pipenv.readthedocs.io/en/latest/), using pip: `pip install pipenv` or `pip2 install pipenv`
-2. navigate to your project folder for this template repo, and enter the command `pipenv --python 2.7.14`
+1. install the Python package  [pipenv](http://pipenv.readthedocs.io/en/latest/), using pip: `pip install pipenv` or `pip3 install pipenv`
+2. navigate to your project folder for this template repo, and enter the command `pipenv --python 3.6`
 
 This command should output some information about how it's creating a virtual environment for us with some path information about it.
 
 Whenever we use pip or python commands, this virtual environment will be used for the remainder of this tutorial.
+
+You can work from within this environment with `pipenv shell`
+
+If you want to run commands from outside of this shell, you can type `pipenv run \_\_\_`, for example, `pipenv run python`.
 
 ### Installing dependencies
 
