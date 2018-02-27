@@ -170,15 +170,6 @@ In the main project directory, run the `migrate` command followed by `collectsta
 
 `$ pipenv run python manage.py collectstatic`
 
-*Please note you can ignore the following warning message:*
- > You have requested to collect static files at the destination location as specified in your settings:
-
- > > development:~/your_project/staticfiles
-
- > This will overwrite existing files!
-   
- > Are you sure you want to do this?
-
 
 Now we are ready to run the app locally. Enter the command `$ pipenv run heroku local`, and don't worry if you see the following warning:
 
@@ -186,7 +177,7 @@ Now we are ready to run the app locally. Enter the command `$ pipenv run heroku 
 
 If you are curious, the cause of this warning is outlined [here](http://stackoverflow.com/questions/4806314/disable-django-debugging-for-celery).
 
-Now head over to http://127.0.0.1:5000 in your browser to see your app running. It should look like this:
+Now head over to http://127.0.0.1:5000 in your browser to see your app running locally. It should look like this:
 
 ![](https://cl.ly/1J3X35170e0s/Image%202018-02-16%20at%202.35.57%20AM.png)
 
@@ -238,6 +229,13 @@ Head back over to your terminal and run the following command to initialize and 
 `$ git push heroku master`
 
 You can watch logs with the command `$ heroku logs -t`.
+
+If you make changes you may have to migrate again, to do this run:
+
+`$ heroku run python manage.py makemigrations`
+`$ heroku run python manage.py migrate`
+`$ git push heroku master`
+
 
 ## Adding dummy data
 
