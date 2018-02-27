@@ -231,6 +231,7 @@ Next go to the `settings` tab and add the environment variables as in the `.env`
 4. `APP_BASE_URL` (e.g. https://your-app-name.herokuapp.com - no trailing dash!)
 5. `SECRET_KEY`
 6. `DEBUG` = true when needed
+7. `REMOTE` = true
 
 Head back over to your terminal and run the following command to initialize and update your code remotely in Heroku:
 
