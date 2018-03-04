@@ -34,10 +34,14 @@ if REMOTE:
     ALLOWED_HOSTS = ['*']
     print('REMOTE True')
 else:
+<<<<<<< HEAD:demotemplate/settings.py
     ALLOWED_HOSTS = []
     print('REMOTE False')
 APP_BASE_URL = os.getenv('APP_BASE_URL')
 
+=======
+    ALLOWED_HOSTS = ['*']
+>>>>>>> correct APP_BASE_URL:oh_data_source/settings.py
 
 # Open Humans configuration
 OH_CLIENT_ID = os.getenv('OH_CLIENT_ID')
