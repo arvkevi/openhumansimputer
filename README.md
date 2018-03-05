@@ -1,11 +1,18 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Template and working demo for adding data to an Open Humans project. Python 3; Django 2.
 =======
 # Open Humans Data Source template and working demo
 >>>>>>> Rewrite of readme after working through
+=======
+# Imputer
+## This repository hosts the source code for the Open Humans App, Imputer. The application is not
+active yet, it is a work in progress.
+>>>>>>> First Imptuer commit
 
-> Work through this guide to add a data source to Open Humans
+Used [oh-data-source-template](https://github.com/OpenHumans/oh-data-source-template) as a template.
 
+<<<<<<< HEAD
 ## Table of Contents
 
 <<<<<<< HEAD
@@ -671,3 +678,5 @@ Good luck, and please do [get in touch]((http://github.com/OpenHumans/oh-data-so
 =======
 Good luck, and please do [get in touch]((http://github.com/OpenHumans/oh-data-source-template/issues)) to ask questions, give suggestions, or join in with our [community chat](http://slackin.openhumans.org)!
 >>>>>>> add correct slack link
+=======
+>>>>>>> First Imptuer commit
