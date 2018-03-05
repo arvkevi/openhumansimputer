@@ -6,9 +6,14 @@
 >>>>>>> Rewrite of readme after working through
 =======
 # Imputer
+<<<<<<< HEAD
 ## This repository hosts the source code for the Open Humans App, Imputer. The application is not
 active yet, it is a work in progress.
 >>>>>>> First Imptuer commit
+=======
+## This repository hosts the source code for the Open Humans App, Imputer. 
+## The application is not active yet, it is a work in progress.
+>>>>>>> README formatting
 
 Used [oh-data-source-template](https://github.com/OpenHumans/oh-data-source-template) as a template.
 
