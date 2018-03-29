@@ -144,14 +144,14 @@ You can install all dependencies with:
 
 ### Environment file
 
-The environment file contains configurations for running the application, which both `pipenv` and `heroku` will use when running the application. It **should never be committed to git** and should be kept private as it contains secrets.  First copy the contents of the template environment file, `env.example`, paste into a new file, and save with the filename `.env`(use `$ cp env.example .env`) we will go back and alter the contents after creating a project on the Open Humans site. The `.env` filename should already be in your `.gitignore`, but it is worth double-checking to make sure.
+The environment file (`.env`) contains configurations for running the application. This file will be used to set up the environmental variables that `Django` uses to set up everything (The deployment to `heroku` does not use this file, instead you can use their website to set up these variables. See more below under `heroku`). The `.env` file **should never be committed to git** and should be kept private as it contains secrets.  First copy the contents of the template environment file, `env.example`, paste into a new file, and save with the filename `.env`(use `$ cp env.example .env`) we will go back and alter the contents after creating a project on the Open Humans site. The `.env` filename should already be in your `.gitignore`, but it is worth double-checking to make sure.
 
 ## Creating an Open Humans project
 
 Head to http://openhumans.org/direct-sharing/projects/manage to create an OAuth2 project in Open Humans. If you do not yet have an Open Humans account, you will need to create one first.
 
 1. Click the button to `Create a new OAuth2 data request project`
-  ![](https://cl.ly/0J0s3w1y3R2b/Image%202018-02-15%20at%204.53.51%20PM.png) 
+  ![](https://cl.ly/0J0s3w1y3R2b/Image%202018-02-15%20at%204.53.51%20PM.png)
 2. Fill out the form for your project description. All of this information can be edited later, so don't worry if you aren't sure about it all just yet. However do make sure you fill out the following fields:
     - **Description of data you plan to upload to member accounts** - if you leave this field blank, Open Humans will assume that your project doesn't plan to add data
     - **Enrollment URL** - set this to `http://127.0.0.1:5000`, this should then automatically set the redirect URL to `http://127.0.0.1:5000/complete`
@@ -274,7 +274,7 @@ Before starting to edit the code in this demo to create your own project, it may
     - gets S3 target for storage
     - performs data upload to this target
     - notifies when the upload is complete
-    
+
 ***A note on asynchronosity***:
 
 *The `celery.py` file sets up asynchronous tasks for the app. The function `xfer_to_open_humans` in `tasks.py` is called (from `complete` function in `views.py`) asynchronously, by the presence of `.delay` in the function call:*
