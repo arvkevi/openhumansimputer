@@ -69,7 +69,7 @@ def make_example_datafile(tempdir):
     """
     Make a lorem-ipsum file in the tempdir, for demonstration purposes.
     """
-    filepath = os.path.join(tempdir, 'example_data.txt')
+    filepath = os.path.join(tempdir, 'example_data1.txt')
     paras = lorem_ipsum.paragraphs(3, common=True)
     output_text = '\n'.join(['\n'.join(textwrap.wrap(p)) for p in paras])
     with open(filepath, 'w') as f:
