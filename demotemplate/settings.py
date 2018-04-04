@@ -31,13 +31,12 @@ REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 
 # Allow all host headers if this is running as a Heroku app.
 if REMOTE:
-    ALLOWED_HOSTS = ['*', 'oh-datauploader.herokuapp.com']
+    ALLOWED_HOSTS = ['*']
     print('REMOTE True')
-    APP_BASE_URL = 'https://oh-datauploader.herokuapp.com'
 else:
     ALLOWED_HOSTS = []
     print('REMOTE False')
-    APP_BASE_URL = os.getenv('APP_BASE_URL')
+APP_BASE_URL = os.getenv('APP_BASE_URL')
 
 
 # Open Humans configuration
