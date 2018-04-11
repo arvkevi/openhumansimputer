@@ -3,11 +3,7 @@ import os
 import sys
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "demotemplate.settings")
-=======
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "oh_imputer.settings")
->>>>>>> change oh_data_source to oh_imputer
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

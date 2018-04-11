@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 db.sqlite3
 *.DS_Store
 *.pyc
@@ -8,17 +6,4 @@ db.sqlite3
 __pycache__
 *.py[cod]
 *$py.class
-=======
-=======
-.DS_Store
->>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits
-*.pyc
-.env
-.env*
-db.sqlite3
-<<<<<<< HEAD
->>>>>>> Add .gitignore
 staticfiles/*
-=======
-staticfiles/*
->>>>>>> replace virtualenv with pipenv, remove foreman for heroku, add .DS_Store to gitignore, minor spelling edits

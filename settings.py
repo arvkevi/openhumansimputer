@@ -33,6 +33,7 @@ REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 if REMOTE:
     ALLOWED_HOSTS = ['*']
     print('REMOTE True')
+    #APP_BASE_URL = 'https://oh-datauploader.herokuapp.com'
 else:
     ALLOWED_HOSTS = []
     print('REMOTE False')
@@ -152,28 +153,6 @@ LOGGING = {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
-    },
-}
-
-
-# Configure logging.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        },
-        'oh_data_source': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
-        }
     },
 }
 
