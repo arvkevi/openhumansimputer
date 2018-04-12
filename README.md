@@ -1,5 +1,7 @@
 # Template and working demo for adding data to an Open Humans project. Python 3; Django 2.
 
+[![Build Status](https://travis-ci.org/OpenHumans/oh-data-demo-template.svg?branch=master)](https://travis-ci.org/OpenHumans/oh-data-demo-template)
+
 > Work through this guide to add a data source to Open Humans
 
 ## Table of Contents

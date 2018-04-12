@@ -1,11 +1,18 @@
 import logging
 import requests
+import os
+import base64
+import json
+import arrow
 
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.conf import settings
-from .tasks import xfer_to_open_humans
-from .models import OpenHumansMember
+from datauploader.tasks import xfer_to_open_humans
+from open_humans.models import OpenHumansMember
+from .models import DataSourceMember
+from demotemplate.settings import rr
+
 
 # Set up logging.
 logger = logging.getLogger(__name__)
@@ -15,10 +22,11 @@ def index(request):
     """
     Starting page for app.
     """
-    context = {'client_id': settings.OH_CLIENT_ID,
+
+    context = {'client_id': settings.OPENHUMANS_CLIENT_ID,
                'oh_proj_page': settings.OH_ACTIVITY_PAGE}
 
-    return render(request, 'datauploader/index.html', context=context)
+    return render(request, 'main/index.html', context=context)
 
 
 def complete(request):
@@ -26,7 +34,6 @@ def complete(request):
     Receive user from Open Humans. Store data, start upload.
     """
     logger.debug("Received user returning from Open Humans.")
-
     # Exchange code for token.
     # This creates an OpenHumansMember and associated user account.
     code = request.GET.get('code', '')
@@ -42,7 +49,7 @@ def complete(request):
         xfer_to_open_humans.delay(oh_id=oh_member.oh_id)
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
-        return render(request, 'datauploader/complete.html',
+        return render(request, 'main/complete.html',
                       context=context)
 
     logger.debug('Invalid code exchange. User returned to starting page.')
@@ -54,18 +61,20 @@ def oh_code_to_member(code):
     Exchange code for token, use this to create and return OpenHumansMember.
     If a matching OpenHumansMember exists, update and return it.
     """
-    if settings.OH_CLIENT_SECRET and settings.OH_CLIENT_ID and code:
+    if settings.OPENHUMANS_CLIENT_SECRET and \
+       settings.OPENHUMANS_CLIENT_ID and code:
         data = {
             'grant_type': 'authorization_code',
-            'redirect_uri': '{}/complete'.format(settings.APP_BASE_URL),
+            'redirect_uri':
+            '{}/complete'.format(settings.OPENHUMANS_APP_BASE_URL),
             'code': code,
         }
         req = requests.post(
-            '{}/oauth2/token/'.format(settings.OH_BASE_URL),
+            '{}/oauth2/token/'.format(settings.OPENHUMANS_OH_BASE_URL),
             data=data,
             auth=requests.auth.HTTPBasicAuth(
-                settings.OH_CLIENT_ID,
-                settings.OH_CLIENT_SECRET
+                settings.OPENHUMANS_CLIENT_ID,
+                settings.OPENHUMANS_CLIENT_SECRET
             )
         )
         data = req.json()
@@ -106,7 +115,7 @@ def oh_get_member_data(token):
     """
     req = requests.get(
         '{}/api/direct-sharing/project/exchange-member/'
-        .format(settings.OH_BASE_URL),
+        .format(settings.OPENHUMANS_OH_BASE_URL),
         params={'access_token': token}
         )
     if req.status_code == 200:

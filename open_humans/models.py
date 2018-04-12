@@ -1,21 +1,50 @@
-import arrow
-import requests
 from datetime import timedelta
+
+import arrow
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.conf import settings
+import requests
+
+OH_BASE_URL = settings.OPENHUMANS_OH_BASE_URL
+OH_API_BASE = OH_BASE_URL + '/api/direct-sharing'
+OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
+OH_DIRECT_UPLOAD = OH_API_BASE + '/project/files/upload/direct/'
+OH_DIRECT_UPLOAD_COMPLETE = OH_API_BASE + '/project/files/upload/complete/'
+
+OPENHUMANS_APP_BASE_URL = settings.OPENHUMANS_APP_BASE_URL
+
+
+def make_unique_username(base):
+    """
+    Ensure a unique username. Probably this never actually gets used.
+    """
+    try:
+        User.objects.get(username=base)
+    except User.DoesNotExist:
+        return base
+    n = 2
+    while True:
+        name = base + str(n)
+        try:
+            User.objects.get(username=name)
+            n += 1
+        except User.DoesNotExist:
+            return name
 
 
 class OpenHumansMember(models.Model):
     """
     Store OAuth2 data for Open Humans member.
-    A user account is created for this Open Humans member.
+    A User account is created for this Open Humans member.
     """
-    user = models.OneToOneField(User, on_delete=models.PROTECT)
+    user = models.OneToOneField(User, related_name="oh_member",
+                                on_delete=models.CASCADE)
     oh_id = models.CharField(max_length=16, primary_key=True, unique=True)
     access_token = models.CharField(max_length=256)
     refresh_token = models.CharField(max_length=256)
     token_expires = models.DateTimeField()
+    public = models.BooleanField(default=False)
 
     @staticmethod
     def get_expiration(expires_in):
@@ -39,17 +68,20 @@ class OpenHumansMember(models.Model):
         return "<OpenHumansMember(oh_id='{}')>".format(
             self.oh_id)
 
-    def get_access_token(self):
+    def get_access_token(self,
+                         client_id=settings.OPENHUMANS_CLIENT_ID,
+                         client_secret=settings.OPENHUMANS_CLIENT_SECRET):
         """
         Return access token. Refresh first if necessary.
         """
         # Also refresh if nearly expired (less than 60s remaining).
         delta = timedelta(seconds=60)
         if arrow.get(self.token_expires) - delta < arrow.now():
-            self._refresh_tokens()
+            self._refresh_tokens(client_id=client_id,
+                                 client_secret=client_secret)
         return self.access_token
 
-    def _refresh_tokens(self):
+    def _refresh_tokens(self, client_id, client_secret):
         """
         Refresh access token.
         """
@@ -58,26 +90,10 @@ class OpenHumansMember(models.Model):
             data={
                 'grant_type': 'refresh_token',
                 'refresh_token': self.refresh_token},
-            auth=requests.auth.HTTPBasicAuth(
-                settings.OH_CLIENT_ID, settings.OH_CLIENT_SECRET))
+            auth=requests.auth.HTTPBasicAuth(client_id, client_secret))
         if response.status_code == 200:
             data = response.json()
             self.access_token = data['access_token']
             self.refresh_token = data['refresh_token']
             self.token_expires = self.get_expiration(data['expires_in'])
             self.save()
-
-
-def make_unique_username(base):
-    try:
-        User.objects.get(username=base)
-    except User.DoesNotExist:
-        return base
-    n = 2
-    while True:
-        name = base + str(n)
-        try:
-            User.objects.get(username=name)
-            n += 1
-        except User.DoesNotExist:
-            return name

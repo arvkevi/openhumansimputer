@@ -1,0 +1,10 @@
+language: python
+services:
+  - redis-server
+python:
+- '3.6'
+install:
+- pip install pipenv
+- pipenv install --dev
+script:
+- python manage.py test
