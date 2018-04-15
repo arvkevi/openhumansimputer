@@ -16,6 +16,7 @@ from celery import shared_task
 from django.conf import settings
 from open_humans.models import OpenHumansMember
 from datetime import datetime
+from demotemplate.settings import rr
 
 # Set up logging.
 logger = logging.getLogger(__name__)
@@ -147,3 +148,9 @@ def upload_file_to_oh(oh_member, filepath, metadata):
 
     logger.debug('Upload done: "{}" for member {}.'.format(
             os.path.basename(filepath), oh_member.oh_id))
+
+
+@shared_task
+def make_request_respectful_get(url, realms, **kwargs):
+    r = rr.get(url=url, realms=realms, **kwargs)
+    logger.debug('Request completed. Response: {}'.format(r.text))
