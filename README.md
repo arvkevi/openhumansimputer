@@ -277,13 +277,21 @@ Before starting to edit the code in this demo to create your own project, it may
     - performs data upload to this target
     - notifies when the upload is complete
 
-***A note on asynchronosity***:
+#### Asynchronosity
 
-*The `celery.py` file sets up asynchronous tasks for the app. The function `xfer_to_open_humans` in `tasks.py` is called (from `complete` function in `views.py`) asynchronously, by the presence of `.delay` in the function call:*
+The `celery.py` file sets up asynchronous tasks for the app. The function `xfer_to_open_humans` in `tasks.py` is called (from `complete` function in `views.py`) asynchronously, by the presence of `.delay` in the function call:
 
 >         xfer_to_open_humans.delay(oh_id=oh_member.oh_id)
 
-*Sometimes uploads can take a long time so we advise using the delay so that this does not prevent the app from processing other events. However if you wish to run your app without asynchronosity, you can simply remove the `.delay` component from this function call.*
+Sometimes uploads can take a long time so we advise using the delay so that this does not prevent the app from processing other events. However if you wish to run your app without asynchronosity, you can simply remove the `.delay` component from this function call.
+
+#### Rate limiting
+
+External APIs will often limit how much data you are allowed to fetch per unit time. This template uses the `requests-respectful` package to easily set rate limits when making requests. The requester can be set up as follows
+
+- find out the limitations of the external API by looking at their documentation
+- specify the limitations in a realm, found in [`demotemplate/settings.py`](https://github.com/OpenHumans/oh-data-demo-template/blob/master/demotemplate/settings.py#L73)
+- when making your request, use the function `make_request_respectful_get` in [`datauploader/tasks.py`](https://github.com/OpenHumans/oh-data-demo-template/blob/a9acbc12d26726dff25a5cd3d583a509d200bedb/datauploader/tasks.py#L154)
 
 ## Editing the template
 
