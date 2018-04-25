@@ -14,6 +14,9 @@ import os
 import dj_database_url
 from env_tools import apply_env
 from requests_respectful import RespectfulRequester
+import logging
+
+logger = logging.getLogger(__name__)
 
 apply_env()
 
