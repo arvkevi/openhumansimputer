@@ -19,7 +19,7 @@ CELERY_BROKER_URL = os.getenv('REDIS_URL')
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE',
-                      'oh-fitbit-integration.settings')
+                      'demotemplate.settings')
 
 app = Celery('datauploader', broker=CELERY_BROKER_URL)
 # Set up Celery with Heroku CloudAMQP (or AMQP in local dev).
