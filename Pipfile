@@ -7,20 +7,22 @@ name = "pypi"
 
 [packages]
 
-django = "*"
+Django = "*"
 celery = "*"
 arrow = "*"
 requests = "*"
-amqp = "*"
 gunicorn = "*"
 dj-database-url = "*"
 "psycopg2" = "*"
 whitenoise = "*"
-env_tools="*"
+env-tools = "*"
+redis = "*"
+PyYAML = "*"
 
 
 [dev-packages]
 
+vcrpy = "*"
 
 
 [requires]

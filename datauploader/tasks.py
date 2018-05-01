@@ -1,20 +1,25 @@
 """
-A template for an asynchronous task that updates data in Open Humans.
-
-This example task:
-  1. deletes any current files in OH if they match the planned upload filename
+Asynchronous tasks that update data in Open Humans.
+These tasks:
+  1. delete any current files in OH if they match the planned upload filename
   2. adds a data file
 """
+import logging
 import os
 import json
 import shutil
 import tempfile
+from django.utils import lorem_ipsum
 import textwrap
 import requests
 from celery import shared_task
-from django.utils import lorem_ipsum
 from django.conf import settings
-from .models import OpenHumansMember
+from open_humans.models import OpenHumansMember
+from datetime import datetime
+from demotemplate.settings import rr
+
+# Set up logging.
+logger = logging.getLogger(__name__)
 
 
 @shared_task
@@ -48,9 +53,7 @@ def xfer_to_open_humans(oh_id, num_submit=0, logger=None, **kwargs):
 def add_data_to_open_humans(oh_member, tempdir):
     """
     Add demonstration file to Open Humans.
-
     This might be a good place to start editing, to add your own project data.
-
     This template is written to provide the function with a tempdir that
     will be cleaned up later. You can use the tempdir to stage the creation of
     files you plan to upload to Open Humans.
@@ -63,6 +66,19 @@ def add_data_to_open_humans(oh_member, tempdir):
 
     # Upload this file to Open Humans.
     upload_file_to_oh(oh_member, data_filepath, data_metadata)
+
+
+def make_datafile(user_data, metadata, tempdir):
+    """
+    Make a user data file in the tempdir.
+    """
+    filename = 'user_data_' + datetime.today().strftime('%Y%m%d')
+    filepath = os.path.join(tempdir, filename)
+
+    with open(filepath, 'w') as f:
+        f.write(user_data)
+
+    return filepath, metadata
 
 
 def make_example_datafile(tempdir):
@@ -84,7 +100,6 @@ def make_example_datafile(tempdir):
 def delete_oh_file_by_name(oh_member, filename):
     """
     Delete all project files matching the filename for this Open Humans member.
-
     This deletes files this project previously added to the Open Humans
     member account, if they match this filename. Read more about file deletion
     API options here:
@@ -98,15 +113,12 @@ def delete_oh_file_by_name(oh_member, filename):
     req.raise_for_status()
 
 
-
 def upload_file_to_oh(oh_member, filepath, metadata):
     """
     This demonstrates using the Open Humans "large file" upload process.
-
     The small file upload process is simpler, but it can time out. This
     alternate approach is required for large files, and still appropriate
     for small files.
-
     This process is "direct to S3" using three steps: 1. get S3 target URL from
     Open Humans, 2. Perform the upload, 3. Notify Open Humans when complete.
     """
@@ -134,5 +146,11 @@ def upload_file_to_oh(oh_member, filepath, metadata):
               'file_id': req1.json()['id']})
     req3.raise_for_status()
 
-    print('Upload done: "{}" for member {}.'.format(
-        os.path.basename(filepath), oh_member.oh_id))
+    logger.debug('Upload done: "{}" for member {}.'.format(
+            os.path.basename(filepath), oh_member.oh_id))
+
+
+@shared_task
+def make_request_respectful_get(url, realms, **kwargs):
+    r = rr.get(url=url, realms=realms, **kwargs)
+    logger.debug('Request completed. Response: {}'.format(r.text))

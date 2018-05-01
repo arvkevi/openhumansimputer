@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 import dj_database_url
 from env_tools import apply_env
+from requests_respectful import RespectfulRequester
+import logging
+
+logger = logging.getLogger(__name__)
 
 apply_env()
 
@@ -29,26 +33,47 @@ DEBUG = False if os.getenv('DEBUG', '').lower() == 'false' else True
 
 REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 
-# Allow all host headers if this is running as a Heroku app.
-if REMOTE:
-    ALLOWED_HOSTS = ['*']
-    print('REMOTE True')
-else:
-    ALLOWED_HOSTS = []
-    print('REMOTE False')
-APP_BASE_URL = os.getenv('APP_BASE_URL')
+ALLOWED_HOSTS = ['*']
 
+HEROKUCONFIG_APP_NAME = os.getenv('HEROKUCONFIG_APP_NAME', '')
+
+DEFAULT_BASE_URL = ('https://{}.herokuapp.com'.format(HEROKUCONFIG_APP_NAME) if
+                    REMOTE else 'http://127.0.0.1:5000')
+
+OPENHUMANS_APP_BASE_URL = os.getenv('APP_BASE_URL', DEFAULT_BASE_URL)
+if OPENHUMANS_APP_BASE_URL[-1] == "/":
+    OPENHUMANS_APP_BASE_URL = OPENHUMANS_APP_BASE_URL[:-1]
 
 # Open Humans configuration
-OH_CLIENT_ID = os.getenv('OH_CLIENT_ID')
-OH_CLIENT_SECRET = os.getenv('OH_CLIENT_SECRET')
+OPENHUMANS_CLIENT_ID = os.getenv('OH_CLIENT_ID')
+OPENHUMANS_CLIENT_SECRET = os.getenv('OH_CLIENT_SECRET')
 OH_ACTIVITY_PAGE = os.getenv('OH_ACTIVITY_PAGE')
-OH_BASE_URL = 'https://www.openhumans.org'
+OPENHUMANS_OH_BASE_URL = 'https://www.openhumans.org'
 
-OH_API_BASE = 'https://www.openhumans.org/api/direct-sharing'
-OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
+OH_API_BASE = OPENHUMANS_OH_BASE_URL + '/api/direct-sharing'
 OH_DIRECT_UPLOAD = OH_API_BASE + '/project/files/upload/direct/'
 OH_DIRECT_UPLOAD_COMPLETE = OH_API_BASE + '/project/files/upload/complete/'
+OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
+
+# Requests Respectful (rate limiting, waiting)
+if REMOTE is True:
+    from urllib.parse import urlparse
+    url_object = urlparse(os.getenv('REDIS_URL'))
+    logger.info('Connecting to redis at %s:%s',
+        url_object.hostname,
+        url_object.port)
+    RespectfulRequester.configure(
+        redis={
+            "host": url_object.hostname,
+            "port": url_object.port,
+            "password": url_object.password,
+            "database": 0
+        },
+        safety_threshold=5)
+
+# This creates a Realm called "source" that allows 60 requests per minute maximum.
+rr = RespectfulRequester()
+rr.register_realm("Source", max_requests=60, timespan=60)
 
 # Applications installed
 INSTALLED_APPS = [
@@ -61,6 +86,8 @@ INSTALLED_APPS = [
 
     # Local apps. Update these if you add or change app names!
     'datauploader.apps.DatauploaderConfig',
+    'open_humans.apps.OpenHumansConfig',
+    'main.apps.MainConfig'
 ]
 
 MIDDLEWARE = [
@@ -121,20 +148,20 @@ DATABASES['default'].update(db_from_env)
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.\
-                 UserAttributeSimilarityValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'UserAttributeSimilarityValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.\
-                 MinimumLengthValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'MinimumLengthValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.\
-                 CommonPasswordValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'CommonPasswordValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.\
-                 NumericPasswordValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'NumericPasswordValidator'),
     },
 ]
 
