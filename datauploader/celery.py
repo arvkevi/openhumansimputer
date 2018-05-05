@@ -26,7 +26,7 @@ app = Celery('datauploader', broker=CELERY_BROKER_URL)
 app.conf.update({
     'BROKER_URL': CELERY_BROKER_URL,
     # Recommended settings. See: https://www.cloudamqp.com/docs/celery.html
-    'BROKER_POOL_LIMIT': 1,
+    'BROKER_POOL_LIMIT': None,
     'BROKER_HEARTBEAT': None,
     'BROKER_CONNECTION_TIMEOUT': 30,
     'CELERY_RESULT_BACKEND': CELERY_BROKER_URL,

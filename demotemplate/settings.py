@@ -59,9 +59,6 @@ OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 if REMOTE is True:
     from urllib.parse import urlparse
     url_object = urlparse(os.getenv('REDIS_URL'))
-    logger.info('Connecting to redis at %s:%s',
-        url_object.hostname,
-        url_object.port)
     RespectfulRequester.configure(
         redis={
             "host": url_object.hostname,
