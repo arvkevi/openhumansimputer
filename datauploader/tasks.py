@@ -17,6 +17,8 @@ from django.conf import settings
 from open_humans.models import OpenHumansMember
 from datetime import datetime
 from demotemplate.settings import rr
+import subprocess
+from ohapi import api
 
 # Set up logging.
 logger = logging.getLogger(__name__)
@@ -49,6 +51,33 @@ def xfer_to_open_humans(oh_id, num_submit=0, logger=None, **kwargs):
     #         args=[oh_id, num_submit], kwargs=kwargs, countdown=10)
     #     return
 
+def get_vcf(oh_member):
+    user_details = api.exchange_oauth2_member(oh_member.get_access_token())
+    for data_source in user_details['data']:
+        if ('vcf' in data_source['metadata']['tags'] and
+            '23andMe' in data_source['metadata']['tags']):
+            data_file_url = data_source['download_url']
+
+    file_23andme = tempfile.NamedTemporaryFile()
+    file_23andme.write(requests.get(data_file_url).content)
+    file_23andme.flush()
+    result = subprocess.run(["ls", "-l"], stdout = subprocess.PIPE)
+    print(result)
+    sys.stdout.flush()
+
+
+
+def convert_vcf_to_plink():
+    """
+    Use plink to convert an OH vcf file to plink format.
+    Then use plink to filter the ref/ref sites
+
+    uniq 23andMe-genotyping.vcf > 23andMe-genotyping.uniq.vcf
+    plink --vcf 23andMe-genotyping.uniq.vcf --out ka.gt
+    plink --bfile ka.gt --maf 0.01 --make-bed --set-missing-var-ids @:#[b37]\$1,\$2 --out ka.gt.maf
+    """
+
+    pass
 
 def add_data_to_open_humans(oh_member, tempdir):
     """
@@ -85,7 +114,7 @@ def make_example_datafile(tempdir):
     """
     Make a lorem-ipsum file in the tempdir, for demonstration purposes.
     """
-    filepath = os.path.join(tempdir, 'example_data1.txt')
+    filepath = os.path.join(tempdir, 'example_data2.txt')
     paras = lorem_ipsum.paragraphs(3, common=True)
     output_text = '\n'.join(['\n'.join(textwrap.wrap(p)) for p in paras])
     with open(filepath, 'w') as f:

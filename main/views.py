@@ -9,7 +9,7 @@ import arrow
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.conf import settings
-from datauploader.tasks import (make_request_respectful_get)
+from datauploader.tasks import (xfer_to_open_humans, make_request_respectful_get)
 from open_humans.models import OpenHumansMember
 from .models import DataSourceMember
 
@@ -45,8 +45,8 @@ def complete(request):
               backend='django.contrib.auth.backends.ModelBackend')
 
         # Initiate a data transfer task, then render `complete.html`.
-        #xfer_to_openhumans.delay(oh_id=oh_member.oh_id)
-        
+        xfer_to_open_humans.delay(oh_id=oh_member.oh_id)
+
         # Example HTTP get with requests_respectful via celery (in tasks.py)
         # Required arguments are url and realms, but you may pass ANY additional
         # arguments that the "requests" library accepts and they will work as well.
