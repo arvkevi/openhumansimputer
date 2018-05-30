@@ -17,12 +17,14 @@ from .models import DataSourceMember
 # Set up logging.
 logger = logging.getLogger(__name__)
 
+
 def index(request):
     """
     Starting page for app.
     """
 
     context = {'client_id': settings.OPENHUMANS_CLIENT_ID,
+               'redirect_uri': settings.OPENHUMANS_APP_REDIRECT_URI,
                'oh_proj_page': settings.OH_ACTIVITY_PAGE}
 
     return render(request, 'main/index.html', context=context)
