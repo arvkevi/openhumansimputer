@@ -19,6 +19,7 @@ env-tools = "*"
 redis = "*"
 PyYAML = "*"
 open-humans-api = "*"
+genipe = "*"
 
 [dev-packages]
 
