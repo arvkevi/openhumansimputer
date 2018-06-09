@@ -51,15 +51,12 @@ def xfer_to_open_humans(oh_id, num_submit=0, logger=None, **kwargs):
 
 @shared_task
 def submit_chrom(chrom, num_submit=0, logger=None, **kwargs):
-    """
-    Build and run the genipe-launcher command in Popen.
-    """
-    #shapeit_extra = '--shapeit-extra', '-R "{}".format()/1000GP_Phase3_chr22.hap.gz '"$REF_PANEL"'/1000GP_Phase3_chr22.legend.gz '"$REF_PANEL"'/1000GP_Phase3.sample --exclude-snp '"$HOME"'/genipe_tutorial/ka_gt_maf_out/chr22/chr22.alignments.snp.strand.exclude'
+    """Build and run the genipe-launcher command in Popen."""
 
     command = [
         'genipe-launcher',
         '--chrom', '{}'.format(chrom),
-        '--bfile', '{}/{}'.format(DATA_DIR, OH_MEMBER_PLINK_PREFIX),
+        '--bfile', '{}/{}'.format(DATA_DIR, 'ohmember'),
         '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
         '--impute2-bin', '{}/impute2'.format(IMP_BIN),
         '--plink-bin', '{}/plink'.format(IMP_BIN),
@@ -85,6 +82,31 @@ def submit_chrom(chrom, num_submit=0, logger=None, **kwargs):
     #except Exception as e:
     #    print(e)
     #    print('oops something went wrong in submit_chrom')
+
+
+def get_vcf(oh_member):
+    """Download member .vcf."""
+    user_details = api.exchange_oauth2_member(oh_member.get_access_token())
+    for data_source in user_details['data']:
+        if 'vcf' in data_source['metadata']['tags'] and '23andMe' in data_source['metadata']['tags']:
+            data_file_url = data_source['download_url']
+
+    file_23andme = requests.get(data_file_url)
+    with open('{}/member.vcf.gz'.format(DATA_DIR), 'wb') as handle:
+        for block in file_23andme.iter_content(1024):
+            handle.write(block)
+
+
+def prepare_vcf():
+    """
+    Process the .vcf.
+    1. unzip
+    2. plink
+    3. plink 2
+    4. name these ohmember.___
+    """
+    pass
+
 
 def add_data_to_open_humans(oh_member, tempdir):
     """

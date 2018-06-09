@@ -9,7 +9,7 @@ import arrow
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.conf import settings
-from imputerlauncher.tasks import submit_chrom
+from imputerlauncher.tasks import (submit_chrom, get_vcf, prepare_vcf)
 from datauploader.tasks import (xfer_to_open_humans, make_request_respectful_get)
 from open_humans.models import OpenHumansMember
 from .models import DataSourceMember
@@ -47,8 +47,11 @@ def complete(request):
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
 
-        # Initiate a data transfer task, then render `complete.html`.
-        #xfer_to_open_humans.delay(oh_id=oh_member.oh_id)
+        # get the member's vcf file
+        logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
+        get_vcf(oh_member)
+
+        prepare_vcf()
 
         CHROMOSOMES = ["{}".format(i) for i in list(range(19, 23))]  # + ["X", "Y"]]
         #CHROMOSOMES = ["chr{}".format(i) for i in list(range(1, 23))]  # + ["X", "Y"]]
@@ -56,11 +59,6 @@ def complete(request):
         for chrom in CHROMOSOMES:
             logger.debug('submitting chromosome {} to celery'.format(chrom))
             submit_chrom.delay(chrom)
-
-        # Example HTTP get with requests_respectful via celery (in tasks.py)
-        # Required arguments are url and realms, but you may pass ANY additional
-        # arguments that the "requests" library accepts and they will work as well.
-        # make_request_respectful_get.delay('urlhere', realms=["Source"])
 
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}

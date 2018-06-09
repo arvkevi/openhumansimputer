@@ -1,11 +1,11 @@
 # this file gets sourced at the start of the app
 # after the heroku config vars.
 
-IMP_BIN=$HOME/impbin
-REF_PANEL=$HOME/1000GP_Phase3
-DATA_DIR=$HOME/data
-REF_FA=$HOME/hg19
-OUT_DIR=$HOME/genipe_output
+IMP_BIN="$HOME"/impbin
+REF_PANEL="$HOME"/1000GP_Phase3
+DATA_DIR="$HOME"/data
+REF_FA="$HOME"/hg19
+OUT_DIR="$HOME"/genipe_output
 
 if [ ! -d "$IMP_BIN" ]; then
   mkdir $IMP_BIN
