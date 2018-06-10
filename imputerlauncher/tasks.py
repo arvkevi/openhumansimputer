@@ -56,7 +56,7 @@ def submit_chrom(chrom, num_submit=0, logger=None, **kwargs):
     command = [
         'genipe-launcher',
         '--chrom', '{}'.format(chrom),
-        '--bfile', '{}/{}'.format(DATA_DIR, 'ohmember'),
+        '--bfile', '{}/{}'.format(DATA_DIR, 'member.plink.gt'),
         '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
         '--impute2-bin', '{}/impute2'.format(IMP_BIN),
         '--plink-bin', '{}/plink'.format(IMP_BIN),
@@ -97,15 +97,25 @@ def get_vcf(oh_member):
             handle.write(block)
 
 
-def prepare_vcf():
+def prepare_data():
     """
     Process the .vcf.
-    1. unzip
+    Maybe just call prepare_vcf.sh from Popen
+
+    uniq 23andMe-genotyping.vcf > 23andMe-genotyping.uniq.vcf
+    plink --vcf 23andMe-genotyping.uniq.vcf --out ka.gt
+    plink --bfile ka.gt --maf 0.01 --make-bed --set-missing-var-ids @:#[b37]\$1,\$2 --out ka.gt.maf
+    1. gunzip
     2. plink
     3. plink 2
-    4. name these ohmember.___
+    4. name these member.__
     """
-    pass
+    print(os.listdir())
+    command = [
+    'imputerlauncher/prepare_genotypes.sh'
+    ]
+    process = Popen(command, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate()
 
 
 def add_data_to_open_humans(oh_member, tempdir):
