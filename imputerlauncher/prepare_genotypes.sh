@@ -6,6 +6,8 @@ uniq "$HOME"/data/member.vcf > "$HOME"/data/member.uniq.vcf
 # convert to plink format
 "$HOME"/impbin/plink \
 --vcf "$HOME"/data/member.uniq.vcf \
+--impute-sex ycount \
+--make-bed \
 --out "$HOME"/data/member.plink
 # remove missing ids
 "$HOME"/impbin/plink \

@@ -52,25 +52,27 @@ def xfer_to_open_humans(oh_id, num_submit=0, logger=None, **kwargs):
 @shared_task
 def submit_chrom(chrom, num_submit=0, logger=None, **kwargs):
     """Build and run the genipe-launcher command in Popen."""
-
-    command = [
-        'genipe-launcher',
-        '--chrom', '{}'.format(chrom),
-        '--bfile', '{}/{}'.format(DATA_DIR, 'member.plink.gt'),
-        '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
-        '--impute2-bin', '{}/impute2'.format(IMP_BIN),
-        '--plink-bin', '{}/plink'.format(IMP_BIN),
-        '--reference', '{}/hg19.fasta'.format(REF_FA),
-        '--hap-template', '{}/1000GP_Phase3_chr{}.hap.gz'.format(REF_PANEL, chrom),
-        '--legend-template', '{}/1000GP_Phase3_chr{}.legend.gz'.format(REF_PANEL, chrom),
-        '--map-template', '{}/genetic_map_chr{}_combined_b37.txt'.format(REF_PANEL, chrom),
-        '--sample-file', '{}/1000GP_Phase3.sample'.format(REF_PANEL),
-        '--filtering-rules', 'ALL<0.01', 'ALL>0.99',
-        '--report-title', '"Test"',
-        '--report-number', '"Test Report"',
-        '--output-dir', '{}'.format(OUT_DIR),
-        '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/chr{}/chr{}.alignments.snp.strand.exclude'.format(REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, chrom, chrom)
-        ]
+    if chrom == 'X':
+        pass
+    else:
+        command = [
+            'genipe-launcher',
+            '--chrom', '{}'.format(chrom),
+            '--bfile', '{}/{}'.format(DATA_DIR, 'member.plink.gt'),
+            '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
+            '--impute2-bin', '{}/impute2'.format(IMP_BIN),
+            '--plink-bin', '{}/plink'.format(IMP_BIN),
+            '--reference', '{}/hg19.fasta'.format(REF_FA),
+            '--hap-template', '{}/1000GP_Phase3_chr{}.hap.gz'.format(REF_PANEL, chrom),
+            '--legend-template', '{}/1000GP_Phase3_chr{}.legend.gz'.format(REF_PANEL, chrom),
+            '--map-template', '{}/genetic_map_chr{}_combined_b37.txt'.format(REF_PANEL, chrom),
+            '--sample-file', '{}/1000GP_Phase3.sample'.format(REF_PANEL),
+            '--filtering-rules', 'ALL<0.01', 'ALL>0.99',
+            '--report-title', '"Test"',
+            '--report-number', '"Test Report"',
+            '--output-dir', '{}'.format(OUT_DIR),
+            '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/chr{}/chr{}.alignments.snp.strand.exclude'.format(REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, chrom, chrom)
+            ]
 
     process = Popen(command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
@@ -110,13 +112,20 @@ def prepare_data():
     3. plink 2
     4. name these member.__
     """
-    print(os.listdir())
     command = [
-    'imputerlauncher/prepare_genotypes.sh'
+        'imputerlauncher/prepare_genotypes.sh'
     ]
     process = Popen(command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
 
+
+@shared_task
+def combine_chrom(num_submit=0, logger=None, **kwargs):
+    # why does this print to log immediately?
+    print('Everything has completed')
+    command = [
+        'cominbe chr vcfs'
+    ]
 
 def add_data_to_open_humans(oh_member, tempdir):
     """

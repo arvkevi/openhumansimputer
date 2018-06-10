@@ -1,19 +1,14 @@
 import logging
 import os
 import requests
-import os
-import base64
-import json
-import arrow
+from celery import chain, group
 
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.conf import settings
-from imputerlauncher.tasks import (submit_chrom, get_vcf, prepare_data)
+from imputerlauncher.tasks import (submit_chrom, get_vcf, prepare_data, combine_chrom)
 from datauploader.tasks import (xfer_to_open_humans, make_request_respectful_get)
 from open_humans.models import OpenHumansMember
-from .models import DataSourceMember
-
 
 # Set up logging.
 logger = logging.getLogger(__name__)
@@ -50,15 +45,13 @@ def complete(request):
         # get the member's vcf file
         logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
         get_vcf(oh_member)
-
+        # convert to plink format
         prepare_data()
 
-        CHROMOSOMES = ["{}".format(i) for i in list(range(19, 23))]  # + ["X", "Y"]]
-        #CHROMOSOMES = ["chr{}".format(i) for i in list(range(1, 23))]  # + ["X", "Y"]]
+        CHROMOSOMES = ["{}".format(i) for i in list(range(21, 23))]  # + ["X"]]
+        #CHROMOSOMES = ["chr{}".format(i) for i in list(range(1, 23))]  # + ["X"]]
 
-        #for chrom in CHROMOSOMES:
-        #    logger.debug('submitting chromosome {} to celery'.format(chrom))
-        #    submit_chrom.delay(chrom)
+        pipeline = (group(submit_chrom.delay(chrom) for chrom in CHROMOSOMES) | combine_chrom.delay())
 
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
