@@ -4,6 +4,7 @@ These tasks:
   1. delete any current files in OH if they match the planned upload filename
   2. adds a data file
 """
+import os
 import logging
 import requests
 from celery import shared_task
@@ -24,9 +25,39 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def submit_chrom(chrom, num_submit=0, logger=None, **kwargs):
-    """Build and run the genipe-launcher command in Popen."""
+    """
+    Build and run the genipe-launcher command in Popen.
+    rate_limit='1/m' sets the number of tasks per minute.
+    This is important because impute2 writes a file to a shared directory that
+    genipe-launcher tries to delete. If multiple tasks launch at the same time,
+    celery task silently fails.
+    """
+    # this silly block of code runs impute2 because genipe-launcher deletes
+    # two unneccesary files before they are available.
+    os.makedirs('{}/chr{}'.format(OUT_DIR, chrom), exist_ok=True)
+    os.chdir('{}/chr{}'.format(OUT_DIR, chrom))
+    run_impute_test = ['{}/impute2'.format(IMP_BIN)]
+    Popen(run_impute_test, stdout=PIPE, stderr=PIPE)
+
     if chrom == 'X':
-        pass
+        command = [
+            'genipe-launcher',
+            '--chrom', '{}'.format(chrom),
+            '--bfile', '{}/{}'.format(DATA_DIR, 'member.plink.gt'),
+            '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
+            '--impute2-bin', '{}/impute2'.format(IMP_BIN),
+            '--plink-bin', '{}/plink'.format(IMP_BIN),
+            '--reference', '{}/hg19.fasta'.format(REF_FA),
+            '--hap-template', '{}/1000GP_Phase3_chr{}.hap.gz'.format(REF_PANEL, chrom),
+            '--legend-template', '{}/1000GP_Phase3_chr{}.legend.gz'.format(REF_PANEL, chrom),
+            '--map-template', '{}/genetic_map_chr{}_combined_b37.txt'.format(REF_PANEL, chrom),
+            '--sample-file', '{}/1000GP_Phase3.sample'.format(REF_PANEL),
+            '--filtering-rules', 'ALL<0.01', 'ALL>0.99',
+            '--report-title', '"Test"',
+            '--report-number', '"Test Report"',
+            '--output-dir', '{}/chr{}'.format(OUT_DIR, chrom),
+            '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, chrom, chrom, chrom)
+            ]
     else:
         command = [
             'genipe-launcher',
@@ -43,20 +74,12 @@ def submit_chrom(chrom, num_submit=0, logger=None, **kwargs):
             '--filtering-rules', 'ALL<0.01', 'ALL>0.99',
             '--report-title', '"Test"',
             '--report-number', '"Test Report"',
-            '--output-dir', '{}'.format(OUT_DIR),
-            '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/chr{}/chr{}.alignments.snp.strand.exclude'.format(REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, chrom, chrom)
+            '--output-dir', '{}/chr{}'.format(OUT_DIR, chrom),
+            '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, chrom, chrom, chrom)
             ]
 
     process = Popen(command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
-
-    #try:
-        #process = Popen(command, stdout=PIPE, stderr=PIPE)
-    #    stdout, stderr = process.communicate()
-
-    #except Exception as e:
-    #    print(e)
-    #    print('oops something went wrong in submit_chrom')
 
 
 def get_vcf(oh_member):
