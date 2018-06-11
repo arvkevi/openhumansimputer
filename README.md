@@ -7,7 +7,7 @@ Monitor celery tasks locally:
 1. After the app is running, open a new terminal session.
 2. `cd /path/to/open-humans-imputer`
 3. `pipenv shell`
-4. `celery flower --broker=redis://kevin@localhost:6379/1`
+4. `celery flower --broker=redis://yourusername@localhost:6379/1`
 5. go to [http://127.0.0.1:5555](http://127.0.0.1:5555)
 
 # Template and working demo for adding data to an Open Humans project. Python 3; Django 2.
