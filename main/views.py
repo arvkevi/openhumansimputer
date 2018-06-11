@@ -53,6 +53,7 @@ def complete(request):
 
         pipeline = (group(submit_chrom.delay(chrom) for chrom in CHROMOSOMES) | combine_chrom.delay())
 
+
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
         return render(request, 'main/complete.html',
