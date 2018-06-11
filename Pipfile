@@ -20,6 +20,8 @@ redis = "*"
 PyYAML = "*"
 open-humans-api = "*"
 genipe = "*"
+flower = "*"
+
 
 [dev-packages]
 
