@@ -1,7 +1,6 @@
-import logging
-import os
 import requests
-from celery import chain, group
+from celery import signature, chord
+import logging
 
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
@@ -48,11 +47,11 @@ def complete(request):
         # convert to plink format
         prepare_data()
 
-        CHROMOSOMES = ["{}".format(i) for i in list(range(21, 23))]  # + ["X"]]
-        #CHROMOSOMES = ["chr{}".format(i) for i in list(range(1, 23))]  # + ["X"]]
+        CHROMOSOMES = ["{}".format(i) for i in list(range(20, 23))] #+ ["X"]
+        #CHROMOSOMES = ["chr{}".format(i) for i in list(range(1, 23))] + ["X"]
 
-        pipeline = (group(submit_chrom.delay(chrom) for chrom in CHROMOSOMES) | combine_chrom.delay())
-
+        signature('shared_tasks.apply_async', countdown=10)
+        res = chord((submit_chrom.s(chrom) for chrom in CHROMOSOMES), combine_chrom.s())()
 
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
