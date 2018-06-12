@@ -1,4 +1,4 @@
-# Imputer: Genotype imputation pipeline for Open humans
+# Imputer: Genotype imputation pipeline for Open Humans
 
 ## Under Active Development!
 

@@ -1,6 +1,7 @@
 import requests
 from celery import signature, chord
 import logging
+import os
 
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
@@ -8,6 +9,10 @@ from django.conf import settings
 from imputerlauncher.tasks import (submit_chrom, get_vcf, prepare_data, combine_chrom)
 from datauploader.tasks import (xfer_to_open_humans, make_request_respectful_get)
 from open_humans.models import OpenHumansMember
+
+
+# in production this should be False
+TEST_CHROMS = os.environ.get('TEST_CHROMS')
 
 # Set up logging.
 logger = logging.getLogger(__name__)
@@ -47,8 +52,10 @@ def complete(request):
         # convert to plink format
         prepare_data()
 
-        CHROMOSOMES = ["{}".format(i) for i in list(range(20, 23))] #+ ["X"]
-        #CHROMOSOMES = ["chr{}".format(i) for i in list(range(1, 23))] + ["X"]
+        if TEST_CHROMS:
+            CHROMOSOMES = ["{}".format(i) for i in list(range(20, 23))] #+ ["X"]
+        else:
+            CHROMOSOMES = ["{}".format(i) for i in list(range(1, 23))] #+ ["X"]
 
         signature('shared_tasks.apply_async', countdown=10)
         res = chord((submit_chrom.s(chrom) for chrom in CHROMOSOMES), combine_chrom.s())()

@@ -39,7 +39,7 @@ def submit_chrom(chrom, num_submit=0, logger=None, **kwargs):
     run_impute_test = ['{}/impute2'.format(IMP_BIN)]
     Popen(run_impute_test, stdout=PIPE, stderr=PIPE)
 
-    if chrom == 'X':
+    if chrom == '23':
         command = [
             'genipe-launcher',
             '--chrom', '{}'.format(chrom),
