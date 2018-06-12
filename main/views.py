@@ -53,9 +53,9 @@ def complete(request):
         prepare_data()
 
         if TEST_CHROMS:
-            CHROMOSOMES = ["{}".format(i) for i in list(range(20, 23))] #+ ["X"]
+            CHROMOSOMES = ["{}".format(i) for i in list(range(20, 23))] #+ ["23"]
         else:
-            CHROMOSOMES = ["{}".format(i) for i in list(range(1, 23))] #+ ["X"]
+            CHROMOSOMES = ["{}".format(i) for i in list(range(1, 23))] #+ ["23"]
 
         signature('shared_tasks.apply_async', countdown=10)
         res = chord((submit_chrom.s(chrom) for chrom in CHROMOSOMES), combine_chrom.s())()

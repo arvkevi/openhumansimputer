@@ -33,12 +33,13 @@ if [ ! -d "$REF_PANEL" ]; then
   tar -xvzf 1000GP_Phase3.tgz
   cd
 
-  echo DOWNLOADING 1kG chrX HAPLOTYPES...
-  mkdir "$REF_PANEL"_chrX
-  cd "$REF_PANEL"_chrX
-  wget https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3_chrX.tgz
-  tar -xvzf 1000GP_Phase3_chrX.tgz
-  cd
+  # uncomment below when implementing X chromosome imputation
+  #echo DOWNLOADING 1kG chrX HAPLOTYPES...
+  #mkdir "$REF_PANEL"_chrX
+  #cd "$REF_PANEL"_chrX
+  #wget https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3_chrX.tgz
+  #tar -xvzf 1000GP_Phase3_chrX.tgz
+  #cd
 fi
 
 if [ ! -d "$REF_FA" ]; then
