@@ -21,7 +21,7 @@ PyYAML = "*"
 open-humans-api = "*"
 genipe = "*"
 flower = "*"
-
+pandas = "*"
 
 [dev-packages]
 

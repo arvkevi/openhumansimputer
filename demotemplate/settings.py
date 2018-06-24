@@ -57,6 +57,16 @@ OH_DIRECT_UPLOAD = OH_API_BASE + '/project/files/upload/direct/'
 OH_DIRECT_UPLOAD_COMPLETE = OH_API_BASE + '/project/files/upload/complete/'
 OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 
+# Imputer Settings
+# in production this should be False
+TEST_CHROMS = os.environ.get('TEST_CHROMS')
+if TEST_CHROMS:
+    CHROMOSOMES = ["{}".format(i)
+                   for i in list(range(21, 23))]  # + ["23"]
+else:
+    CHROMOSOMES = ["{}".format(i)
+                   for i in list(range(1, 23))]  # + ["23"]
+
 # Requests Respectful (rate limiting, waiting)
 if REMOTE is True:
     from urllib.parse import urlparse

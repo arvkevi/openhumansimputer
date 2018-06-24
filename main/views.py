@@ -6,13 +6,13 @@ import os
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.conf import settings
-from imputerlauncher.tasks import (submit_chrom, get_vcf, prepare_data, combine_chrom)
-from datauploader.tasks import (xfer_to_open_humans, make_request_respectful_get)
+from imputerlauncher.tasks import (
+    submit_chrom, get_vcf, prepare_data, combine_chrom)
+from datauploader.tasks import (
+    xfer_to_open_humans, make_request_respectful_get)
 from open_humans.models import OpenHumansMember
+from demotemplate.settings import CHROMOSOMES
 
-
-# in production this should be False
-TEST_CHROMS = os.environ.get('TEST_CHROMS')
 
 # Set up logging.
 logger = logging.getLogger(__name__)
@@ -52,13 +52,9 @@ def complete(request):
         # convert to plink format
         prepare_data()
 
-        if TEST_CHROMS:
-            CHROMOSOMES = ["{}".format(i) for i in list(range(20, 23))] #+ ["23"]
-        else:
-            CHROMOSOMES = ["{}".format(i) for i in list(range(1, 23))] #+ ["23"]
-
         signature('shared_tasks.apply_async', countdown=10)
-        res = chord((submit_chrom.s(chrom) for chrom in CHROMOSOMES), combine_chrom.s())()
+        res = chord((submit_chrom.s(chrom)
+                     for chrom in CHROMOSOMES), combine_chrom.s())()
 
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
@@ -130,7 +126,7 @@ def oh_get_member_data(token):
         '{}/api/direct-sharing/project/exchange-member/'
         .format(settings.OPENHUMANS_OH_BASE_URL),
         params={'access_token': token}
-        )
+    )
     if req.status_code == 200:
         return req.json()
     raise Exception('Status code {}'.format(req.status_code))

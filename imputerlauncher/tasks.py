@@ -11,6 +11,9 @@ from celery import shared_task
 from subprocess import Popen, PIPE
 from ohapi import api
 from os import environ
+import pandas as pd
+from demotemplate.settings import CHROMOSOMES
+
 
 HOME = environ.get('HOME')
 IMP_BIN = environ.get('IMP_BIN')
@@ -48,16 +51,20 @@ def submit_chrom(chrom, num_submit=0, logger=None, **kwargs):
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
             '--reference', '{}/hg19.fasta'.format(REF_FA),
-            '--hap-template', '{}/1000GP_Phase3_chr{}.hap.gz'.format(REF_PANEL, chrom),
-            '--legend-template', '{}/1000GP_Phase3_chr{}.legend.gz'.format(REF_PANEL, chrom),
-            '--map-template', '{}/genetic_map_chr{}_combined_b37.txt'.format(REF_PANEL, chrom),
+            '--hap-template', '{}/1000GP_Phase3_chr{}.hap.gz'.format(
+                REF_PANEL, chrom),
+            '--legend-template', '{}/1000GP_Phase3_chr{}.legend.gz'.format(
+                REF_PANEL, chrom),
+            '--map-template', '{}/genetic_map_chr{}_combined_b37.txt'.format(
+                REF_PANEL, chrom),
             '--sample-file', '{}/1000GP_Phase3.sample'.format(REF_PANEL),
             '--filtering-rules', 'ALL<0.01', 'ALL>0.99',
             '--report-title', '"Test"',
             '--report-number', '"Test Report"',
             '--output-dir', '{}/chr{}'.format(OUT_DIR, chrom),
-            '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, chrom, chrom, chrom)
-            ]
+            '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(
+                REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, chrom, chrom, chrom)
+        ]
     else:
         command = [
             'genipe-launcher',
@@ -67,16 +74,20 @@ def submit_chrom(chrom, num_submit=0, logger=None, **kwargs):
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
             '--reference', '{}/hg19.fasta'.format(REF_FA),
-            '--hap-template', '{}/1000GP_Phase3_chr{}.hap.gz'.format(REF_PANEL, chrom),
-            '--legend-template', '{}/1000GP_Phase3_chr{}.legend.gz'.format(REF_PANEL, chrom),
-            '--map-template', '{}/genetic_map_chr{}_combined_b37.txt'.format(REF_PANEL, chrom),
+            '--hap-template', '{}/1000GP_Phase3_chr{}.hap.gz'.format(
+                REF_PANEL, chrom),
+            '--legend-template', '{}/1000GP_Phase3_chr{}.legend.gz'.format(
+                REF_PANEL, chrom),
+            '--map-template', '{}/genetic_map_chr{}_combined_b37.txt'.format(
+                REF_PANEL, chrom),
             '--sample-file', '{}/1000GP_Phase3.sample'.format(REF_PANEL),
             '--filtering-rules', 'ALL<0.01', 'ALL>0.99',
             '--report-title', '"Test"',
             '--report-number', '"Test Report"',
             '--output-dir', '{}/chr{}'.format(OUT_DIR, chrom),
-            '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, chrom, chrom, chrom)
-            ]
+            '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(
+                REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, chrom, chrom, chrom)
+        ]
 
     process = Popen(command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
@@ -104,10 +115,50 @@ def prepare_data():
     stdout, stderr = process.communicate()
 
 
+def _rreplace(s, old, new, occurrence):
+    li = s.rsplit(old, occurrence)
+    return new.join(li)
+
+
 @shared_task
 def combine_chrom(num_submit=0, logger=None, **kwargs):
     # why does this print to log immediately?
-    print('Everything has completed')
+    print('Imputation has completed, now combining results...')
+
+    impute_cols = ['chr', 'name', 'position',
+                   'a0', 'a1', 'a0a0_p', 'a0a1_p', 'a1a1_p']
+
+    df = pd.DataFrame()
+    for chrom in CHROMOSOMES:
+        df_impute = pd.read_csv('{}/chr{}/chr{}/final_impute2/'
+                                'chr{}.imputed.impute2'
+                                .format(OUT_DIR, chrom, chrom, chrom),
+                                sep=' ',
+                                header=None,
+                                names=impute_cols)
+
+        df_info = pd.read_csv(
+            '{}/chr{}/chr{}/final_impute2/chr{}.imputed.impute2_info'.format(
+                OUT_DIR, chrom, chrom, chrom),
+            sep='\t')
+        # filtering threshold
+        df_info = df_info.loc[df_info['info'] > 0.5]
+        # combine impute2 and impute2_info to induce filter
+        df_filtered = df_impute.merge(
+            df_info, on=['chr', 'position', 'a0', 'a1'], how='right')
+        df_filtered.rename(columns={'name_x': 'name'}, inplace=True)
+        df_filtered = df_filtered[impute_cols]
+        df = pd.concat([df, df_filtered])
+
+    df['name'] = df['name'].apply(_rreplace, args=(':', '_', 2))
+
+    # dump all chromosomes as an .impute2
+    df.to_csv('{}/member.imputed.impute2'.format(OUT_DIR),
+              header=False,
+              index=False,
+              sep=' ')
+    print('finished combining results, now converting to .vcf')
+    # convert to vcf
     command = [
-        'cominbe chr vcfs'
+        'qctool',
     ]
