@@ -61,6 +61,7 @@ OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 # in production this should be False
 TEST_CHROMS = os.environ.get('TEST_CHROMS')
 if TEST_CHROMS:
+    print('using chr21 and chr22 for testing')
     CHROMOSOMES = ["{}".format(i)
                    for i in list(range(21, 23))]  # + ["23"]
 else:

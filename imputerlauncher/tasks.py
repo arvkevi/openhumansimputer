@@ -82,6 +82,7 @@ def submit_chrom(chrom, num_submit=0, logger=None, **kwargs):
                 REF_PANEL, chrom),
             '--sample-file', '{}/1000GP_Phase3.sample'.format(REF_PANEL),
             '--filtering-rules', 'ALL<0.01', 'ALL>0.99',
+            '--impute2-extra', '-nind 1',
             '--report-title', '"Test"',
             '--report-number', '"Test Report"',
             '--output-dir', '{}/chr{}'.format(OUT_DIR, chrom),
@@ -122,13 +123,19 @@ def _rreplace(s, old, new, occurrence):
 
 @shared_task
 def combine_chrom(num_submit=0, logger=None, **kwargs):
-    # why does this print to log immediately?
+    """
+    1. read .impute2 files (w/ genotype probabilities)
+    2. read .impute2_info files (with "info" field for filtering)
+    3. filter the genotypes in .impute2_info
+    4. merge on right (.impute2_info), acts like a filter for the left.
+    """
     print('Imputation has completed, now combining results...')
 
     impute_cols = ['chr', 'name', 'position',
                    'a0', 'a1', 'a0a0_p', 'a0a1_p', 'a1a1_p']
 
     df = pd.DataFrame()
+    df_gp = pd.DataFrame()  # hold genotype probabilities
     for chrom in CHROMOSOMES:
         df_impute = pd.read_csv('{}/chr{}/chr{}/final_impute2/'
                                 'chr{}.imputed.impute2'
@@ -141,16 +148,22 @@ def combine_chrom(num_submit=0, logger=None, **kwargs):
             '{}/chr{}/chr{}/final_impute2/chr{}.imputed.impute2_info'.format(
                 OUT_DIR, chrom, chrom, chrom),
             sep='\t')
-        # filtering threshold
-        df_info = df_info.loc[df_info['info'] > 0.5]
+
         # combine impute2 and impute2_info to induce filter
         df_filtered = df_impute.merge(
             df_info, on=['chr', 'position', 'a0', 'a1'], how='right')
         df_filtered.rename(columns={'name_x': 'name'}, inplace=True)
+        df_gp = pd.concat([df_gp, df_filtered])
         df_filtered = df_filtered[impute_cols]
         df = pd.concat([df, df_filtered])
 
+    df_gp['name'] = df_gp['name'].apply(_rreplace, args=(':', '_', 2))
     df['name'] = df['name'].apply(_rreplace, args=(':', '_', 2))
+
+    df_gp.to_csv('{}/member.imputed.impute2.GP'.format(OUT_DIR),
+                 header=False,
+                 index=False,
+                 sep=' ')
 
     # dump all chromosomes as an .impute2
     df.to_csv('{}/member.imputed.impute2'.format(OUT_DIR),
@@ -160,5 +173,9 @@ def combine_chrom(num_submit=0, logger=None, **kwargs):
     print('finished combining results, now converting to .vcf')
     # convert to vcf
     command = [
-        'qctool',
+        '{}/plink'.format(IMP_BIN),
+        '--gen', '{}/member.imputed.impute2'.format(OUT_DIR),
+        '--sample', '{}/chr{}/chr{}/final_impute2/chr{}.imputed.sample'.format(
+            OUT_DIR, chrom, chrom, chrom),
+        '--recode', 'vcf',
     ]
