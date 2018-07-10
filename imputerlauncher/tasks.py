@@ -150,18 +150,18 @@ def combine_chrom(num_submit=0, logger=None, **kwargs):
             sep='\t')
 
         # combine impute2 and impute2_info to induce filter
-        df_filtered = df_impute.merge(
+        df_merged = df_impute.merge(
             df_info, on=['chr', 'position', 'a0', 'a1'], how='right')
-        df_filtered.rename(columns={'name_x': 'name'}, inplace=True)
-        df_gp = pd.concat([df_gp, df_filtered])
-        df_filtered = df_filtered[impute_cols]
-        df = pd.concat([df, df_filtered])
+        df_merged.rename(columns={'name_x': 'name'}, inplace=True)
+        df_gp = pd.concat([df_gp, df_merged])
+        df_merged = df_merged[impute_cols]
+        df = pd.concat([df, df_merged])
 
     df_gp['name'] = df_gp['name'].apply(_rreplace, args=(':', '_', 2))
     df['name'] = df['name'].apply(_rreplace, args=(':', '_', 2))
 
     df_gp.to_csv('{}/member.imputed.impute2.GP'.format(OUT_DIR),
-                 header=False,
+                 header=True,
                  index=False,
                  sep=' ')
 
@@ -171,11 +171,15 @@ def combine_chrom(num_submit=0, logger=None, **kwargs):
               index=False,
               sep=' ')
     print('finished combining results, now converting to .vcf')
+
     # convert to vcf
-    command = [
+    gen_to_vcf = [
         '{}/plink'.format(IMP_BIN),
         '--gen', '{}/member.imputed.impute2'.format(OUT_DIR),
         '--sample', '{}/chr{}/chr{}/final_impute2/chr{}.imputed.sample'.format(
             OUT_DIR, chrom, chrom, chrom),
         '--recode', 'vcf',
+        '--out', '{}/member.imputed'.format(OUT_DIR)
     ]
+    Popen(gen_to_vcf, stdout=PIPE, stderr=PIPE)
+    print('finished converting to .vcf')
