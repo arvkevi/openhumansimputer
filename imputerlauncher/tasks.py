@@ -12,6 +12,7 @@ from subprocess import Popen, PIPE
 from ohapi import api
 from os import environ
 import pandas as pd
+from django.conf import settings
 from demotemplate.settings import CHROMOSOMES
 
 
@@ -173,13 +174,11 @@ def combine_chrom(num_submit=0, logger=None, **kwargs):
     print('finished combining results, now converting to .vcf')
 
     # convert to vcf
-    gen_to_vcf = [
-        '{}/plink'.format(IMP_BIN),
-        '--gen', '{}/member.imputed.impute2'.format(OUT_DIR),
-        '--sample', '{}/chr{}/chr{}/final_impute2/chr{}.imputed.sample'.format(
-            OUT_DIR, chrom, chrom, chrom),
-        '--recode', 'vcf',
-        '--out', '{}/member.imputed'.format(OUT_DIR)
+    os.chdir(settings.BASE_DIR)
+    output_vcf_cmd = [
+        'imputerlauncher/output_vcf.sh'
     ]
-    Popen(gen_to_vcf, stdout=PIPE, stderr=PIPE)
+    process = Popen(output_vcf_cmd, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate()
+
     print('finished converting to .vcf')

@@ -55,7 +55,6 @@ def complete(request):
         signature('shared_tasks.apply_async', countdown=10)
         res = chord((submit_chrom.s(chrom)
                      for chrom in CHROMOSOMES), combine_chrom.s())()
-
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
         return render(request, 'main/complete.html',
