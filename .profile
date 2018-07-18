@@ -16,9 +16,15 @@ if [ ! -d "$IMP_BIN" ]; then
   mv impute_v2.3.2_x86_64_static/impute2 $IMP_BIN/impute2
 
   echo DOWNLOADING PLINK...
-  wget https://www.cog-genomics.org/static/bin/plink180528/plink_linux_x86_64.zip
-  unzip plink_linux_x86_64.zip
-  mv plink $IMP_BIN/plink
+  # plink 1.x
+  #wget https://www.cog-genomics.org/static/bin/plink180528/plink_linux_x86_64.zip
+  #unzip plink_linux_x86_64.zip
+  #mv plink $IMP_BIN/plink
+
+  # plink 2.x
+  wget http://s3.amazonaws.com/plink2-assets/alpha1/plink2_linux_avx2.zip
+  unzip plink2_linux_avx2.zip
+  mv plink2 $IMP_BIN/plink
 
   echo DOWNLOADING SHAPEIT...
   wget https://mathgen.stats.ox.ac.uk/genetics_software/shapeit/shapeit.v2.r837.GLIBCv2.12.Linux.static.tgz
