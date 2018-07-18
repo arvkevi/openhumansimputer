@@ -6,7 +6,7 @@ cp "$OUT_DIR"/chr22/chr22/final_impute2/chr22.imputed.sample "$OUT_DIR"/member.s
 sed -i'.bak' '3s/0/-9/g' "$OUT_DIR"/member.sample
 
 # convert to vcf and
-"$IMP_BIN"/plink \
+"$IMP_BIN"/plink2 \
 --gen "$OUT_DIR"/member.imputed.impute2 \
 --sample "$OUT_DIR"/member.sample \
 --export vcf \
