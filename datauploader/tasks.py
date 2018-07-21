@@ -5,152 +5,112 @@ These tasks:
   2. adds a data file
 """
 import logging
-import os
 import json
-import shutil
 import tempfile
-from django.utils import lorem_ipsum
-import textwrap
 import requests
+import os
 from celery import shared_task
 from django.conf import settings
 from open_humans.models import OpenHumansMember
-from datetime import datetime
+from datetime import datetime, timedelta
 from demotemplate.settings import rr
+from requests_respectful import RequestsRespectfulRateLimitedError
+from ohapi import api
+import arrow
 
 # Set up logging.
 logger = logging.getLogger(__name__)
 
 
 @shared_task
-def xfer_to_open_humans(oh_id, num_submit=0, logger=None, **kwargs):
-    """
-    Transfer data to Open Humans.
-    num_submit is an optional parameter in case you want to resubmit failed
-    tasks (see comments in code).
-    """
-    print('Trying to copy data for {} to Open Humans'.format(oh_id))
+def process_source(oh_id):
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
-
-    # Make a tempdir for all temporary files.
-    # Delete this even if an exception occurs.
-    tempdir = tempfile.mkdtemp()
-    try:
-        add_data_to_open_humans(oh_member, tempdir)
-    finally:
-        shutil.rmtree(tempdir)
-
-    # Note: Want to re-run tasks in case of a failure?
-    # You can resubmit a task by calling it again. (Be careful with recursion!)
-    # e.g. to give up, resubmit, & try again after 10s if less than 5 attempts:
-    # if num_submit < 5:
-    #     num_submit += 1
-    #     xfer_to_open_humans.apply_async(
-    #         args=[oh_id, num_submit], kwargs=kwargs, countdown=10)
-    #     return
-
-
-def add_data_to_open_humans(oh_member, tempdir):
-    """
-    Add demonstration file to Open Humans.
-    This might be a good place to start editing, to add your own project data.
-    This template is written to provide the function with a tempdir that
-    will be cleaned up later. You can use the tempdir to stage the creation of
-    files you plan to upload to Open Humans.
-    """
-    # Create example file.
-    data_filepath, data_metadata = make_example_datafile(tempdir)
-
-    # Remove any files with this name previously added to Open Humans.
-    delete_oh_file_by_name(oh_member, filename=os.path.basename(data_filepath))
-
-    # Upload this file to Open Humans.
-    upload_file_to_oh(oh_member, data_filepath, data_metadata)
-
-
-def make_datafile(user_data, metadata, tempdir):
-    """
-    Make a user data file in the tempdir.
-    """
-    filename = 'user_data_' + datetime.today().strftime('%Y%m%d')
-    filepath = os.path.join(tempdir, filename)
-
-    with open(filepath, 'w') as f:
-        f.write(user_data)
-
-    return filepath, metadata
-
-
-def make_example_datafile(tempdir):
-    """
-    Make a lorem-ipsum file in the tempdir, for demonstration purposes.
-    """
-    filepath = os.path.join(tempdir, 'example_data2.txt')
-    paras = lorem_ipsum.paragraphs(3, common=True)
-    output_text = '\n'.join(['\n'.join(textwrap.wrap(p)) for p in paras])
-    with open(filepath, 'w') as f:
-        f.write(output_text)
+    OUT_DIR = os.environ.get('OUT_DIR')
     metadata = {
-        'tags': ['example', 'text', 'demo'],
-        'description': 'File with lorem ipsum text for demonstration purposes',
+        'description':
+        'Imputed genotypes from Imputer',
+        'tags': ['genomics'],
+        'updated_at': str(datetime.utcnow()),
     }
-    return filepath, metadata
+    oh_access_token = oh_member.get_access_token(
+        client_id=settings.OPENHUMANS_CLIENT_ID,
+        client_secret=settings.OPENHUMANS_CLIENT_SECRET)
 
+    #source_data = get_existing_data(oh_access_token)
+    source_data = None
+    #datasource_member = oh_member.datasourcemember
 
-def delete_oh_file_by_name(oh_member, filename):
-    """
-    Delete all project files matching the filename for this Open Humans member.
-    This deletes files this project previously added to the Open Humans
-    member account, if they match this filename. Read more about file deletion
-    API options here:
-    https://www.openhumans.org/direct-sharing/oauth2-data-upload/#deleting-files
-    """
-    req = requests.post(
-        settings.OH_DELETE_FILES,
-        params={'access_token': oh_member.get_access_token()},
-        data={'project_member_id': oh_member.oh_id,
-              'file_basename': filename})
-    req.raise_for_status()
+    update_datasource(oh_member, source_data)
 
-
-def upload_file_to_oh(oh_member, filepath, metadata):
-    """
-    This demonstrates using the Open Humans "large file" upload process.
-    The small file upload process is simpler, but it can time out. This
-    alternate approach is required for large files, and still appropriate
-    for small files.
-    This process is "direct to S3" using three steps: 1. get S3 target URL from
-    Open Humans, 2. Perform the upload, 3. Notify Open Humans when complete.
-    """
-    # Get the S3 target from Open Humans.
-    upload_url = '{}?access_token={}'.format(
-        settings.OH_DIRECT_UPLOAD, oh_member.get_access_token())
-    req1 = requests.post(
-        upload_url,
-        data={'project_member_id': oh_member.oh_id,
-              'filename': os.path.basename(filepath),
-              'metadata': json.dumps(metadata)})
-    req1.raise_for_status()
-
-    # Upload to S3 target.
-    with open(filepath, 'rb') as fh:
-        req2 = requests.put(url=req1.json()['url'], data=fh)
-    req2.raise_for_status()
-
-    # Report completed upload to Open Humans.
-    complete_url = ('{}?access_token={}'.format(
-        settings.OH_DIRECT_UPLOAD_COMPLETE, oh_member.get_access_token()))
-    req3 = requests.post(
-        complete_url,
-        data={'project_member_id': oh_member.oh_id,
-              'file_id': req1.json()['id']})
-    req3.raise_for_status()
-
-    logger.debug('Upload done: "{}" for member {}.'.format(
-            os.path.basename(filepath), oh_member.oh_id))
+    # this works below
+    # api.upload_aws('{}/member.imputed.vcf'.format(OUT_DIR), metadata,
+    #               oh_access_token,
+    #               project_member_id=oh_member.oh_id)
 
 
 @shared_task
 def make_request_respectful_get(url, realms, **kwargs):
     r = rr.get(url=url, realms=realms, **kwargs)
     logger.debug('Request completed. Response: {}'.format(r.text))
+
+
+def update_datasource(oh_member, source_data):
+    try:
+        # 1. Set start and end times for API calls- may have to loop over short periods.
+        # 2. Get data from API using requests_respectful:
+
+        # r = rr.get(url=url, realms=realms, **kwargs)
+        # logger.debug('Request completed. Response: {}'.format(r.text))
+        # source_data += r.json()
+
+        print('successfully finished update for {}'.format(oh_member.oh_id))
+        #datasource_member = oh_member.datasourcemember
+        #datasource_member.last_updated = arrow.now().format()
+        # datasource_member.save()
+    except RequestsRespectfulRateLimitedError:
+        logger.debug(
+            'requeued processing for {} with 60 secs delay'.format(
+                oh_member.oh_id)
+        )
+        process_source.apply_async(args=[oh_member.oh_id], countdown=61)
+    finally:
+        replace_datasource(oh_member, source_data)
+
+
+def replace_datasource(oh_member, source_data):
+    OUT_DIR = os.environ.get('OUT_DIR')
+    metadata = {
+        'description':
+        'Imputed genotypes from Imputer',
+        'tags': ['genomics'],
+        'updated_at': str(datetime.utcnow()),
+    }
+    oh_access_token = oh_member.get_access_token()
+    logger.debug('deleted old file for {}'.format(oh_member.oh_id))
+    api.delete_file(oh_member.access_token,
+                    oh_member.oh_id,
+                    file_basename="member.imputed.vcf")
+    api.upload_aws('{}/member.imputed.vcf'.format(OUT_DIR), metadata,
+                   oh_access_token,
+                   project_member_id=oh_member.oh_id)
+    logger.debug('uploaded new file for {}'.format(oh_member.oh_id))
+
+
+def get_start_date(source_data):
+    # This function should get a start date for data
+    # retrieval, by using the data source API.
+    pass
+
+
+def get_existing_data(oh_access_token):
+    member = api.exchange_oauth2_member(oh_access_token)
+    for dfile in member['data']:
+        if 'genomics' in dfile['metadata']['tags']:
+            # get file here and read the json into memory
+            tf_in = tempfile.NamedTemporaryFile(suffix='.vcf')
+            tf_in.write(requests.get(dfile['download_url']).content)
+            tf_in.flush()
+            with open(tf_in.name) as f:
+                existing_file = f.readlines()
+            return existing_file
+    return []

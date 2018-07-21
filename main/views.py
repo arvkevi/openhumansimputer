@@ -1,15 +1,17 @@
 import requests
-from celery import signature, chord
+from celery import signature, chord, chain
 import logging
 import os
-
-from django.contrib.auth import login
+from django.contrib import messages
+from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
 from django.conf import settings
-from imputerlauncher.tasks import (
-    submit_chrom, get_vcf, prepare_data, combine_chrom)
-from datauploader.tasks import (
-    xfer_to_open_humans, make_request_respectful_get)
+from open_humans.models import OpenHumansMember
+from .models import DataSourceMember
+from imputerlauncher.tasks import get_vcf, prepare_data, submit_chrom, combine_chrom
+from datauploader.tasks import process_source
+from ohapi import api
+import arrow
 from open_humans.models import OpenHumansMember
 from demotemplate.settings import CHROMOSOMES
 
@@ -53,8 +55,8 @@ def complete(request):
         prepare_data()
 
         signature('shared_tasks.apply_async', countdown=10)
-        res = chord((submit_chrom.s(chrom)
-                     for chrom in CHROMOSOMES), combine_chrom.s())()
+        res = chain(chord((submit_chrom.s(chrom)
+                           for chrom in CHROMOSOMES), combine_chrom.si()) | process_source.si(oh_member.oh_id))()
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
         return render(request, 'main/complete.html',
