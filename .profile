@@ -17,7 +17,7 @@ if [ ! -d "$IMP_BIN" ]; then
 
   echo DOWNLOADING PLINK...
   # plink 1.x
-  wget https://www.cog-genomics.org/static/bin/plink180528/plink_linux_x86_64.zip
+  wget https://www.cog-genomics.org/static/bin/plink180717/plink_linux_x86_64.zip
   unzip plink_linux_x86_64.zip
   mv plink $IMP_BIN/plink
 
@@ -50,7 +50,10 @@ fi
 
 if [ ! -d "$REF_FA" ]; then
   echo DOWNLOADING HG19...
-  wget -P $REF_FA http://statgen.org/wp-content/uploads/Softwares/genipe/supp_files/hg19.fasta
+  wget -P $REF_FA http://statgen.org/wp-content/uploads/Softwares/genipe/supp_files/hg19.tar.bz2
+  bzip2 -d $REF_FA/hg19.tar.bz2
+  tar xvf $REF_FA/hg19.tar
+
 
 # this is where the OH user data will exist
 mkdir $DATA_DIR

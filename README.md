@@ -3,6 +3,11 @@
 ## Under Active Development!
 
 ### Notes
+DigitalOcean:
+set -a; source /home/kevin/open-humans-imputer/.env; set +a
+python manage.py runserver 0.0.0.0:8000
+
+
 Monitor celery tasks locally:
 1. After the app is running, open a new terminal session.
 2. `cd /path/to/open-humans-imputer`
