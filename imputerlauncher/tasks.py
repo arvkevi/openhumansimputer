@@ -11,11 +11,12 @@ from celery import shared_task
 from subprocess import Popen, PIPE
 from ohapi import api
 from os import environ
+from io import BytesIO
+import shutil
 import pandas as pd
-from bz2 import decompress
 from django.conf import settings
 from demotemplate.settings import CHROMOSOMES
-
+import bz2
 
 HOME = environ.get('HOME')
 IMP_BIN = environ.get('IMP_BIN')
@@ -27,6 +28,11 @@ OUT_DIR = environ.get('OUT_DIR')
 # Set up logging.
 logger = logging.getLogger(__name__)
 
+import time
+@shared_task
+def add_this_sleepy(a, b):
+    time.sleep(20)
+    return a + b
 
 @shared_task
 def submit_chrom(chrom, oh_member, num_submit=0, logger=None, **kwargs):
@@ -39,6 +45,7 @@ def submit_chrom(chrom, oh_member, num_submit=0, logger=None, **kwargs):
     """
     # this silly block of code runs impute2 because genipe-launcher deletes
     # two unneccesary files before they are available.
+    print(chrom, oh_member)
     os.makedirs('{}/{}/chr{}'.format(OUT_DIR,
                                      oh_member.oh_id, chrom), exist_ok=True)
     os.chdir('{}/{}/chr{}'.format(OUT_DIR, oh_member.oh_id, chrom))
@@ -49,7 +56,7 @@ def submit_chrom(chrom, oh_member, num_submit=0, logger=None, **kwargs):
         command = [
             'genipe-launcher',
             '--chrom', '{}'.format(chrom),
-            '--bfile', '{}/{}'.format(DATA_DIR, 'member.plink.gt'),
+            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_member.oh_id, oh_member.oh_id),
             '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
@@ -73,7 +80,7 @@ def submit_chrom(chrom, oh_member, num_submit=0, logger=None, **kwargs):
         command = [
             'genipe-launcher',
             '--chrom', '{}'.format(chrom),
-            '--bfile', '{}/{}'.format(DATA_DIR, 'member.plink.gt'),
+            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_member.oh_id, oh_member.oh_id),
             '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
@@ -86,6 +93,7 @@ def submit_chrom(chrom, oh_member, num_submit=0, logger=None, **kwargs):
                 REF_PANEL, chrom),
             '--sample-file', '{}/1000GP_Phase3.sample'.format(REF_PANEL),
             '--filtering-rules', 'ALL<0.01', 'ALL>0.99',
+            '--segment-length', '4e+06',
             '--impute2-extra', '-nind 1',
             '--report-title', '"Test"',
             '--report-number', '"Test Report"',
@@ -105,15 +113,14 @@ def get_vcf(oh_member):
     for data_source in user_details['data']:
         if 'vcf' in data_source['metadata']['tags'] and '23andMe' in data_source['metadata']['tags']:
             data_file_url = data_source['download_url']
-
+    print(data_file_url)
     file_23andme = requests.get(data_file_url)
-    if '.bz2' in file_23andme:
-        content = decompress(file_23andme.content)
-        with open('{}/member.{}.vcf.gz'.format(DATA_DIR, oh_member.oh_id), 'wb') as handle:
-            for line in content.readlines():
-                handle.write(line)
-    else:
-        with open('{}/member.{}.vcf.gz'.format(DATA_DIR, oh_member.oh_id), 'wb') as handle:
+    os.makedirs('{}/{}'.format(DATA_DIR, oh_member.oh_id), exist_ok=True)
+    with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_member.oh_id, oh_member.oh_id), 'wb') as handle:
+        if '.bz2' in data_file_url:
+            textobj = bz2.decompress(file_23andme.content)    
+            handle.write(textobj)
+        else:
             for block in file_23andme.iter_content(1024):
                 handle.write(block)
 
