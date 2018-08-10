@@ -12,6 +12,7 @@ from subprocess import Popen, PIPE
 from ohapi import api
 from os import environ
 import pandas as pd
+from bz2 import decompress
 from django.conf import settings
 from demotemplate.settings import CHROMOSOMES
 
@@ -106,9 +107,15 @@ def get_vcf(oh_member):
             data_file_url = data_source['download_url']
 
     file_23andme = requests.get(data_file_url)
-    with open('{}/member.{}.vcf.gz'.format(MEMBER_DIR, oh_member.oh_id), 'wb') as handle:
-        for block in file_23andme.iter_content(1024):
-            handle.write(block)
+    if '.bz2' in file_23andme:
+        content = decompress(file_23andme.content)
+        with open('{}/member.{}.vcf.gz'.format(DATA_DIR, oh_member.oh_id), 'wb') as handle:
+            for line in content.readlines():
+                handle.write(line)
+    else:
+        with open('{}/member.{}.vcf.gz'.format(DATA_DIR, oh_member.oh_id), 'wb') as handle:
+            for block in file_23andme.iter_content(1024):
+                handle.write(block)
 
 
 def prepare_data(oh_member):
