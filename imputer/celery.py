@@ -21,7 +21,7 @@ CELERY_BROKER_URL = os.getenv('REDIS_URL')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE',
                       'openhumansimputer.settings')
 
-app = Celery('imputer', broker=CELERY_BROKER_URL)
+app = Celery('openhumansimputer', broker=CELERY_BROKER_URL)
 # Set up Celery with Heroku CloudAMQP (or AMQP in local dev).
 app.conf.update({
     'BROKER_URL': CELERY_BROKER_URL,

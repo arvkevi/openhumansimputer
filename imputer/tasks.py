@@ -29,13 +29,13 @@ OUT_DIR = environ.get('OUT_DIR')
 logger = logging.getLogger(__name__)
 
 import time
-@shared_task
+@shared_task(ignore_result=False)
 def add_this_sleepy(a, b):
     time.sleep(20)
     return a + b
 
-@shared_task
-def submit_chrom(chrom, oh_member, num_submit=0, logger=None, **kwargs):
+@shared_task(ignore_result=False)
+def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
     """
     Build and run the genipe-launcher command in Popen.
     rate_limit='1/m' sets the number of tasks per minute.
@@ -45,10 +45,10 @@ def submit_chrom(chrom, oh_member, num_submit=0, logger=None, **kwargs):
     """
     # this silly block of code runs impute2 because genipe-launcher deletes
     # two unneccesary files before they are available.
-    print(chrom, oh_member)
+    print(chrom, oh_id)
     os.makedirs('{}/{}/chr{}'.format(OUT_DIR,
-                                     oh_member.oh_id, chrom), exist_ok=True)
-    os.chdir('{}/{}/chr{}'.format(OUT_DIR, oh_member.oh_id, chrom))
+                                     oh_id, chrom), exist_ok=True)
+    os.chdir('{}/{}/chr{}'.format(OUT_DIR, oh_id, chrom))
     run_impute_test = ['{}/impute2'.format(IMP_BIN)]
     Popen(run_impute_test, stdout=PIPE, stderr=PIPE)
 
@@ -56,7 +56,7 @@ def submit_chrom(chrom, oh_member, num_submit=0, logger=None, **kwargs):
         command = [
             'genipe-launcher',
             '--chrom', '{}'.format(chrom),
-            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_member.oh_id, oh_member.oh_id),
+            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_id, oh_member.oh_id),
             '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
@@ -72,15 +72,15 @@ def submit_chrom(chrom, oh_member, num_submit=0, logger=None, **kwargs):
             '--report-title', '"Test"',
             '--report-number', '"Test Report"',
             '--output-dir', '{}/{}/chr{}'.format(OUT_DIR,
-                                                 oh_member.oh_id, chrom),
+                                                 oh_id, chrom),
             '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/{}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(
-                REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, oh_member.oh_id, chrom, chrom, chrom)
+                REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, oh_id, chrom, chrom, chrom)
         ]
     else:
         command = [
             'genipe-launcher',
             '--chrom', '{}'.format(chrom),
-            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_member.oh_id, oh_member.oh_id),
+            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_id, oh_id),
             '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
@@ -98,9 +98,9 @@ def submit_chrom(chrom, oh_member, num_submit=0, logger=None, **kwargs):
             '--report-title', '"Test"',
             '--report-number', '"Test Report"',
             '--output-dir', '{}/{}/chr{}'.format(OUT_DIR,
-                                                 oh_member.oh_id, chrom),
+                                                 oh_id, chrom),
             '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/{}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(
-                REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, oh_member.oh_id, chrom, chrom, chrom)
+                REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, oh_id, chrom, chrom, chrom)
         ]
 
     process = Popen(command, stdout=PIPE, stderr=PIPE)
@@ -139,8 +139,8 @@ def _rreplace(s, old, new, occurrence):
     return new.join(li)
 
 
-@shared_task
-def combine_chrom(oh_member, num_submit=0, logger=None, **kwargs):
+@shared_task(ignore_result=False)
+def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     """
     1. read .impute2 files (w/ genotype probabilities)
     2. read .impute2_info files (with "info" field for filtering)
@@ -152,19 +152,20 @@ def combine_chrom(oh_member, num_submit=0, logger=None, **kwargs):
     impute_cols = ['chr', 'name', 'position',
                    'a0', 'a1', 'a0a0_p', 'a0a1_p', 'a1a1_p']
 
+    print(oh_id)
     df = pd.DataFrame()
     df_gp = pd.DataFrame()  # hold genotype probabilities
     for chrom in CHROMOSOMES:
         df_impute = pd.read_csv('{}/{}/chr{}/chr{}/final_impute2/'
                                 'chr{}.imputed.impute2'
-                                .format(OUT_DIR, oh_member.oh_id, chrom, chrom, chrom),
+                                .format(OUT_DIR, oh_id, chrom, chrom, chrom),
                                 sep=' ',
                                 header=None,
                                 names=impute_cols)
 
         df_info = pd.read_csv(
             '{}/{}/chr{}/chr{}/final_impute2/chr{}.imputed.impute2_info'.format(
-                OUT_DIR, oh_member.oh_id, chrom, chrom, chrom),
+                OUT_DIR, oh_id, chrom, chrom, chrom),
             sep='\t')
 
         # combine impute2 and impute2_info to induce filter
@@ -178,13 +179,13 @@ def combine_chrom(oh_member, num_submit=0, logger=None, **kwargs):
     df_gp['name'] = df_gp['name'].apply(_rreplace, args=(':', '_', 2))
     df['name'] = df['name'].apply(_rreplace, args=(':', '_', 2))
 
-    df_gp.to_csv('{}/{}/member.imputed.impute2.GP'.format(OUT_DIR, oh_member.oh_id),
+    df_gp.to_csv('{}/{}/member.imputed.impute2.GP'.format(OUT_DIR, oh_id),
                  header=True,
                  index=False,
                  sep=' ')
 
     # dump all chromosomes as an .impute2
-    df.to_csv('{}/{}/member.imputed.impute2'.format(OUT_DIR, oh_member.oh_id),
+    df.to_csv('{}/{}/member.imputed.impute2'.format(OUT_DIR, oh_id),
               header=False,
               index=False,
               sep=' ')
@@ -193,7 +194,7 @@ def combine_chrom(oh_member, num_submit=0, logger=None, **kwargs):
     # convert to vcf
     os.chdir(settings.BASE_DIR)
     output_vcf_cmd = [
-        'imputer/output_vcf.sh', '{}'.format(oh_member.oh_id)
+        'imputer/output_vcf.sh', '{}'.format(oh_id)
     ]
     process = Popen(output_vcf_cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()

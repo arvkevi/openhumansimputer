@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from open_humans.models import OpenHumansMember
 from .models import DataSourceMember
-from imputer.tasks import get_vcf, prepare_data, submit_chrom, combine_chrom
+from imputer.tasks import get_vcf, prepare_data, submit_chrom, combine_chrom, add_this_sleepy
 from datauploader.tasks import process_source
 from ohapi import api
 import arrow
@@ -45,6 +45,7 @@ def complete(request):
     if oh_member:
         # Log in the user.
         user = oh_member.user
+        oh_id = oh_member.oh_id
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
 
@@ -55,8 +56,8 @@ def complete(request):
         prepare_data(oh_member)
 
         signature('shared_tasks.apply_async', countdown=10)
-        res = chord((submit_chrom.s(chrom, oh_member)
-                     for chrom in CHROMOSOMES), combine_chrom.s(oh_member))()
+        res = chord((submit_chrom.si(chrom, oh_id)
+                     for chrom in CHROMOSOMES), combine_chrom.si(oh_id))()
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
         return render(request, 'main/complete.html',
