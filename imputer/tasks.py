@@ -93,7 +93,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
                 REF_PANEL, chrom),
             '--sample-file', '{}/1000GP_Phase3.sample'.format(REF_PANEL),
             '--filtering-rules', 'ALL<0.01', 'ALL>0.99',
-            '--segment-length', '4e+06',
+            '--segment-length', '5e+06',
             '--impute2-extra', '-nind 1',
             '--report-title', '"Test"',
             '--report-number', '"Test Report"',
@@ -202,3 +202,10 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     print('finished converting to .vcf')
 
     # clean users files
+    #clean_command = [
+    #    'imputer/clean_files.sh', '{}'.format(oh_member.oh_id)
+    #]
+    #process = Popen(clean_command, stdout=PIPE, stderr=PIPE)
+    #stdout, stderr = process.communicate()
+
+
