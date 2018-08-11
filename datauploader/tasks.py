@@ -13,7 +13,7 @@ from celery import shared_task
 from django.conf import settings
 from open_humans.models import OpenHumansMember
 from datetime import datetime, timedelta
-from demotemplate.settings import rr
+from openhumansimputer.settings import rr
 from requests_respectful import RequestsRespectfulRateLimitedError
 from ohapi import api
 import arrow

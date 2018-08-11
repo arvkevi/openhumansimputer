@@ -8,12 +8,12 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from open_humans.models import OpenHumansMember
 from .models import DataSourceMember
-from imputerlauncher.tasks import get_vcf, prepare_data, submit_chrom, combine_chrom
+from imputer.tasks import get_vcf, prepare_data, submit_chrom, combine_chrom
 from datauploader.tasks import process_source
 from ohapi import api
 import arrow
 from open_humans.models import OpenHumansMember
-from demotemplate.settings import CHROMOSOMES
+from openhumansimputer.settings import CHROMOSOMES
 
 
 # Set up logging.

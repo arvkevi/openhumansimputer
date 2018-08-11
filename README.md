@@ -4,13 +4,13 @@
 
 ### Notes
 DigitalOcean:
-set -a; source /home/kevin/open-humans-imputer/.env; set +a
+set -a; source /home/kevin/openhumansimputer/.env; set +a
 python manage.py runserver 0.0.0.0:8000
 
 
 Monitor celery tasks locally:
 1. After the app is running, open a new terminal session.
-2. `cd /path/to/open-humans-imputer`
+2. `cd /path/to/openhumansimputer`
 3. `pipenv shell`
 4. `celery flower --broker=redis://yourusername@localhost:6379/1`
 5. go to [http://127.0.0.1:5555](http://127.0.0.1:5555)
@@ -307,7 +307,7 @@ Sometimes uploads can take a long time so we advise using the delay so that this
 External APIs will often limit how much data you are allowed to fetch per unit time. This template uses the `requests-respectful` package to easily set rate limits when making requests. The requester can be set up as follows
 
 - find out the limitations of the external API by looking at their documentation
-- specify the limitations in a realm, found in [`demotemplate/settings.py`](https://github.com/OpenHumans/oh-data-demo-template/blob/master/demotemplate/settings.py#L73)
+- specify the limitations in a realm, found in [`openhumansimputer/settings.py`](https://github.com/OpenHumans/oh-data-demo-template/blob/master/openhumansimputer/settings.py#L73)
 - when making your request, use the function `make_request_respectful_get` in [`datauploader/tasks.py`](https://github.com/OpenHumans/oh-data-demo-template/blob/a9acbc12d26726dff25a5cd3d583a509d200bedb/datauploader/tasks.py#L154)
 
 ## Editing the template

@@ -15,7 +15,7 @@ from io import BytesIO
 import shutil
 import pandas as pd
 from django.conf import settings
-from demotemplate.settings import CHROMOSOMES
+from openhumansimputer.settings import CHROMOSOMES
 import bz2
 
 HOME = environ.get('HOME')
@@ -128,7 +128,7 @@ def get_vcf(oh_member):
 def prepare_data(oh_member):
     """Process the member's .vcf."""
     command = [
-        'imputerlauncher/prepare_genotypes.sh', '{}'.format(oh_member.oh_id)
+        'imputer/prepare_genotypes.sh', '{}'.format(oh_member.oh_id)
     ]
     process = Popen(command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
@@ -193,7 +193,7 @@ def combine_chrom(oh_member, num_submit=0, logger=None, **kwargs):
     # convert to vcf
     os.chdir(settings.BASE_DIR)
     output_vcf_cmd = [
-        'imputerlauncher/output_vcf.sh', '{}'.format(oh_member.oh_id)
+        'imputer/output_vcf.sh', '{}'.format(oh_member.oh_id)
     ]
     process = Popen(output_vcf_cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
