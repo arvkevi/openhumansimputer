@@ -52,11 +52,11 @@ def complete(request):
         logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
         get_vcf(oh_member)
         # convert to plink format
-        prepare_data()
+        prepare_data(oh_member)
 
         signature('shared_tasks.apply_async', countdown=10)
-        res = chain(chord((submit_chrom.s(chrom)
-                           for chrom in CHROMOSOMES), combine_chrom.si()) | process_source.si(oh_member.oh_id))()
+        res = chord((submit_chrom.s(chrom, oh_member)
+                     for chrom in CHROMOSOMES), combine_chrom.s(oh_member))()
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
         return render(request, 'main/complete.html',

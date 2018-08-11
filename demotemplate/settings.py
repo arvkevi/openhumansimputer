@@ -35,10 +35,12 @@ REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 
 ALLOWED_HOSTS = ['*']
 
-HEROKUCONFIG_APP_NAME = os.getenv('HEROKUCONFIG_APP_NAME', '')
+#HEROKUCONFIG_APP_NAME = os.getenv('HEROKUCONFIG_APP_NAME', '')
+#DEFAULT_BASE_URL = ('https://{}.herokuapp.com'.format(HEROKUCONFIG_APP_NAME) if
+#                    REMOTE else 'http://127.0.0.1:5000')
 
-DEFAULT_BASE_URL = ('https://{}.herokuapp.com'.format(HEROKUCONFIG_APP_NAME) if
-                    REMOTE else 'http://127.0.0.1:5000')
+HEROKUCONFIG_APP_NAME = 'http://142.93.20.214'
+DEFAULT_BASE_URL = 'http://142.93.20.214:8000'
 
 OPENHUMANS_APP_BASE_URL = os.getenv('APP_BASE_URL', DEFAULT_BASE_URL)
 if OPENHUMANS_APP_BASE_URL[-1] == "/":
@@ -77,7 +79,7 @@ if REMOTE is True:
             "host": url_object.hostname,
             "port": url_object.port,
             "password": url_object.password,
-            "database": 0
+            "database": 0 
         },
         safety_threshold=5)
 
