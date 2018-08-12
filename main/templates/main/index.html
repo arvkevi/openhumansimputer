@@ -2,17 +2,17 @@
 {% load static %}
 {% block content %}
 
-  <div class="container">
-    <h1>Demo Data Source &rarr; Open Humans</h1>
+  <div class="jumbotron">
+      <h1 class="display-4">Open Humans Imputer</h1>
     <p class="lead">
-      Use this demo app to add demo project data to an
-      <a href="https://www.openhumans.org/">Open Humans</a> account.
+     This is the homepage for the 
+      <a href="https://www.openhumans.org/">Open Humans</a> Imputer app.
     </p>
     <p class="lead">
       Learn more by visiting:<br>
       <a href="{{ oh_proj_page }}">{{ oh_proj_page }}</a>
     </p>
-    <h2>How it works</h2>
+    <h2>How to impute your Open Humans genotype data:</h2>
     <ol>
       <li><b>Click the button below</b><br>
         This takes you to Open Humans.</li>
@@ -20,9 +20,11 @@
         Data will be added to this account.</li>
       <li><b>Authorize this app in Open Humans</b><br>
         This authorizes us to add data to your account.</li>
-      <li><b>Return and the app will add data.</b><br>
-        Demo data should be added to your Open Humans account.
-        You'll be able to access &amp; manage data here:
+      <li><b>Wait... and check back later.</b><br>
+        Genome imputation is a computaionally expensive task, please be patient as other members may be ahead of you in the queue.
+        One member's imputation completes in approximately 7 hours with our current configuration.
+        A file named <b>member.imputed.vcf</b> should be added to your Open Humans account.
+        You'll be able to access and manage data here:
         <a href="{{ oh_proj_page }}">{{ oh_proj_page }}</a>
       </li>
     </ol>
