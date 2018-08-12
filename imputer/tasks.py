@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 import time
 @shared_task(ignore_result=False)
 def add_this_sleepy(a, b):
+    """this function helps with debugging"""
     time.sleep(20)
     return a + b
 
@@ -106,7 +107,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
     process = Popen(command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
 
-
+#@shared_task
 def get_vcf(oh_member):
     """Download member .vcf."""
     user_details = api.exchange_oauth2_member(oh_member.get_access_token())
@@ -117,14 +118,16 @@ def get_vcf(oh_member):
     file_23andme = requests.get(data_file_url)
     os.makedirs('{}/{}'.format(DATA_DIR, oh_member.oh_id), exist_ok=True)
     with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_member.oh_id, oh_member.oh_id), 'wb') as handle:
-        if '.bz2' in data_file_url:
-            textobj = bz2.decompress(file_23andme.content)    
-            handle.write(textobj)
-        else:
-            for block in file_23andme.iter_content(1024):
-                handle.write(block)
+        textobj = bz2.decompress(file_23andme.content)
+        handle.write(textobj)
+        #if '.bz2' in data_file_url:
+        #    textobj = bz2.decompress(file_23andme.content)    
+        #    handle.write(textobj)
+        #else:
+        #    for block in file_23andme.iter_content(1024):
+        #        handle.write(block)
 
-
+#@shared_task
 def prepare_data(oh_member):
     """Process the member's .vcf."""
     command = [

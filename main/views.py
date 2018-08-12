@@ -49,13 +49,13 @@ def complete(request):
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
 
+        signature('shared_tasks.apply_async', countdown=10)
         # get the member's vcf file
         logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
         get_vcf(oh_member)
         # convert to plink format
         prepare_data(oh_member)
 
-        signature('shared_tasks.apply_async', countdown=10)
         res = chord((submit_chrom.si(chrom, oh_id)
                      for chrom in CHROMOSOMES), combine_chrom.si(oh_id))()
         context = {'oh_id': oh_member.oh_id,
