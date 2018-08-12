@@ -57,7 +57,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
         command = [
             'genipe-launcher',
             '--chrom', '{}'.format(chrom),
-            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_id, oh_member.oh_id),
+            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_id, /oh_id),
             '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
@@ -121,17 +121,17 @@ def get_vcf(oh_member):
         textobj = bz2.decompress(file_23andme.content)
         handle.write(textobj)
         #if '.bz2' in data_file_url:
-        #    textobj = bz2.decompress(file_23andme.content)    
+        #    textobj = bz2.decompress(file_23andme.content)
         #    handle.write(textobj)
         #else:
         #    for block in file_23andme.iter_content(1024):
         #        handle.write(block)
 
-#@shared_task
-def prepare_data(oh_member):
+@shared_task
+def prepare_data(oh_id):
     """Process the member's .vcf."""
     command = [
-        'imputer/prepare_genotypes.sh', '{}'.format(oh_member.oh_id)
+        'imputer/prepare_genotypes.sh', '{}'.format(oh_id)
     ]
     process = Popen(command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()

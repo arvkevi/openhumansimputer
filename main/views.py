@@ -54,7 +54,7 @@ def complete(request):
         logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
         get_vcf(oh_member)
         # convert to plink format
-        prepare_data(oh_member)
+        prepare_data.si(oh_id)
 
         res = chord((submit_chrom.si(chrom, oh_id)
                      for chrom in CHROMOSOMES), combine_chrom.si(oh_id))()
