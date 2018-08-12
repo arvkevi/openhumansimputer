@@ -57,7 +57,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
         command = [
             'genipe-launcher',
             '--chrom', '{}'.format(chrom),
-            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_id, /oh_id),
+            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_id, oh_id),
             '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
