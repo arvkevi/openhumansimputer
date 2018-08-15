@@ -14,6 +14,3 @@ sed -i'.bak' '3s/0/-9/g' "$OUT_DIR"/"$1"/member.sample
 --missing-code -9 \
 --out "$OUT_DIR"/"$1"/member.imputed
 
-# remove user files
-rm "DATA_DIR"/member."$1"*
-#rm -rf "$OUT_DIR"/"$1"
