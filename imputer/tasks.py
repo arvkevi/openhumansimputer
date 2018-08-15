@@ -15,6 +15,8 @@ from io import BytesIO
 import shutil
 import pandas as pd
 from django.conf import settings
+from open_humans.models import OpenHumansMember
+from datauploader.tasks import process_source
 from openhumansimputer.settings import CHROMOSOMES
 import bz2
 
@@ -108,8 +110,9 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
     stdout, stderr = process.communicate()
 
 #@shared_task
-def get_vcf(oh_member):
+def get_vcf(oh_id):
     """Download member .vcf."""
+    oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
     user_details = api.exchange_oauth2_member(oh_member.get_access_token())
     for data_source in user_details['data']:
         if 'vcf' in data_source['metadata']['tags'] and '23andMe' in data_source['metadata']['tags']:
@@ -202,13 +205,15 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     process = Popen(output_vcf_cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
 
-    print('finished converting to .vcf')
+    print('finished converting to .vcf, now uploading to OpenHumans')
 
+    process_source(oh_id)
+    
     # clean users files
     #clean_command = [
     #    'imputer/clean_files.sh', '{}'.format(oh_member.oh_id)
     #]
     #process = Popen(clean_command, stdout=PIPE, stderr=PIPE)
     #stdout, stderr = process.communicate()
-
+    
 

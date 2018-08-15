@@ -52,7 +52,7 @@ def complete(request):
         signature('shared_tasks.apply_async', countdown=10)
         # get the member's vcf file
         logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
-        get_vcf(oh_member)
+        get_vcf(oh_id)
         # convert to plink format
         prepare_data(oh_id)
 
