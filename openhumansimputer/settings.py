@@ -61,7 +61,7 @@ OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 
 # Imputer Settings
 # in production this should be False
-TEST_CHROMS = os.environ.get('TEST_CHROMS')
+TEST_CHROMS = True if os.environ.get('TEST_CHROMS', '').lower() == 'true' else False
 if TEST_CHROMS:
     print('using chr21 and chr22 for testing')
     CHROMOSOMES = ["{}".format(i)
