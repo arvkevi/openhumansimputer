@@ -220,7 +220,7 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     # clean users files
     os.chdir(settings.BASE_DIR)
     clean_command = [
-        'imputer/clean_files.sh', '{}'.format(oh_member.oh_id)
+        'imputer/clean_files.sh', '{}'.format(oh_id)
     ]
     process = Popen(clean_command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()

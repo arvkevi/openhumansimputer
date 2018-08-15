@@ -1,0 +1,172 @@
+using chr21 and chr22 for testing
+ 
+ -------------- celery@open-humans-imputer v4.2.0 (windowlicker)
+---- **** ----- 
+--- * ***  * -- Linux-4.4.0-130-generic-x86_64-with-debian-stretch-sid 2018-08-15 13:08:02
+-- * - **** --- 
+- ** ---------- [config]
+- ** ---------- .> app:         openhumansimputer:0x7f3b3501b128
+- ** ---------- .> transport:   redis://django@localhost:6379/1
+- ** ---------- .> results:     redis://django@localhost:6379/1
+- *** --- * --- .> concurrency: 1 (prefork)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** ----- 
+ -------------- [queues]
+                .> celery           exchange=celery(direct) key=celery
+                
+
+[tasks]
+  . imputer.tasks.add_this_sleepy
+  . imputer.tasks.combine_chrom
+  . imputer.tasks.prepare_data
+  . imputer.tasks.submit_chrom
+  . openhumansimputer.celery.debug_task
+
+[2018-08-15 13:08:02,476: INFO/MainProcess] Connected to redis://django@localhost:6379/1
+[2018-08-15 13:08:02,488: INFO/MainProcess] mingle: searching for neighbors
+[2018-08-15 13:08:03,512: INFO/MainProcess] mingle: all alone
+[2018-08-15 13:08:03,526: INFO/MainProcess] celery@open-humans-imputer ready.
+[2018-08-15 13:08:04 +0000] [4933] [INFO] Starting gunicorn 19.8.1
+[2018-08-15 13:08:04 +0000] [4933] [INFO] Listening at: http://142.93.20.214:8000 (4933)
+[2018-08-15 13:08:04 +0000] [4933] [INFO] Using worker: sync
+[2018-08-15 13:08:04 +0000] [4943] [INFO] Booting worker with pid: 4943
+using chr21 and chr22 for testing
+https://open-humans-production.s3.amazonaws.com:443/member-files/twenty_three_and_me/15c69470-0175-11e8-a43c-3ae9042b31e9/23andMe-genotyping.vcf.bz2?Signature=MMivKk%2BVXoDKP2MTN7DG4kXkiLQ%3D&Expires=1534342094&AWSAccessKeyId=AKIAIKNTFUJJTNS6N7HA
+[2018-08-15 13:08:36,694: INFO/MainProcess] Received task: imputer.tasks.submit_chrom[38784482-2001-45ca-bfe8-25369450c769]  
+[2018-08-15 13:08:36,696: INFO/MainProcess] Received task: imputer.tasks.submit_chrom[1de7875a-90a8-497c-99f0-5a722c0b2df7]  
+[2018-08-15 13:08:36,697: WARNING/ForkPoolWorker-1] 21
+[2018-08-15 13:08:36,698: WARNING/ForkPoolWorker-1] 77687130
+[2018-08-15 13:08:39,960: INFO/ForkPoolWorker-1] Task imputer.tasks.submit_chrom[38784482-2001-45ca-bfe8-25369450c769] succeeded in 3.2624211259535514s: None
+[2018-08-15 13:08:39,961: WARNING/ForkPoolWorker-1] 22
+[2018-08-15 13:08:39,961: WARNING/ForkPoolWorker-1] 77687130
+[2018-08-15 13:08:43,120: INFO/ForkPoolWorker-1] Task imputer.tasks.submit_chrom[1de7875a-90a8-497c-99f0-5a722c0b2df7] succeeded in 3.1591479740454815s: None
+[2018-08-15 13:08:43,121: INFO/MainProcess] Received task: imputer.tasks.combine_chrom[f3bcbb69-f6b2-4548-beeb-74a44a046ed3]  
+[2018-08-15 13:08:43,124: WARNING/ForkPoolWorker-1] 77687130 Imputation has completed, now combining results.
+[2018-08-15 13:08:56,163: WARNING/ForkPoolWorker-1] 77687130 finished combining results, now converting to .vcf
+[2018-08-15 13:09:05,787: WARNING/ForkPoolWorker-1] 77687130 finished converting to .vcf, now uploading to OpenHumans
+[2018-08-15 13:09:09,708: INFO/ForkPoolWorker-1] Upload complete: /home/django/outdir/77687130/member.imputed.vcf
+[2018-08-15 13:09:10,422: WARNING/ForkPoolWorker-1] 77687130 emailed member
+[2018-08-15 13:09:10,452: WARNING/ForkPoolWorker-1] 77687130 finished removing files
+[2018-08-15 13:09:10,530: INFO/ForkPoolWorker-1] Task imputer.tasks.combine_chrom[f3bcbb69-f6b2-4548-beeb-74a44a046ed3] succeeded in 27.4054856300354s: None
+https://www.openhumans.org/data-management/datafile-download/12983/
+[2018-08-15 16:04:18,792: INFO/MainProcess] Received task: imputer.tasks.submit_chrom[4a90c889-c171-4752-a9bf-8daf38ba0269]  
+[2018-08-15 16:04:18,795: INFO/MainProcess] Received task: imputer.tasks.submit_chrom[f056a399-2667-44b9-b9fa-8a420f641b6e]  
+[2018-08-15 16:04:18,797: WARNING/ForkPoolWorker-1] 21
+[2018-08-15 16:04:18,797: WARNING/ForkPoolWorker-1] 02080045
+[2018-08-15 16:04:22,111: INFO/ForkPoolWorker-1] Task imputer.tasks.submit_chrom[4a90c889-c171-4752-a9bf-8daf38ba0269] succeeded in 3.314748677017633s: None
+[2018-08-15 16:04:22,113: WARNING/ForkPoolWorker-1] 22
+[2018-08-15 16:04:22,113: WARNING/ForkPoolWorker-1] 02080045
+[2018-08-15 16:04:25,286: INFO/ForkPoolWorker-1] Task imputer.tasks.submit_chrom[f056a399-2667-44b9-b9fa-8a420f641b6e] succeeded in 3.173188877000939s: None
+[2018-08-15 16:04:25,286: INFO/MainProcess] Received task: imputer.tasks.combine_chrom[b18bf121-7a4a-4bfd-9cac-dc1876aa4710]  
+[2018-08-15 16:04:25,288: WARNING/ForkPoolWorker-1] 02080045 Imputation has completed, now combining results.
+[2018-08-15 16:04:37,539: WARNING/ForkPoolWorker-1] 02080045 finished combining results, now converting to .vcf
+[2018-08-15 16:04:46,837: WARNING/ForkPoolWorker-1] 02080045 finished converting to .vcf, now uploading to OpenHumans
+[2018-08-15 16:04:50,824: INFO/ForkPoolWorker-1] Upload complete: /home/django/outdir/02080045/member.imputed.vcf
+[2018-08-15 16:04:51,232: ERROR/ForkPoolWorker-1] Task imputer.tasks.combine_chrom[b18bf121-7a4a-4bfd-9cac-dc1876aa4710] raised unexpected: Exception('API response status code 400',)
+Traceback (most recent call last):
+  File "/home/django/.local/share/virtualenvs/openhumansimputer-clvi7-Gr/lib/python3.6/site-packages/celery/app/trace.py", line 382, in trace_task
+    R = retval = fun(*args, **kwargs)
+  File "/home/django/.local/share/virtualenvs/openhumansimputer-clvi7-Gr/lib/python3.6/site-packages/celery/app/trace.py", line 641, in __protected_call__
+    return self.run(*args, **kwargs)
+  File "/home/django/openhumansimputer/imputer/tasks.py", line 217, in combine_chrom
+    project_member_ids=[oh_id])
+  File "/home/django/.local/share/virtualenvs/openhumansimputer-clvi7-Gr/lib/python3.6/site-packages/ohapi/api.py", line 276, in message
+    handle_error(r, 200)
+  File "/home/django/.local/share/virtualenvs/openhumansimputer-clvi7-Gr/lib/python3.6/site-packages/ohapi/api.py", line 323, in handle_error
+    raise Exception(info)
+Exception: API response status code 400
+
+worker: Warm shutdown (MainProcess)
+[2018-08-15 16:55:13 +0000] [4933] [INFO] Handling signal: term
+[2018-08-15 16:55:13 +0000] [4943] [INFO] Worker exiting (pid: 4943)
+[2018-08-15 16:55:13 +0000] [4933] [INFO] Shutting down: Master
+using chr21 and chr22 for testing
+ 
+ -------------- celery@open-humans-imputer v4.2.0 (windowlicker)
+---- **** ----- 
+--- * ***  * -- Linux-4.4.0-130-generic-x86_64-with-debian-stretch-sid 2018-08-15 16:55:22
+-- * - **** --- 
+- ** ---------- [config]
+- ** ---------- .> app:         openhumansimputer:0x7f3f849d9128
+- ** ---------- .> transport:   redis://django@localhost:6379/1
+- ** ---------- .> results:     redis://django@localhost:6379/1
+- *** --- * --- .> concurrency: 1 (prefork)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** ----- 
+ -------------- [queues]
+                .> celery           exchange=celery(direct) key=celery
+                
+
+[tasks]
+  . imputer.tasks.add_this_sleepy
+  . imputer.tasks.combine_chrom
+  . imputer.tasks.prepare_data
+  . imputer.tasks.submit_chrom
+  . openhumansimputer.celery.debug_task
+
+[2018-08-15 16:55:22,348: INFO/MainProcess] Connected to redis://django@localhost:6379/1
+[2018-08-15 16:55:22,359: INFO/MainProcess] mingle: searching for neighbors
+[2018-08-15 16:55:23,382: INFO/MainProcess] mingle: all alone
+[2018-08-15 16:55:23,393: INFO/MainProcess] celery@open-humans-imputer ready.
+[2018-08-15 16:55:26 +0000] [8594] [INFO] Starting gunicorn 19.8.1
+[2018-08-15 16:55:26 +0000] [8594] [INFO] Listening at: http://142.93.20.214:8000 (8594)
+[2018-08-15 16:55:26 +0000] [8594] [INFO] Using worker: sync
+[2018-08-15 16:55:26 +0000] [8604] [INFO] Booting worker with pid: 8604
+using chr21 and chr22 for testing
+
+worker: Warm shutdown (MainProcess)
+[2018-08-15 16:57:08 +0000] [8604] [INFO] Worker exiting (pid: 8604)
+[2018-08-15 16:57:08 +0000] [8594] [INFO] Handling signal: term
+[2018-08-15 16:57:09 +0000] [8594] [INFO] Shutting down: Master
+using chr21 and chr22 for testing
+ 
+ -------------- celery@open-humans-imputer v4.2.0 (windowlicker)
+---- **** ----- 
+--- * ***  * -- Linux-4.4.0-130-generic-x86_64-with-debian-stretch-sid 2018-08-15 16:57:21
+-- * - **** --- 
+- ** ---------- [config]
+- ** ---------- .> app:         openhumansimputer:0x7fd34a36f128
+- ** ---------- .> transport:   redis://django@localhost:6379/1
+- ** ---------- .> results:     redis://django@localhost:6379/1
+- *** --- * --- .> concurrency: 1 (prefork)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** ----- 
+ -------------- [queues]
+                .> celery           exchange=celery(direct) key=celery
+                
+
+[tasks]
+  . imputer.tasks.add_this_sleepy
+  . imputer.tasks.combine_chrom
+  . imputer.tasks.prepare_data
+  . imputer.tasks.submit_chrom
+  . openhumansimputer.celery.debug_task
+
+[2018-08-15 16:57:21,918: INFO/MainProcess] Connected to redis://django@localhost:6379/1
+[2018-08-15 16:57:21,929: INFO/MainProcess] mingle: searching for neighbors
+[2018-08-15 16:57:22,950: INFO/MainProcess] mingle: all alone
+[2018-08-15 16:57:22,962: INFO/MainProcess] celery@open-humans-imputer ready.
+[2018-08-15 16:57:24 +0000] [8690] [INFO] Starting gunicorn 19.8.1
+[2018-08-15 16:57:24 +0000] [8690] [INFO] Listening at: http://142.93.20.214:8000 (8690)
+[2018-08-15 16:57:24 +0000] [8690] [INFO] Using worker: sync
+[2018-08-15 16:57:24 +0000] [8700] [INFO] Booting worker with pid: 8700
+using chr21 and chr22 for testing
+https://open-humans-production.s3.amazonaws.com:443/member-files/twenty_three_and_me/15c69470-0175-11e8-a43c-3ae9042b31e9/23andMe-genotyping.vcf.bz2?Signature=AkV8WyIi72zMNxgT6y0pRUcJQow%3D&Expires=1534355856&AWSAccessKeyId=AKIAIKNTFUJJTNS6N7HA
+[2018-08-15 16:57:48,697: INFO/MainProcess] Received task: imputer.tasks.submit_chrom[f0bfa08b-8109-425d-857e-e0f118bc52eb]  
+[2018-08-15 16:57:48,699: INFO/MainProcess] Received task: imputer.tasks.submit_chrom[db0e0af1-5a18-4c4f-905a-7b3d551ec58a]  
+[2018-08-15 16:57:48,700: WARNING/ForkPoolWorker-1] 21
+[2018-08-15 16:57:48,701: WARNING/ForkPoolWorker-1] 77687130
+[2018-08-15 16:57:51,757: INFO/ForkPoolWorker-1] Task imputer.tasks.submit_chrom[f0bfa08b-8109-425d-857e-e0f118bc52eb] succeeded in 3.056682960013859s: None
+[2018-08-15 16:57:51,759: WARNING/ForkPoolWorker-1] 22
+[2018-08-15 16:57:51,759: WARNING/ForkPoolWorker-1] 77687130
+[2018-08-15 16:57:54,761: INFO/MainProcess] Received task: imputer.tasks.combine_chrom[61307c48-2bf9-4591-bc8e-249d20f1f005]  
+[2018-08-15 16:57:54,762: INFO/ForkPoolWorker-1] Task imputer.tasks.submit_chrom[db0e0af1-5a18-4c4f-905a-7b3d551ec58a] succeeded in 3.0030547570204362s: None
+[2018-08-15 16:57:54,764: WARNING/ForkPoolWorker-1] 77687130 Imputation has completed, now combining results.
+[2018-08-15 16:58:08,271: WARNING/ForkPoolWorker-1] 77687130 finished combining results, now converting to .vcf
+[2018-08-15 16:58:14,303: WARNING/ForkPoolWorker-1] 77687130 finished converting to .vcf, now uploading to OpenHumans
+[2018-08-15 16:58:18,488: INFO/ForkPoolWorker-1] Upload complete: /home/django/outdir/77687130/member.imputed.vcf
+[2018-08-15 16:58:20,084: WARNING/ForkPoolWorker-1] 77687130 emailed member
+[2018-08-15 16:58:20,133: WARNING/ForkPoolWorker-1] b'/home/django/data\n77687130\n'
+[2018-08-15 16:58:20,133: WARNING/ForkPoolWorker-1] b''
+[2018-08-15 16:58:20,133: WARNING/ForkPoolWorker-1] 77687130 finished removing files
+[2018-08-15 16:58:20,198: INFO/ForkPoolWorker-1] Task imputer.tasks.combine_chrom[61307c48-2bf9-4591-bc8e-249d20f1f005] succeeded in 25.433926541998517s: None
