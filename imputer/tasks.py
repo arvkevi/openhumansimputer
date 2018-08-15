@@ -153,12 +153,11 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     3. filter the genotypes in .impute2_info
     4. merge on right (.impute2_info), acts like a filter for the left.
     """
-    print('Imputation has completed, now combining results...')
+    print('{} Imputation has completed, now combining results.'.format(oh_id))
 
     impute_cols = ['chr', 'name', 'position',
                    'a0', 'a1', 'a0a0_p', 'a0a1_p', 'a1a1_p']
 
-    print(oh_id)
     df = pd.DataFrame()
     df_gp = pd.DataFrame()  # hold genotype probabilities
     for chrom in CHROMOSOMES:
@@ -195,7 +194,7 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
               header=False,
               index=False,
               sep=' ')
-    print('finished combining results, now converting to .vcf')
+    print('{} finished combining results, now converting to .vcf'.format(oh_id))
 
     # convert to vcf
     os.chdir(settings.BASE_DIR)
@@ -205,7 +204,7 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     process = Popen(output_vcf_cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
 
-    print('finished converting to .vcf, now uploading to OpenHumans')
+    print('{} finished converting to .vcf, now uploading to OpenHumans'.format(oh_id))
     # upload file to OpenHumans
     process_source(oh_id)
     
@@ -216,11 +215,13 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
             'Check {} to see your imputed genotype results from Open Humans.'.format(project_page),
             oh_member.access_token,
             project_member_ids=[oh_id])
+    print('{} emailed member'.format(oh_id))
 
     # clean users files
+    os.chdir(settings.BASE_DIR)
     clean_command = [
         'imputer/clean_files.sh', '{}'.format(oh_member.oh_id)
     ]
     process = Popen(clean_command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
-    
+    print('{} finished removing files'.format(oh_id))
