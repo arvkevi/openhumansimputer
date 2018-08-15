@@ -206,14 +206,21 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     stdout, stderr = process.communicate()
 
     print('finished converting to .vcf, now uploading to OpenHumans')
-
+    # upload file to OpenHumans
     process_source(oh_id)
     
-    # clean users files
-    #clean_command = [
-    #    'imputer/clean_files.sh', '{}'.format(oh_member.oh_id)
-    #]
-    #process = Popen(clean_command, stdout=PIPE, stderr=PIPE)
-    #stdout, stderr = process.communicate()
-    
+    # Message Member
+    oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
+    project_page = environ.get('OH_ACTIVITY_PAGE')
+    api.message('Open Humans Imputation Complete', 
+            'Check {} to see your imputed genotype results from Open Humans.'.format(project_page),
+            oh_member.access_token,
+            project_member_ids=[oh_id])
 
+    # clean users files
+    clean_command = [
+        'imputer/clean_files.sh', '{}'.format(oh_member.oh_id)
+    ]
+    process = Popen(clean_command, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate()
+    
