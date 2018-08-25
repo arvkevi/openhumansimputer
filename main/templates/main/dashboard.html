@@ -1,0 +1,36 @@
+{% extends 'main/base.html' %}
+{% block content %}
+{% load static %}
+<h2 class="display-5">Imputation Dashboard</h2>
+<p class="lead">
+</br>See which notebooks you have shared and can share.
+</p>
+<div class="row">
+  <div class="col-md-4">
+    <p>
+      {%if all_datasources%}
+      <div class="table-responsive">
+      <table class='table'>
+        <thead>
+          <tr>
+            <th>Data Sources Imputer can Access</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for source_id, source_name in all_datasources.items %}
+        <tr>
+          <td>
+          {{ source_name }}
+          </td>
+        </tr>
+        {%endfor%}
+      </tbody>
+    </table>
+    </div>
+    {%else%}
+    You haven't shared any notebooks yet! <b>Head to the <a href="/about">About</a> page</b> to learn how to share your own notebooks!
+    {%endif%}
+    </p>
+  </div>
+</div>
+{% endblock %}

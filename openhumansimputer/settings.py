@@ -79,7 +79,7 @@ if REMOTE is True:
             "host": url_object.hostname,
             "port": url_object.port,
             "password": url_object.password,
-            "database": 0 
+            "database": 0
         },
         safety_threshold=5)
 
@@ -222,3 +222,5 @@ STATICFILES_DIRS = (
 )
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+INSTALLED_APPS += ['django_extensions']

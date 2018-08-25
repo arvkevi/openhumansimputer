@@ -2,8 +2,10 @@ import requests
 from celery import signature, chord, chain
 import logging
 import os
+from django.template.defaulttags import register
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.conf import settings
 from open_humans.models import OpenHumansMember
@@ -32,6 +34,72 @@ def index(request):
     return render(request, 'main/index.html', context=context)
 
 
+@login_required(login_url="/")
+def logout_user(request):
+    """
+    Logout user
+    """
+    if request.method == 'POST':
+        logout(request)
+    return redirect('index')
+
+
+@login_required(login_url="/")
+def delete_user(request):
+    if request.method == "POST":
+        request.user.delete()
+        messages.info(request, "Your account was deleted!")
+        logout(request)
+    return redirect('index')
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+
+@login_required(login_url='/')
+def dashboard(request):
+    oh_member = request.user.oh_member
+    context = {
+        'oh_member': oh_member,
+    }
+    try:
+        oh_member_data = api.exchange_oauth2_member(
+            oh_member.get_access_token())
+    except:
+        messages.error(request, "You need to re-authenticate with Open Humans")
+        logout(request)
+        return redirect("/")
+
+    requested_sources = {
+        'direct-sharing-128': '23andMe Upload',
+        'direct-sharing-129': 'AncestryDNA Upload',
+        'direct-sharing-120': 'FamilyTreeDNA integration',
+        'direct-sharing-40': 'Gencove',
+        'direct-sharing-131': 'Genome/Exome Upload',
+        'direct-sharing-139': 'Harvard Personal Genome Project',
+        'direct-sharing-55': 'openSNP'
+    }
+
+    matching_sources = {}
+    for data_source in oh_member_data['data']:
+        if data_source['source'] in requested_sources:
+            matching_sources[requested_sources[data_source['source']]] = data_source['download_url']
+    print(matching_sources)
+
+    context = {
+        'base_url': request.build_absolute_uri("/").rstrip('/'),
+        'section': 'dashboard',
+        'all_datasources': requested_sources,
+        'matching_sources': matching_sources}
+
+    return render(request, 'main/dashboard.html',
+                  context=context)
+
+
+def about(request):
+    return render(request, 'main/about.html', {'section': 'about'})
+
+
 def complete(request):
     """
     Receive user from Open Humans. Store data, start upload.
@@ -49,19 +117,21 @@ def complete(request):
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
 
-        signature('shared_tasks.apply_async', countdown=10)
+        #signature('shared_tasks.apply_async', countdown=10)
         # get the member's vcf file
-        logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
-        get_vcf(oh_id)
+        #logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
+        # get_vcf(oh_id)
         # convert to plink format
-        prepare_data(oh_id)
+        # prepare_data(oh_id)
 
-        res = chord((submit_chrom.si(chrom, oh_id)
-                     for chrom in CHROMOSOMES), combine_chrom.si(oh_id))()
+        # res = chord((submit_chrom.si(chrom, oh_id)
+        #             for chrom in CHROMOSOMES), combine_chrom.si(oh_id))()
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
-        return render(request, 'main/complete.html',
-                      context=context)
+        return redirect('/dashboard')
+
+        # return render(request, 'main/complete.html',
+        #              context=context)
 
     logger.debug('Invalid code exchange. User returned to starting page.')
     return redirect('/')

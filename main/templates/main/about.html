@@ -1,0 +1,37 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="jumbotron">
+  <h5 class="display-5">Can you solve this puzzle by filling in the missing letters?</h5>
+  <p></p>
+  <h5 class="text-success">The quic<font color="#ee0000">_</font> brown fox <font color="#ee0000">_</font>umps over the <font color="#ee0000">_</font>azy dog</h5>
+  <p></p>
+    <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#Mymodal">Show Answer</button>
+    <div class="modal" id="Mymodal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Answer!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="text-success">The quic<font color="#ee0000">_</font> brown fox <font color="#ee0000">_</font>umps over the <font color="#ee0000">_</font>azy dog</p>
+            <p class="text-info">The quick brown fox jumps over the lazy dog</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <br></br><p></p>
+  <p>If so, or if you even have a best guess, you can understand how genotype imputation works. Genotype imputation works in a similar method to the one your brain used to fill in the missing letters above.
+  You used context clues from the letters and words surrounding the missing letters as well as your knowledge of the known words in the english dictionary.
+  Genotype imputation relies on a reference population of many individuals who have essentially no missing letters and looks for shared <a href="https://en.wikipedia.org/wiki/Haplotype" target="_blank">haplotypes <i class="fa fa-external-link"></i></a> between reference sequences and your sequence.
+  Imputation algorithms provide a probability for each possible genotype at every imputed locus in the genome.</p>
+</div>
+
+{% endblock %}

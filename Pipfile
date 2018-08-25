@@ -22,9 +22,11 @@ open-humans-api = "*"
 genipe = "*"
 flower = "*"
 pandas = "*"
+ipython = "*"
+django_extensions = "*"
+requests_oauthlib = "*"
 
 [dev-packages]
-
 vcrpy = "*"
 
 
