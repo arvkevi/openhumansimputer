@@ -2,18 +2,15 @@
 {% block content %}
 {% load static %}
 <h2 class="display-5">Imputation Dashboard</h2>
-<p class="lead">
-</br>See which notebooks you have shared and can share.
-</p>
 <div class="row">
-  <div class="col-md-4">
+  <div class="col-md-6">
     <p>
       {%if all_datasources%}
       <div class="table-responsive">
       <table class='table table-bordered'>
         <thead class="thead-light">
           <tr>
-            <th>Data Sources Imputer can Access</th>
+            <th class="w-150">Data Sources Imputer can Access</th>
           </tr>
         </thead>
         <tbody>
@@ -21,9 +18,9 @@
         <tr>
           <td>
           {% if source_name in matching_sources %}
-          {{ source_name }} &emsp; <button type="button" class="btn btn-primary btn-lg">Large button</button>
+          <b class="text-info">{{ source_name }} </b><button type="button" class="btn btn-primary btn-sm float-right">Impute!</button>
           {% else %}
-          {{ source_name }} &emsp; <button type="button" class="btn btn-primary btn-lg">Large button</button>
+          <b class="text-info">{{ source_name }} </b>is not connected to <b class="text-warning">Imputer</b>.
           {% endif %}
           </td>
         </tr>
