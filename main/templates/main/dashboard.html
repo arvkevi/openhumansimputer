@@ -10,8 +10,8 @@
     <p>
       {%if all_datasources%}
       <div class="table-responsive">
-      <table class='table'>
-        <thead>
+      <table class='table table-bordered'>
+        <thead class="thead-light">
           <tr>
             <th>Data Sources Imputer can Access</th>
           </tr>
@@ -20,7 +20,11 @@
         {% for source_id, source_name in all_datasources.items %}
         <tr>
           <td>
-          {{ source_name }}
+          {% if source_name in matching_sources %}
+          {{ source_name }} &emsp; <button type="button" class="btn btn-primary btn-lg">Large button</button>
+          {% else %}
+          {{ source_name }} &emsp; <button type="button" class="btn btn-primary btn-lg">Large button</button>
+          {% endif %}
           </td>
         </tr>
         {%endfor%}
