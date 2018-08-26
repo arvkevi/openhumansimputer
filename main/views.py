@@ -117,6 +117,26 @@ def complete(request):
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
 
+
+        context = {'oh_id': oh_member.oh_id,
+                   'oh_proj_page': settings.OH_ACTIVITY_PAGE}
+        return redirect('/dashboard')
+
+        # return render(request, 'main/complete.html',
+        #              context=context)
+
+    logger.debug('Invalid code exchange. User returned to starting page.')
+    return redirect('/')
+
+
+def launch_imputation(request):
+    """
+    Receive user from Open Humans. Store data, start upload.
+    """
+    oh_member = request.user.oh_member
+    logger.debug("Launching {}'s pipeline.".format(oh_member.oh_id))
+
+    if oh_member:
         #signature('shared_tasks.apply_async', countdown=10)
         # get the member's vcf file
         #logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
@@ -126,14 +146,13 @@ def complete(request):
 
         # res = chord((submit_chrom.si(chrom, oh_id)
         #             for chrom in CHROMOSOMES), combine_chrom.si(oh_id))()
+        print('Launching pipeline!')
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
-        return redirect('/dashboard')
+        return render(request, 'main/complete.html',
+                      context=context)
 
-        # return render(request, 'main/complete.html',
-        #              context=context)
-
-    logger.debug('Invalid code exchange. User returned to starting page.')
+    logger.debug('Oops! User returned to starting page.')
     return redirect('/')
 
 
