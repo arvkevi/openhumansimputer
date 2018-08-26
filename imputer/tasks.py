@@ -110,15 +110,16 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
     process = Popen(command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
 
+
 #@shared_task
-def get_vcf(oh_id):
+def get_vcf(data_file_url):
     """Download member .vcf."""
-    oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
-    user_details = api.exchange_oauth2_member(oh_member.get_access_token())
-    for data_source in user_details['data']:
-        if 'vcf' in data_source['metadata']['tags'] and '23andMe' in data_source['metadata']['tags']:
-            data_file_url = data_source['download_url']
-    print(data_file_url)
+    #oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
+    #user_details = api.exchange_oauth2_member(oh_member.get_access_token())
+    #for data_source in user_details['data']:
+#        if 'vcf' in data_source['metadata']['tags'] and '23andMe' in data_source['metadata']['tags']:
+            #data_file_url = data_source['download_url']
+    #print(data_file_url)
     file_23andme = requests.get(data_file_url)
     os.makedirs('{}/{}'.format(DATA_DIR, oh_member.oh_id), exist_ok=True)
     with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_member.oh_id, oh_member.oh_id), 'wb') as handle:
@@ -214,7 +215,7 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
         headiter = takewhile(lambda s: s.startswith('#'), vcf)
         header = list(headiter)
         dfvcf = pd.read_csv(vcf_file, sep='\t', header=None, comment='#', names=cols)
-    
+
     df_gp.rename(columns={'name': 'ID'}, inplace=True)
     df_gp.set_index(['ID'], inplace=True)
     dfvcf.set_index(['ID'], inplace=True)
@@ -237,11 +238,11 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     print('{} finished converting to .vcf, now uploading to OpenHumans'.format(oh_id))
     # upload file to OpenHumans
     process_source(oh_id)
-    
+
     # Message Member
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
     project_page = environ.get('OH_ACTIVITY_PAGE')
-    api.message('Open Humans Imputation Complete', 
+    api.message('Open Humans Imputation Complete',
             'Check {} to see your imputed genotype results from Open Humans.'.format(project_page),
             oh_member.access_token,
             project_member_ids=[oh_id])
@@ -256,4 +257,3 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     stdout, stderr = process.communicate()
 
     print('{} finished removing files'.format(oh_id))
-

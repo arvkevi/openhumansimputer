@@ -134,20 +134,23 @@ def launch_imputation(request):
     Receive user from Open Humans. Store data, start upload.
     """
     oh_member = request.user.oh_member
+    oh_id = oh_member.oh_id
+
+    vcf_link = request.GET.get('source_link', '')
     logger.debug("Launching {}'s pipeline.".format(oh_member.oh_id))
 
     if oh_member:
         #signature('shared_tasks.apply_async', countdown=10)
         # get the member's vcf file
         #logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
-        # get_vcf(oh_id)
+        # get_vcf(vcf_link)
         # convert to plink format
         # prepare_data(oh_id)
 
         # res = chord((submit_chrom.si(chrom, oh_id)
         #             for chrom in CHROMOSOMES), combine_chrom.si(oh_id))()
         print('Launching pipeline!')
-        context = {'oh_id': oh_member.oh_id,
+        context = {'oh_member': oh_member,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
         return render(request, 'main/complete.html',
                       context=context)

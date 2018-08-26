@@ -18,7 +18,7 @@
         <tr>
           <td>
           {% if source_name in matching_sources %}
-          <a href="{% url 'launch-imputation' %}"><b class="text-info">{{ source_name }} </b><button type="button" class="btn btn-primary btn-sm float-right">Impute!</button></a>
+          <a href="{% url 'launch-imputation'%}?source_link={{matching_sources|get_item:source_name}}"><b class="text-info">{{ source_name }} </b><button type="button" class="btn btn-primary btn-sm float-right">Impute!</button></a>
           {% else %}
           <b class="text-info">{{ source_name }} </b>is not connected to <b class="text-warning">Imputer</b>.
           {% endif %}
