@@ -217,7 +217,7 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     del df_gp
     dfvcf['MEMBER'] = dfvcf['MEMBER'] + ':' + dfvcf['a0a0_p'].round(3).astype(str) + ',' + dfvcf['a0a1_p'].round(3).astype(str) + ',' + dfvcf['a1a1_p'].round(3).astype(str)
     dfvcf['FORMAT'] = dfvcf['FORMAT'].astype(str) + ':GP'
-    dfvcf['INFO'] = dfvcf['INFO'].astype(str) + ';INFO=' + dfvcf['info'].astype(str)
+    dfvcf['INFO'] = dfvcf['INFO'].astype(str) + ';INFO=' + dfvcf['info'].round(3).astype(str)
     dfvcf.reset_index(inplace=True)
     new_header = ['##FORMAT=<ID=GP,Number=3,Type=Float,Description="Estimated Posterior Probabilities (rounded to 3 digits) for Genotypes 0/0, 0/1 and 1/1">\n',
             '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n'

@@ -9,6 +9,7 @@ sed -i'.bak' '3s/0/-9/g' "$OUT_DIR"/"$1"/member.sample
 "$IMP_BIN"/plink2 \
 --gen "$OUT_DIR"/"$1"/member.imputed.impute2 \
 --sample "$OUT_DIR"/"$1"/member.sample \
+--hard-call-threshold 0.4 \
 --export vcf \
 --ref-from-fa "$REF_FA"/hg19.fasta \
 --missing-code -9 \
