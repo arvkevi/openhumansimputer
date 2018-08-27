@@ -10,7 +10,7 @@
       <table class='table table-bordered'>
         <thead class="thead-light">
           <tr>
-            <th class="w-150">Data Sources Imputer can Access</th>
+            <th class="w-150">Data sources which <b class="text-warning">Imputer</b> can access</th>
           </tr>
         </thead>
         <tbody>
@@ -18,7 +18,16 @@
         <tr>
           <td>
           {% if source_name in matching_sources %}
-          <a href="{% url 'launch-imputation'%}?source_link={{matching_sources|get_item:source_name}}"><b class="text-info">{{ source_name }} </b><button type="button" class="btn btn-primary btn-sm float-right">Impute!</button></a>
+          <a href="{% url 'launch-imputation'%}?source_link={{matching_sources|get_item:source_name}}" class="confirmation"><b class="text-info">{{ source_name }} </b><button type="button" class="btn btn-primary btn-sm float-right">Impute!</button></a>
+          <script type="text/javascript">
+              var elems = document.getElementsByClassName('confirmation');
+              var confirmIt = function (e) {
+                  if (!confirm('Are you sure you want to impute this source?\nPlease be courteous to other members and wait for results from one file before starting another.')) e.preventDefault();
+              };
+              for (var i = 0, l = elems.length; i < l; i++) {
+                  elems[i].addEventListener('click', confirmIt, false);
+              }
+          </script>
           {% else %}
           <b class="text-info">{{ source_name }} </b>is not connected to <b class="text-warning">Imputer</b>.
           {% endif %}
@@ -28,10 +37,30 @@
       </tbody>
     </table>
     </div>
-    {%else%}
-    You haven't shared any notebooks yet! <b>Head to the <a href="/about">About</a> page</b> to learn how to share your own notebooks!
     {%endif%}
     </p>
+  </div>
+  <div class="col-md-6">
+  <p>
+    <div class="card mb-3">
+      <h3 class="card-header">Explore Results</h3>
+      <div class="card-body">
+        <h5 class="card-title">Learn how to explore your imputed genotype results in an Open Humans notebook</h5>
+        <h6 class="card-subtitle text-muted">Under Construction!</h6>
+      </div>
+      <img style="height: 200px; width: 100%; display: block;" src="{% static 'imputer.explore.png' %}" alt="Card image">
+      <div class="card-body">
+        <p class="card-text">The links below will take you to notebooks with some starter code to explore and visulize your results.</p>
+      </div>
+      <div class="card-body">
+        <a href="#" class="card-link">Parsing Notebook</a>
+        <a href="#" class="card-link">Visualizations Notebook</a>
+      </div>
+      <div class="card-footer text-muted">
+        Last Updated: August 26, 2018
+      </div>
+    </div>
+</p>
   </div>
 </div>
 {% endblock %}

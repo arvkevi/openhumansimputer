@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from open_humans.models import OpenHumansMember
 from .models import DataSourceMember
-from imputer.tasks import get_vcf, prepare_data, submit_chrom, combine_chrom, add_this_sleepy
+from imputer.tasks import get_vcf, prepare_data, submit_chrom, combine_chrom
 from datauploader.tasks import process_source
 from ohapi import api
 import arrow
@@ -52,9 +52,11 @@ def delete_user(request):
         logout(request)
     return redirect('index')
 
+
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
 
 @login_required(login_url='/')
 def dashboard(request):
@@ -117,13 +119,9 @@ def complete(request):
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
 
-
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
         return redirect('/dashboard')
-
-        # return render(request, 'main/complete.html',
-        #              context=context)
 
     logger.debug('Invalid code exchange. User returned to starting page.')
     return redirect('/')

@@ -31,12 +31,6 @@ OUT_DIR = environ.get('OUT_DIR')
 # Set up logging.
 logger = logging.getLogger(__name__)
 
-import time
-@shared_task(ignore_result=False)
-def add_this_sleepy(a, b):
-    """this function helps with debugging"""
-    time.sleep(20)
-    return a + b
 
 @shared_task(ignore_result=False)
 def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
