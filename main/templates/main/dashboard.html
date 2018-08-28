@@ -18,7 +18,7 @@
         <tr>
           <td>
           {% if source_name in matching_sources %}
-          <a href="{% url 'launch-imputation'%}?source_link={{matching_sources|get_item:source_name}}" class="confirmation"><b class="text-info">{{ source_name }} </b><button type="button" class="btn btn-primary btn-sm float-right">Impute!</button></a>
+          <b class="text-info">{{ source_name }}</b><a href="{% url 'launch-imputation'%}?source_link={{matching_sources|get_item:source_name}}" class="confirmation"><button type="button" class="btn btn-primary btn-sm float-right">Impute!</button></a>
           <script type="text/javascript">
               var elems = document.getElementsByClassName('confirmation');
               var confirmIt = function (e) {
@@ -29,7 +29,7 @@
               }
           </script>
           {% else %}
-          <b class="text-info">{{ source_name }} </b>is not connected to <b class="text-warning">Imputer</b>.
+          <b class="text-info">{{ source_name }} </b>is not connected to <b class="text-warning">Imputer</b> or you have no data in that project.
           {% endif %}
           </td>
         </tr>

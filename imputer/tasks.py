@@ -106,17 +106,16 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
 
 
 #@shared_task
-def get_vcf(data_file_url):
+def get_vcf(data_source_id, oh_id):
     """Download member .vcf."""
-    #oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
-    #user_details = api.exchange_oauth2_member(oh_member.get_access_token())
-    #for data_source in user_details['data']:
-#        if 'vcf' in data_source['metadata']['tags'] and '23andMe' in data_source['metadata']['tags']:
-            #data_file_url = data_source['download_url']
-    #print(data_file_url)
+    oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
+    user_details = api.exchange_oauth2_member(oh_member.get_access_token())
+    for data_source in user_details['data']:
+        if data_source['id'] == data_source_id:    
+            data_file_url = data_source['download_url']
     file_23andme = requests.get(data_file_url)
-    os.makedirs('{}/{}'.format(DATA_DIR, oh_member.oh_id), exist_ok=True)
-    with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_member.oh_id, oh_member.oh_id), 'wb') as handle:
+    os.makedirs('{}/{}'.format(DATA_DIR, oh_id), exist_ok=True)
+    with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id), 'wb') as handle:
         textobj = bz2.decompress(file_23andme.content)
         handle.write(textobj)
         #if '.bz2' in data_file_url:
