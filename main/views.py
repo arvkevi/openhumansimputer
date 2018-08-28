@@ -166,8 +166,7 @@ def oh_code_to_member(code):
        settings.OPENHUMANS_CLIENT_ID and code:
         data = {
             'grant_type': 'authorization_code',
-            'redirect_uri':
-            '{}/complete'.format(settings.OPENHUMANS_APP_BASE_URL),
+            'redirect_uri': settings.OPENHUMANS_APP_REDIRECT_URI,
             'code': code,
         }
         req = requests.post(
