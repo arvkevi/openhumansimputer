@@ -111,7 +111,7 @@ def get_vcf(data_source_id, oh_id):
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
     user_details = api.exchange_oauth2_member(oh_member.get_access_token())
     for data_source in user_details['data']:
-        if data_source['id'] == data_source_id:
+        if str(data_source['id']) == str(data_source_id):
             data_file_url = data_source['download_url']
     file_23andme = requests.get(data_file_url)
     os.makedirs('{}/{}'.format(DATA_DIR, oh_id), exist_ok=True)
