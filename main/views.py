@@ -107,9 +107,6 @@ def dashboard(request):
             matching_sources[source_id] = {'project': source_name,
                                             'id': None,
                                             'source_id': source_id}
-
-    print(matching_sources)
-
     context = {
         'base_url': request.build_absolute_uri("/").rstrip('/'),
         'section': 'dashboard',
