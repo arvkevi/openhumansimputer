@@ -1,54 +1,57 @@
 {% extends 'main/base.html' %}
 {% block content %}
 {% load static %}
-<h2 class="display-5">Imputation Dashboard</h2>
-<div class="row">
-  <div class="col-md-6">
-    <p>
-      {%if all_datasources%}
-      <div class="table-responsive">
-      <table class='table table-bordered'>
-        <thead class="thead-light">
-          <tr>
-            <th class="w-150">Data sources which <b class="text-warning">Imputer</b> can access</th>
-          </tr>
-        </thead>
-        <tbody>
-        {% for source_id, source_name in all_datasources.items %}
-        <tr>
-          <td>
-          {% if source_name in matching_sources %}
-          <b class="text-info">{{ source_name }}</b><a href="{% url 'launch-imputation'%}?source_link={{matching_sources|get_item:source_name}}" class="confirmation"><button type="button" class="btn btn-primary btn-sm float-right">Impute!</button></a>
-          <script type="text/javascript">
-              var elems = document.getElementsByClassName('confirmation');
-              var confirmIt = function (e) {
-                  if (!confirm('Are you sure you want to impute this source?\nPlease be courteous to other members and wait for results from one file before starting another.')) e.preventDefault();
-              };
-              for (var i = 0, l = elems.length; i < l; i++) {
-                  elems[i].addEventListener('click', confirmIt, false);
-              }
-          </script>
-          {% else %}
-          <b class="text-info">{{ source_name }} </b>is not connected to <b class="text-warning">Imputer</b> or you have no data in that project.
-          {% endif %}
-          </td>
-        </tr>
-        {%endfor%}
-      </tbody>
-    </table>
-    </div>
-    {%endif%}
-    </p>
-  </div>
-  <div class="col-md-6">
+<h2 class="display-4">Imputation Dashboard <i class="fa fa-rocket fa-xl"></i></h2>
+
+{%if all_datasources%}
+  <h4>Data sources which <b class="text-warning">Imputer</b> can access</h4>
+  <p>Choose a data source to impute, but please remember not to abuse the server by launching multiple jobs.</p> 
+  <table class='table table-hover' style='width: 50rem;'>
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">OH Data Source</th>
+        <th scope="col">Connected Filename</th>
+        <th scope="col">Impute?</th>
+      </tr>
+    </thead>
+      <tbody>
+      {% for key in matching_sources %}
+        {% if matching_sources|get_item_id:key != None %}
+        <tr class="table-success">
+        <th scope="row">{{ matching_sources|get_item_proj:key }}</th>
+        <td>{{ key }}</td>
+        <td><a href="{% url 'launch-imputation'%}?source_link={{matching_sources|get_item_id:key}}" class="confirmation"><button type="button" class="btn btn-primary btn-sm float-right">Impute!</button></a></td>
+      </tr>
+        <script type="text/javascript">
+            var elems = document.getElementsByClassName('confirmation');
+            var confirmIt = function (e) {
+                if (!confirm('Are you sure you want to impute this source?\nPlease be courteous to other members and wait for results from one file before starting another.')) e.preventDefault();
+            };
+            for (var i = 0, l = elems.length; i < l; i++) {
+                elems[i].addEventListener('click', confirmIt, false);
+            }
+        </script>
+        {% else %}
+        <tr class="table-secondary">
+        <th scope="row">{{ matching_sources|get_item_proj:key }}</th>
+        <td>{{ matching_sources|get_item_proj:key }} not connected or no .vcf data.</td>
+        <td></td>
+      </tr>
+        {% endif %}
+        </td>
+      </tr>
+      {%endfor%}
+    </tbody>
+</table>
+{%endif%}
   <p>
-    <div class="card mb-3">
-      <h3 class="card-header">Explore Results</h3>
+    <div class="card mb-3" style="width: 60rem;">
+      <h3 class="card-header">Explore Results <i class="fa fa-file-text-o fa-xl"></i></h3>
       <div class="card-body">
         <h5 class="card-title">Learn how to explore your imputed genotype results in an Open Humans notebook</h5>
         <h6 class="card-subtitle text-muted">Under Construction!</h6>
       </div>
-      <img style="height: 200px; width: 100%; display: block;" src="{% static 'imputer.explore.png' %}" alt="Card image">
+      <img style="height: 550px; width: 100%; display: block;" src="{% static 'imputer.explore.png' %}" alt="Card image">
       <div class="card-body">
         <p class="card-text">The links below will take you to notebooks with some starter code to explore and visulize your results.</p>
       </div>
@@ -61,6 +64,5 @@
       </div>
     </div>
 </p>
-  </div>
-</div>
+
 {% endblock %}

@@ -54,8 +54,18 @@ def delete_user(request):
 
 
 @register.filter
-def get_item(dictionary, key):
-    return dictionary.get(key)
+def get_item_proj(dictionary, key):
+    return dictionary.get(key, {}).get('project')
+
+
+@register.filter
+def get_item_id(dictionary, key):
+    return dictionary.get(key, {}).get('id')
+
+
+@register.filter
+def get_item_source_id(dictionary, key):
+    return dictionary.get(key, {}).get('source_id')
 
 
 @login_required(login_url='/')
@@ -83,9 +93,21 @@ def dashboard(request):
     }
 
     matching_sources = {}
+    found_source_ids = []
     for data_source in oh_member_data['data']:
-        if data_source['source'] in requested_sources:
-            matching_sources[requested_sources[data_source['source']]] = data_source['download_url']
+        if (data_source['source'] in requested_sources and
+                'vcf' in data_source['basename']):
+            matching_sources[data_source['basename']] =  {'project': requested_sources[data_source['source']],
+                                                        'id': data_source['id'],
+                                                        'source_id': data_source['source']}
+            found_source_ids.append(data_source['source'])
+
+    for source_id, source_name in requested_sources.items():
+        if source_id not in found_source_ids:
+            matching_sources[source_id] = {'project': source_name,
+                                            'id': None,
+                                            'source_id': source_id}
+
     print(matching_sources)
 
     context = {
@@ -138,15 +160,15 @@ def launch_imputation(request):
     logger.debug("Launching {}'s pipeline.".format(oh_member.oh_id))
 
     if oh_member:
-        #signature('shared_tasks.apply_async', countdown=10)
+        signature('shared_tasks.apply_async', countdown=10)
         # get the member's vcf file
-        #logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
-        # get_vcf(vcf_link)
+        logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
+        get_vcf(vcf_link)
         # convert to plink format
-        # prepare_data(oh_id)
+        prepare_data(oh_id)
 
-        # res = chord((submit_chrom.si(chrom, oh_id)
-        #             for chrom in CHROMOSOMES), combine_chrom.si(oh_id))()
+        res = chord((submit_chrom.si(chrom, oh_id)
+                     for chrom in CHROMOSOMES), combine_chrom.si(oh_id))()
         print('Launching pipeline!')
         context = {'oh_member': oh_member,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
