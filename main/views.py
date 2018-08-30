@@ -96,17 +96,18 @@ def dashboard(request):
     found_source_ids = []
     for data_source in oh_member_data['data']:
         if (data_source['source'] in requested_sources and
-                'vcf' in data_source['basename']):
-            matching_sources[data_source['basename']] =  {'project': requested_sources[data_source['source']],
-                                                        'id': data_source['id'],
-                                                        'source_id': data_source['source']}
+                'vcf' in data_source['basename']
+                and 'metadata' not in data_source['basename']):
+            matching_sources[data_source['basename']] = {'project': requested_sources[data_source['source']],
+                                                         'id': data_source['id'],
+                                                         'source_id': data_source['source']}
             found_source_ids.append(data_source['source'])
 
     for source_id, source_name in requested_sources.items():
         if source_id not in found_source_ids:
             matching_sources[source_id] = {'project': source_name,
-                                            'id': None,
-                                            'source_id': source_id}
+                                           'id': None,
+                                           'source_id': source_id}
     context = {
         'base_url': request.build_absolute_uri("/").rstrip('/'),
         'section': 'dashboard',

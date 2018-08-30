@@ -19,6 +19,7 @@ from open_humans.models import OpenHumansMember
 from datauploader.tasks import process_source
 from openhumansimputer.settings import CHROMOSOMES
 import bz2
+import gzip
 from itertools import takewhile
 
 HOME = environ.get('HOME')
@@ -113,17 +114,18 @@ def get_vcf(data_source_id, oh_id):
     for data_source in user_details['data']:
         if str(data_source['id']) == str(data_source_id):
             data_file_url = data_source['download_url']
-    file_23andme = requests.get(data_file_url)
+    datafile = requests.get(data_file_url)
     os.makedirs('{}/{}'.format(DATA_DIR, oh_id), exist_ok=True)
     with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id), 'wb') as handle:
-        textobj = bz2.decompress(file_23andme.content)
-        handle.write(textobj)
-        #if '.bz2' in data_file_url:
-        #    textobj = bz2.decompress(file_23andme.content)
-        #    handle.write(textobj)
-        #else:
-        #    for block in file_23andme.iter_content(1024):
-        #        handle.write(block)
+        if '.bz2' in data_file_url:
+            textobj = bz2.decompress(datafile.content)
+            handle.write(textobj)
+        elif '.gz' in data_file_url:
+            textobj = gzip.decompress(datafile.content)
+            handle.write(textobj)
+        else:
+            for block in datafile.iter_content(1024):
+                handle.write(block)
 
 @shared_task
 def prepare_data(oh_id):
