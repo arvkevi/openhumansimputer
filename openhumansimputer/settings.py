@@ -35,12 +35,12 @@ REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 
 ALLOWED_HOSTS = ['*']
 
-#HEROKUCONFIG_APP_NAME = os.getenv('HEROKUCONFIG_APP_NAME', '')
-#DEFAULT_BASE_URL = ('https://{}.herokuapp.com'.format(HEROKUCONFIG_APP_NAME) if
-#                    REMOTE else 'http://127.0.0.1:5000')
+REMOTE_APP_NAME = os.getenv('REMOTE_APP_NAME', '')
+DEFAULT_BASE_URL = ('https://{}:8000'.format(REMOTE_APP_NAME) if
+                    REMOTE else 'http://127.0.0.1:5000')
 
-HEROKUCONFIG_APP_NAME = 'http://142.93.20.214'
-DEFAULT_BASE_URL = 'http://142.93.20.214:8000'
+#HEROKUCONFIG_APP_NAME = 'http://142.93.20.214'
+#DEFAULT_BASE_URL = 'http://142.93.20.214:8000'
 
 OPENHUMANS_APP_BASE_URL = os.getenv('APP_BASE_URL', DEFAULT_BASE_URL)
 if OPENHUMANS_APP_BASE_URL[-1] == "/":
@@ -61,11 +61,12 @@ OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 
 # Imputer Settings
 # in production this should be False
-TEST_CHROMS = True if os.environ.get('TEST_CHROMS', '').lower() == 'true' else False
+TEST_CHROMS = True if os.environ.get(
+    'TEST_CHROMS', '').lower() == 'true' else False
 if TEST_CHROMS:
     print('using chr21 and chr22 for testing')
     CHROMOSOMES = ["{}".format(i)
-                   for i in list(range(21, 23))]  # + ["23"]
+                   for i in list(range(18, 19))]  # + ["23"]
 else:
     CHROMOSOMES = ["{}".format(i)
                    for i in list(range(1, 23))]  # + ["23"]

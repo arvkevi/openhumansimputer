@@ -158,7 +158,7 @@ def launch_imputation(request):
     logger.debug("Launching {}'s pipeline.".format(oh_member.oh_id))
 
     if oh_member:
-        signature('shared_tasks.apply_async', countdown=10)
+        signature('shared_tasks.apply_async', shadow=oh_id, countdown=10)
         # get the member's vcf file
         logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
         get_vcf(vcf_id, oh_id)
