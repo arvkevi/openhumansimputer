@@ -1,14 +1,36 @@
 {% extends 'main/base.html' %}
 {% block content %}
 {% load static %}
-<h2 class="display-4">Imputation Dashboard <i class="fa fa-rocket fa-xl"></i></h2>
+
+<h2 class="display-4">Imputation Dashboard</h2>
 <br>
 <br>
 
+{% if queue_position == None %}
+<div class="alert alert-dismissible alert-light">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  <h4 class="alert-heading">Imputation Pipeline Queue &emsp; <i class="fa fa-list-ol fa-xl"></i></h4>
+  <p class="mb-0">You do not have any imputation jobs running in the pipeline.</p>
+</div>
+{% else %}
+<div class="alert alert-dismissible alert-light">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  <h4 class="alert-heading">Imputation Pipeline Queue &emsp; <i class="fa fa-list-ol fa-xl"></i></h4>
+  <p class="mb-0">There are <strong>{{queue_position}}</strong> members in front of you. Each job completes in approximately 13 hours.</p>
+</div>
+{% endif %}
+
+{% if "duplicate" in request.get_full_path %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong>Oops!</strong> We checked, you already have an imputation job running. Please wait for that to finish before relaunching.
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif %}
 {%if all_datasources%}
-  <h4>Data sources which <b class="text-warning">Imputer</b> can access</h4>
-  <p>Choose a data source to impute, but please remember not to abuse the server by launching multiple jobs.</p>
-  <p>After clicking "Impute!" you will need to wait approximately 15-30 seconds for the pipeline to launch before being redirected to a confirmation page.</p>
+  <h4>Data sources which <b class="text-warning">Imputer</b> can access &emsp; <i class="fa fa-rocket fa-xl"></i></h4>
+  <p>Choose a data source to impute, after clicking "Impute!" you will be redirected to a confirmation page.</p>
   <table class='table table-hover' style='width: 50rem;'>
     <thead class="thead-light">
       <tr>

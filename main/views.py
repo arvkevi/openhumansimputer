@@ -1,7 +1,5 @@
 import requests
-from celery import signature, chord, chain
 import logging
-import os
 from django.template.defaulttags import register
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -9,13 +7,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.conf import settings
 from open_humans.models import OpenHumansMember
-from .models import DataSourceMember
-from imputer.tasks import get_vcf, prepare_data, submit_chrom, combine_chrom
-from datauploader.tasks import process_source
+from imputer.tasks import pipeline
 from ohapi import api
-import arrow
-from open_humans.models import OpenHumansMember
 from openhumansimputer.settings import CHROMOSOMES
+from imputer.models import ImputerMember
 
 
 # Set up logging.
@@ -108,11 +103,21 @@ def dashboard(request):
             matching_sources[source_id] = {'project': source_name,
                                            'id': None,
                                            'source_id': source_id}
+
+    # check position in queue
+    active_sorted = ImputerMember.objects.filter(active=True).order_by('id')
+    queue_position = None
+    for index, active in enumerate(active_sorted):
+        if int(oh_member.oh_id) == int(active.oh_id):
+            queue_position = index
+
     context = {
         'base_url': request.build_absolute_uri("/").rstrip('/'),
         'section': 'dashboard',
         'all_datasources': requested_sources,
-        'matching_sources': matching_sources}
+        'matching_sources': matching_sources,
+        'queue_position': queue_position
+        }
 
     return render(request, 'main/dashboard.html',
                   context=context)
@@ -149,28 +154,32 @@ def complete(request):
 
 def launch_imputation(request):
     """
-    Receive user from Open Humans. Store data, start upload.
+    Logic to check whether user exists:
+    If true, alerts member and redirects to Dashboard, otherwise,
+    create the user and launch Pipeline
     """
     oh_member = request.user.oh_member
     oh_id = oh_member.oh_id
 
     vcf_id = request.GET.get('id', '')
-    logger.debug("Launching {}'s pipeline.".format(oh_member.oh_id))
 
     if oh_member:
-        signature('shared_tasks.apply_async', shadow=oh_id, countdown=10)
-        # get the member's vcf file
-        logger.debug('downloading {}\'s .vcf file.'.format(oh_member.oh_id))
-        get_vcf(vcf_id, oh_id)
-        # convert to plink format
-        prepare_data(oh_id)
 
-        res = chord((submit_chrom.si(chrom, oh_id)
-                     for chrom in CHROMOSOMES), combine_chrom.si(oh_id))()
-        print('Launching pipeline!')
-        context = {'oh_member': oh_member,
-                   'oh_proj_page': settings.OH_ACTIVITY_PAGE}
-        return render(request, 'main/complete.html',
+        exists = len(ImputerMember.objects.filter(oh_id__in=(oh_id,), active=True))
+        # should never be higher than 1
+        if exists >= 1:
+            return redirect('/dashboard?duplicate')
+        else:
+            new_imputer = ImputerMember(oh_id=oh_id, active=True, step='launch')
+            new_imputer.save()
+
+            logger.debug("Launching {}'s pipeline.".format(oh_member.oh_id))
+
+            pipeline(vcf_id, oh_id, CHROMOSOMES)
+
+            context = {'oh_member': oh_member,
+                       'oh_proj_page': settings.OH_ACTIVITY_PAGE}
+            return render(request, 'main/complete.html',
                       context=context)
 
     logger.debug('Oops! User returned to starting page.')

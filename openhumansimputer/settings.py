@@ -66,7 +66,7 @@ TEST_CHROMS = True if os.environ.get(
 if TEST_CHROMS:
     print('using chr21 and chr22 for testing')
     CHROMOSOMES = ["{}".format(i)
-                   for i in list(range(18, 19))]  # + ["23"]
+                   for i in list(range(21, 23))]  # + ["23"]
 else:
     CHROMOSOMES = ["{}".format(i)
                    for i in list(range(1, 23))]  # + ["23"]
@@ -225,3 +225,6 @@ STATICFILES_DIRS = (
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 INSTALLED_APPS += ['django_extensions']
+
+if not REMOTE:
+    BROKER_URL = 'redis://localhost:6379'

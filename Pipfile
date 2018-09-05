@@ -29,7 +29,6 @@ requests_oauthlib = "*"
 [dev-packages]
 vcrpy = "*"
 tornado = "*"
-flower = "*"
 
 [requires]
 

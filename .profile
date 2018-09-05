@@ -53,7 +53,7 @@ if [ ! -d "$REF_FA" ]; then
   wget -P $REF_FA http://statgen.org/wp-content/uploads/Softwares/genipe/supp_files/hg19.tar.bz2
   bzip2 -d $REF_FA/hg19.tar.bz2
   tar xvf $REF_FA/hg19.tar
-
+fi
 
 # this is where the OH user data will exist
 mkdir $DATA_DIR

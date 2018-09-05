@@ -5,16 +5,10 @@
   <div class="container">
     <h1>One last step.</h1>
     <p class="lead">
-      Thank you! We have your authorization from Open Humans.
-    </p>
-    <p>
-      This is the waiting step!
-      Remember, genome imputation is a computaionally expensive task, please be patient as other members may be ahead of you in the queue.
-      One member's imputation completes in approximately 7 hours with our current configuration.
-    </p>
-    <p>
-      Check this out here:
-      <a href="{{ oh_proj_page }}">{{ oh_proj_page }}</a>
+      This is the waiting step... an email will be sent to you when your job has finished.<br>
+      In the meantime, you can check the status at the <strong><a href={% url 'dashboard' %}>Dashboard</a></strong>
+      <br>
+      Please do not refresh this page.
     </p>
   </div>
 

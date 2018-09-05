@@ -7,20 +7,21 @@ These tasks:
 import os
 import logging
 import requests
-from celery import shared_task
+from celery import chord, chain, group
 from subprocess import Popen, PIPE
 from ohapi import api
 from os import environ
-from io import BytesIO
-import shutil
 import pandas as pd
 from django.conf import settings
 from open_humans.models import OpenHumansMember
 from datauploader.tasks import process_source
 from openhumansimputer.settings import CHROMOSOMES
+from imputer.models import ImputerMember
 import bz2
 import gzip
 from itertools import takewhile
+from openhumansimputer.celery import app
+
 
 HOME = environ.get('HOME')
 IMP_BIN = environ.get('IMP_BIN')
@@ -32,8 +33,10 @@ OUT_DIR = environ.get('OUT_DIR')
 # Set up logging.
 logger = logging.getLogger(__name__)
 
+import time
 
-@shared_task(ignore_result=False)
+
+@app.task(ignore_result=False)
 def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
     """
     Build and run the genipe-launcher command in Popen.
@@ -44,7 +47,10 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
     """
     # this silly block of code runs impute2 because genipe-launcher deletes
     # two unneccesary files before they are available.
-    print(chrom, oh_id)
+    imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
+    imputer_record.step = 'submit_chrom'
+    imputer_record.save()
+
     os.makedirs('{}/{}/chr{}'.format(OUT_DIR,
                                      oh_id, chrom), exist_ok=True)
     os.chdir('{}/{}/chr{}'.format(OUT_DIR, oh_id, chrom))
@@ -55,7 +61,8 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
         command = [
             'genipe-launcher',
             '--chrom', '{}'.format(chrom),
-            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_id, oh_id),
+            '--bfile', '{}/{}/member.{}.plink.gt'.format(
+                DATA_DIR, oh_id, oh_id),
             '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
@@ -79,7 +86,8 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
         command = [
             'genipe-launcher',
             '--chrom', '{}'.format(chrom),
-            '--bfile', '{}/{}/member.{}.plink.gt'.format(DATA_DIR, oh_id, oh_id),
+            '--bfile', '{}/{}/member.{}.plink.gt'.format(
+                DATA_DIR, oh_id, oh_id),
             '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
@@ -106,10 +114,14 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
     stdout, stderr = process.communicate()
 
 
-#@shared_task
+@app.task(ignore_result=True)
 def get_vcf(data_source_id, oh_id):
     """Download member .vcf."""
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
+    imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
+    imputer_record.step = 'get_vcf'
+    imputer_record.save()
+
     user_details = api.exchange_oauth2_member(oh_member.get_access_token())
     for data_source in user_details['data']:
         if str(data_source['id']) == str(data_source_id):
@@ -127,9 +139,14 @@ def get_vcf(data_source_id, oh_id):
             for block in datafile.iter_content(1024):
                 handle.write(block)
 
-@shared_task
+
+@app.task(ignore_result=False)
 def prepare_data(oh_id):
     """Process the member's .vcf."""
+    imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
+    imputer_record.step = 'prepare_data'
+    imputer_record.save()
+
     command = [
         'imputer/prepare_genotypes.sh', '{}'.format(oh_id)
     ]
@@ -142,7 +159,7 @@ def _rreplace(s, old, new, occurrence):
     return new.join(li)
 
 
-@shared_task(ignore_result=False)
+@app.task(ignore_result=False)
 def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     """
     1. read .impute2 files (w/ genotype probabilities)
@@ -151,7 +168,6 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     4. merge on right (.impute2_info), acts like a filter for the left.
     """
     print('{} Imputation has completed, now combining results.'.format(oh_id))
-
     impute_cols = ['chr', 'name', 'position',
                    'a0', 'a1', 'a0a0_p', 'a0a1_p', 'a1a1_p']
 
@@ -205,24 +221,29 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
 
     # annotate genotype probabilities and info metric
     vcf_file = '{}/{}/member.imputed.vcf'.format(OUT_DIR, oh_id)
-    cols = ['CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT', 'MEMBER']
+    cols = ['CHROM', 'POS', 'ID', 'REF', 'ALT',
+            'QUAL', 'FILTER', 'INFO', 'FORMAT', 'MEMBER']
     with open(vcf_file, 'r') as vcf:
         headiter = takewhile(lambda s: s.startswith('#'), vcf)
         header = list(headiter)
-        dfvcf = pd.read_csv(vcf_file, sep='\t', header=None, comment='#', names=cols)
+        dfvcf = pd.read_csv(vcf_file, sep='\t', header=None,
+                            comment='#', names=cols)
 
     df_gp.rename(columns={'name': 'ID'}, inplace=True)
     df_gp.set_index(['ID'], inplace=True)
     dfvcf.set_index(['ID'], inplace=True)
-    dfvcf = dfvcf.merge(df_gp[['a0a0_p', 'a0a1_p', 'a1a1_p', 'info']], left_index=True, right_index=True)
+    dfvcf = dfvcf.merge(
+        df_gp[['a0a0_p', 'a0a1_p', 'a1a1_p', 'info']], left_index=True, right_index=True)
     del df_gp
-    dfvcf['MEMBER'] = dfvcf['MEMBER'] + ':' + dfvcf['a0a0_p'].round(3).astype(str) + ',' + dfvcf['a0a1_p'].round(3).astype(str) + ',' + dfvcf['a1a1_p'].round(3).astype(str)
+    dfvcf['MEMBER'] = dfvcf['MEMBER'] + ':' + dfvcf['a0a0_p'].round(3).astype(
+        str) + ',' + dfvcf['a0a1_p'].round(3).astype(str) + ',' + dfvcf['a1a1_p'].round(3).astype(str)
     dfvcf['FORMAT'] = dfvcf['FORMAT'].astype(str) + ':GP'
-    dfvcf['INFO'] = dfvcf['INFO'].astype(str) + ';INFO=' + dfvcf['info'].round(3).astype(str)
+    dfvcf['INFO'] = dfvcf['INFO'].astype(
+        str) + ';INFO=' + dfvcf['info'].round(3).astype(str)
     dfvcf.reset_index(inplace=True)
     new_header = ['##FORMAT=<ID=GP,Number=3,Type=Float,Description="Estimated Posterior Probabilities (rounded to 3 digits) for Genotypes 0/0, 0/1 and 1/1">\n',
-            '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n'
-              ]
+                  '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n'
+                  ]
     header.insert(-2, new_header[0])
     header.insert(-4, new_header[1])
     with open(vcf_file, 'w') as vcf:
@@ -238,9 +259,10 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
     project_page = environ.get('OH_ACTIVITY_PAGE')
     api.message('Open Humans Imputation Complete',
-            'Check {} to see your imputed genotype results from Open Humans.'.format(project_page),
-            oh_member.access_token,
-            project_member_ids=[oh_id])
+                'Check {} to see your imputed genotype results from Open Humans.'.format(
+                    project_page),
+                oh_member.access_token,
+                project_member_ids=[oh_id])
     print('{} emailed member'.format(oh_id))
 
     # clean users files
@@ -252,3 +274,17 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     stdout, stderr = process.communicate()
 
     print('{} finished removing files'.format(oh_id))
+
+    imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
+    imputer_record.step = 'complete'
+    imputer_record.active = False
+    imputer_record.save()
+
+@app.task
+def pipeline(vcf_id, oh_id, CHROMOSOMES):
+    task1 = get_vcf.si(vcf_id, oh_id)
+    task2 = prepare_data.si(oh_id)
+    async_chroms = group(submit_chrom.si(chrom, oh_id) for chrom in CHROMOSOMES)
+    task3 = chord(async_chroms, combine_chrom.si(oh_id))
+
+    pipeline = chain(task1, task2, task3)()

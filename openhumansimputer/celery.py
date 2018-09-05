@@ -23,6 +23,11 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE',
 
 app = Celery('openhumansimputer', broker=CELERY_BROKER_URL)
 # Set up Celery with Heroku CloudAMQP (or AMQP in local dev).
+# Using a string here means the worker will not have to
+# pickle the object when using Windows.
+app.config_from_object('django.conf:settings', namespace='CELERY')
+app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+
 app.conf.update({
     'BROKER_URL': CELERY_BROKER_URL,
     # Recommended settings. See: https://www.cloudamqp.com/docs/celery.html
@@ -30,15 +35,10 @@ app.conf.update({
     'BROKER_HEARTBEAT': None,
     'BROKER_CONNECTION_TIMEOUT': 30,
     'CELERY_RESULT_BACKEND': CELERY_BROKER_URL,
-    'CELERY_SEND_EVENTS': False,
+    'CELERY_SEND_EVENTS': True,
     'CELERY_EVENT_QUEUE_EXPIRES': 60,
+    'CELERYD_PREFETCH_MULTIPLIER': 0,
 })
-
-
-# Using a string here means the worker will not have to
-# pickle the object when using Windows.
-app.config_from_object('django.conf:settings')
-app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 
 @app.task(bind=True)
