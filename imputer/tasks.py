@@ -281,7 +281,7 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     imputer_record.save()
 
 @app.task
-def pipeline(vcf_id, oh_id, CHROMOSOMES):
+def pipeline(vcf_id, oh_id):
     task1 = get_vcf.si(vcf_id, oh_id)
     task2 = prepare_data.si(oh_id)
     async_chroms = group(submit_chrom.si(chrom, oh_id) for chrom in CHROMOSOMES)

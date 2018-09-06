@@ -175,7 +175,7 @@ def launch_imputation(request):
 
             logger.debug("Launching {}'s pipeline.".format(oh_member.oh_id))
 
-            pipeline(vcf_id, oh_id, CHROMOSOMES)
+            pipeline(vcf_id, oh_id)
 
             context = {'oh_member': oh_member,
                        'oh_proj_page': settings.OH_ACTIVITY_PAGE}
