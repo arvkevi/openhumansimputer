@@ -235,6 +235,7 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     dfvcf = dfvcf.merge(
         df_gp[['a0a0_p', 'a0a1_p', 'a1a1_p', 'info']], left_index=True, right_index=True)
     del df_gp
+    # currently using custom annotation for "dosage"
     dfvcf['MEMBER'] = dfvcf['MEMBER'] + ':' + dfvcf['a0a0_p'].round(3).astype(
         str) + ',' + dfvcf['a0a1_p'].round(3).astype(str) + ',' + dfvcf['a1a1_p'].round(3).astype(str)
     dfvcf['FORMAT'] = dfvcf['FORMAT'].astype(str) + ':GP'
@@ -285,6 +286,8 @@ def pipeline(vcf_id, oh_id):
     task1 = get_vcf.si(vcf_id, oh_id)
     task2 = prepare_data.si(oh_id)
     async_chroms = group(submit_chrom.si(chrom, oh_id) for chrom in CHROMOSOMES)
+    #async_combine = group(combine_chrom.si(chrom, oh_id) for chrom in CHROMOSOMES)
+    #task3 = chain(async_chroms, async_combine)
     task3 = chord(async_chroms, combine_chrom.si(oh_id))
 
     pipeline = chain(task1, task2, task3)()

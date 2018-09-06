@@ -2,13 +2,14 @@
 {% load static %}
 {% block content %}
 
+
 <div class="jumbotron">
   <h5 class="display-5">Can you solve this puzzle by filling in the missing letters?</h5>
   <p></p>
   <h5 class="text-success">The quic<font color="#ee0000">_</font> brown fox <font color="#ee0000">_</font>umps over the <font color="#ee0000">_</font>azy dog</h5>
   <p></p>
     <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#Mymodal">Show Answer</button>
-    <div class="modal" id="Mymodal">
+    <div class="modal" id="Mymodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -32,6 +33,17 @@
   You used context clues from the letters and words surrounding the missing letters as well as your knowledge of the known words in the english dictionary.
   Genotype imputation relies on a reference population of many individuals who have essentially no missing letters and looks for shared <a href="https://en.wikipedia.org/wiki/Haplotype" target="_blank">haplotypes <i class="fa fa-external-link"></i></a> between reference sequences and your sequence.
   Imputation algorithms provide a probability for each possible genotype at every imputed locus in the genome.</p>
+</div>
+
+<div class="jumbotron">
+  <h5 class="display-5">References</h5>
+  <p>The Imputation pipeline was architected with <a href="http://pgxcentre.github.io/genipe/" target="_blank">genipe <i class="fa fa-external-link"></i></a><br>
+    Within genipe:<br>
+    <a href="https://www.cog-genomics.org/plink2" target="_blank">plink <i class="fa fa-external-link"></i></a> is used for pre-phasing data cleaning and format conversion.<br>
+    <a href="http://mathgen.stats.ox.ac.uk/genetics_software/shapeit/shapeit.html" target="_blank">SHAPEIT <i class="fa fa-external-link"></i></a> is used for phasing.<br>
+    <a href="https://mathgen.stats.ox.ac.uk/impute/impute_v2.html#home" target="_blank">IMPUTE2 <i class="fa fa-external-link"></i></a> is used for imputation, using the 1000 Genomes Phase 3 reference data.
+
+
 </div>
 
 {% endblock %}
