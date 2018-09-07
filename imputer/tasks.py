@@ -160,67 +160,65 @@ def _rreplace(s, old, new, occurrence):
 
 
 @app.task(ignore_result=False)
-def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
+def process_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
     """
     1. read .impute2 files (w/ genotype probabilities)
     2. read .impute2_info files (with "info" field for filtering)
     3. filter the genotypes in .impute2_info
     4. merge on right (.impute2_info), acts like a filter for the left.
     """
-    print('{} Imputation has completed, now combining results.'.format(oh_id))
+    print('{} Imputation has completed, now processing results.'.format(oh_id))
     impute_cols = ['chr', 'name', 'position',
                    'a0', 'a1', 'a0a0_p', 'a0a1_p', 'a1a1_p']
 
     df = pd.DataFrame()
     df_gp = pd.DataFrame()  # hold genotype probabilities
-    for chrom in CHROMOSOMES:
-        df_impute = pd.read_csv('{}/{}/chr{}/chr{}/final_impute2/'
-                                'chr{}.imputed.impute2'
-                                .format(OUT_DIR, oh_id, chrom, chrom, chrom),
-                                sep=' ',
-                                header=None,
-                                names=impute_cols)
+    df_impute = pd.read_csv('{}/{}/chr{}/chr{}/final_impute2/'
+                            'chr{}.imputed.impute2'
+                            .format(OUT_DIR, oh_id, chrom, chrom, chrom),
+                            sep=' ',
+                            header=None,
+                            names=impute_cols)
 
-        df_info = pd.read_csv(
-            '{}/{}/chr{}/chr{}/final_impute2/chr{}.imputed.impute2_info'.format(
-                OUT_DIR, oh_id, chrom, chrom, chrom),
-            sep='\t')
+    df_info = pd.read_csv(
+        '{}/{}/chr{}/chr{}/final_impute2/chr{}.imputed.impute2_info'.format(
+            OUT_DIR, oh_id, chrom, chrom, chrom),
+        sep='\t')
 
-        # combine impute2 and impute2_info to induce filter
-        df_merged = df_impute.merge(
-            df_info, on=['chr', 'position', 'a0', 'a1'], how='right')
-        df_merged.rename(columns={'name_x': 'name'}, inplace=True)
-        df_gp = pd.concat([df_gp, df_merged])
-        df_merged = df_merged[impute_cols]
-        df = pd.concat([df, df_merged])
+    # combine impute2 and impute2_info to induce filter
+    df = df_impute.merge(
+        df_info, on=['chr', 'position', 'a0', 'a1'], how='right')
+    df.rename(columns={'name_x': 'name'}, inplace=True)
+    df_gp = pd.concat([df_gp, df])
+    df = df[impute_cols]
 
     df_gp['name'] = df_gp['name'].apply(_rreplace, args=(':', '_', 2))
     df['name'] = df['name'].apply(_rreplace, args=(':', '_', 2))
 
-    df_gp.to_csv('{}/{}/member.imputed.impute2.GP'.format(OUT_DIR, oh_id),
+    df_gp.to_csv('{}/{}/chr{}/chr{}/final_impute2/chr{}.imputed.impute2.GP'.format(OUT_DIR, oh_id, chrom, chrom, chrom),
                  header=True,
                  index=False,
                  sep=' ')
 
     # dump all chromosomes as an .impute2
-    df.to_csv('{}/{}/member.imputed.impute2'.format(OUT_DIR, oh_id),
+    df.to_csv('{}/{}/chr{}/chr{}/final_impute2/chr{}.imputed.impute2'.format(OUT_DIR, oh_id, chrom, chrom, chrom),
               header=False,
               index=False,
               sep=' ')
     # don't need this huge dataframe anymore
     del df
-    print('{} finished combining results, now converting to .vcf'.format(oh_id))
+    #print('{} finished combining results, now converting to .vcf'.format(oh_id))
 
     # convert to vcf
     os.chdir(settings.BASE_DIR)
     output_vcf_cmd = [
-        'imputer/output_vcf.sh', '{}'.format(oh_id)
+        'imputer/output_vcf.sh', '{}'.format(oh_id), '{}'.format(chrom)
     ]
     process = Popen(output_vcf_cmd, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
 
     # annotate genotype probabilities and info metric
-    vcf_file = '{}/{}/member.imputed.vcf'.format(OUT_DIR, oh_id)
+    vcf_file = '{}/{}/chr{}/chr{}/final_impute2/chr{}.member.imputed.vcf'.format(OUT_DIR, oh_id, chrom, chrom, chrom)
     cols = ['CHROM', 'POS', 'ID', 'REF', 'ALT',
             'QUAL', 'FILTER', 'INFO', 'FORMAT', 'MEMBER']
     with open(vcf_file, 'r') as vcf:
@@ -242,17 +240,34 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     dfvcf['INFO'] = dfvcf['INFO'].astype(
         str) + ';INFO=' + dfvcf['info'].round(3).astype(str)
     dfvcf.reset_index(inplace=True)
-    new_header = ['##FORMAT=<ID=GP,Number=3,Type=Float,Description="Estimated Posterior Probabilities (rounded to 3 digits) for Genotypes 0/0, 0/1 and 1/1">\n',
-                  '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n'
-                  ]
-    header.insert(-2, new_header[0])
-    header.insert(-4, new_header[1])
-    with open(vcf_file, 'w') as vcf:
-        for line in header:
-            vcf.write(line)
-    dfvcf[cols].to_csv(vcf_file, sep='\t', header=None, index=False, mode='a')
 
-    print('{} finished converting to .vcf, now uploading to OpenHumans'.format(oh_id))
+    if chrom == 1:
+        new_header = ['##FORMAT=<ID=GP,Number=3,Type=Float,Description="Estimated Posterior Probabilities (rounded to 3 digits) for Genotypes 0/0, 0/1 and 1/1">\n',
+                      '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n'
+                      ]
+        header.insert(-2, new_header[0])
+        header.insert(-4, new_header[1])
+        with open(vcf_file, 'w') as vcf:
+            for line in header:
+                vcf.write(line)
+        dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t', header=None, index=False, mode='a', compression='bz2')
+
+    else:
+        dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t', header=None, index=False, compression='bz2')
+
+
+@app.task(ignore_result=False)
+def upload_to_oh(oh_id):
+    print('{} finished converting to .vcf.bz2, now uploading to OpenHumans'.format(oh_id))
+
+    # combine all vcfs
+    os.chdir(settings.BASE_DIR)
+    clean_command = [
+        'imputer/combine_chrom.sh', '{}'.format(oh_id)
+    ]
+    process = Popen(clean_command, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate()
+
     # upload file to OpenHumans
     process_source(oh_id)
 
@@ -281,13 +296,13 @@ def combine_chrom(oh_id, num_submit=0, logger=None, **kwargs):
     imputer_record.active = False
     imputer_record.save()
 
+
 @app.task
 def pipeline(vcf_id, oh_id):
     task1 = get_vcf.si(vcf_id, oh_id)
     task2 = prepare_data.si(oh_id)
     async_chroms = group(submit_chrom.si(chrom, oh_id) for chrom in CHROMOSOMES)
-    #async_combine = group(combine_chrom.si(chrom, oh_id) for chrom in CHROMOSOMES)
-    #task3 = chain(async_chroms, async_combine)
-    task3 = chord(async_chroms, combine_chrom.si(oh_id))
+    async_process = group(process_chrom.si(chrom, oh_id) for chrom in CHROMOSOMES)
+    task3 = chain(async_chroms, async_process, upload_to_oh.si(oh_id))
 
     pipeline = chain(task1, task2, task3)()

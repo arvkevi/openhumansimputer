@@ -5,18 +5,11 @@ These tasks:
   2. adds a data file
 """
 import logging
-import json
-import tempfile
-import requests
 import os
-from celery import shared_task
 from django.conf import settings
 from open_humans.models import OpenHumansMember
-from datetime import datetime, timedelta
-from openhumansimputer.settings import rr
-from requests_respectful import RequestsRespectfulRateLimitedError
+from datetime import datetime
 from ohapi import api
-import arrow
 
 # Set up logging.
 logger = logging.getLogger(__name__)
@@ -39,11 +32,10 @@ def process_source(oh_id):
     try:
         api.delete_file(oh_member.access_token,
                     oh_member.oh_id,
-                    file_basename="member.imputed.vcf")
+                    file_basename="member.imputed.vcf.bz2")
     except FileNotFoundError :
         """OK, just means new file"""
         pass
-    api.upload_aws('{}/{}/member.imputed.vcf'.format(OUT_DIR, oh_id), metadata,
+    api.upload_aws('{}/{}/member.imputed.vcf.bz2'.format(OUT_DIR, oh_id), metadata,
                    oh_access_token,
                    project_member_id=oh_member.oh_id)
-
