@@ -9,11 +9,10 @@ fi
 
 if [[ $TEST_CHROMS = false ]]
 do
-cat "$OUT_DIR"/"$1"/chr2/chr1/final_impute2/chr1.member.imputed.vcf.bz2 \
+cat "$OUT_DIR"/"$1"/chr1/chr1/final_impute2/chr1.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr2/chr2/final_impute2/chr2.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr3/chr3/final_impute2/chr3.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr4/chr4/final_impute2/chr4.member.imputed.vcf.bz2 \
-"$OUT_DIR"/"$1"/chr5/chr5/final_impute2/chr5.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr5/chr5/final_impute2/chr5.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr6/chr6/final_impute2/chr6.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr7/chr7/final_impute2/chr7.member.imputed.vcf.bz2 \
@@ -29,7 +28,7 @@ cat "$OUT_DIR"/"$1"/chr2/chr1/final_impute2/chr1.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr17/chr17/final_impute2/chr17.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr18/chr18/final_impute2/chr18.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr19/chr19/final_impute2/chr19.member.imputed.vcf.bz2 \
-"$OUT_DIR"/"$1"/chr20/chr20/final_impute2/chr10.member.imputed.vcf.bz2 \
+"$OUT_DIR"/"$1"/chr20/chr20/final_impute2/chr20.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr21/chr21/final_impute2/chr21.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr22/chr22/final_impute2/chr22.member.imputed.vcf.bz2 \
 >"$OUT_DIR"/"$1"/member.imputed.vcf.bz2
