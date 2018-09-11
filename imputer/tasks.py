@@ -146,6 +146,7 @@ def prepare_data(oh_id):
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
     imputer_record.step = 'prepare_data'
     imputer_record.save()
+    os.chdir(settings.BASE_DIR)
 
     command = [
         'imputer/prepare_genotypes.sh', '{}'.format(oh_id)

@@ -38,6 +38,7 @@ app.conf.update({
     'CELERY_SEND_EVENTS': True,
     'CELERY_EVENT_QUEUE_EXPIRES': 60,
     'CELERYD_PREFETCH_MULTIPLIER': 0,
+    'CELERY_IGNORE_RESULT': True,
 })
 
 
