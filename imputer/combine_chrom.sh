@@ -1,14 +1,14 @@
 #!/bin/bash
 
 if [[ $TEST_CHROMS = true ]]
-do
+then
 cat "$OUT_DIR"/"$1"/chr21/chr21/final_impute2/chr21.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr22/chr22/final_impute2/chr22.member.imputed.vcf.bz2 \
 >"$OUT_DIR"/"$1"/member.imputed.vcf.bz2
 fi
 
 if [[ $TEST_CHROMS = false ]]
-do
+then
 cat "$OUT_DIR"/"$1"/chr1/chr1/final_impute2/chr1.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr2/chr2/final_impute2/chr2.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr3/chr3/final_impute2/chr3.member.imputed.vcf.bz2 \
