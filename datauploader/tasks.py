@@ -38,4 +38,4 @@ def process_source(oh_id):
         pass
     api.upload_aws('{}/{}/member.imputed.vcf.bz2'.format(OUT_DIR, oh_id), metadata,
                    oh_access_token,
-                   project_member_id=oh_member.oh_id)
+                   project_member_id=oh_member.oh_id, max_bytes=256000000)
