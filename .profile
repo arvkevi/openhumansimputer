@@ -1,3 +1,4 @@
+#!/usr/bin/bash
 # this file gets sourced at the start of the app
 # after the heroku config vars.
 
