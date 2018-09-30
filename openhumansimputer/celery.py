@@ -15,26 +15,22 @@ from celery import Celery
 
 from django.conf import settings
 
-CELERY_BROKER_URL = os.getenv('REDIS_URL')
-
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE',
                       'openhumansimputer.settings')
 
-app = Celery('openhumansimputer', broker=CELERY_BROKER_URL)
-# Set up Celery with Heroku CloudAMQP (or AMQP in local dev).
-# Using a string here means the worker will not have to
-# pickle the object when using Windows.
+app = Celery('openhumansimputer', broker=settings.CELERY_BROKER_URL)
+#app.conf.CELERY_ALWAYS_EAGER = True
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.update({
-    'BROKER_URL': CELERY_BROKER_URL,
+    'BROKER_URL': settings.CELERY_BROKER_URL,
     # Recommended settings. See: https://www.cloudamqp.com/docs/celery.html
     'BROKER_POOL_LIMIT': 1,
     'BROKER_HEARTBEAT': None,
     'BROKER_CONNECTION_TIMEOUT': 30,
-    'CELERY_RESULT_BACKEND': CELERY_BROKER_URL,
+    'CELERY_RESULT_BACKEND': settings.CELERY_BROKER_URL,
     'CELERY_SEND_EVENTS': True,
     'CELERY_EVENT_QUEUE_EXPIRES': 60,
     'CELERYD_PREFETCH_MULTIPLIER': 0,

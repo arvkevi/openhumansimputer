@@ -14,7 +14,7 @@ from imputer.models import ImputerMember
 
 
 # Set up logging.
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('oh')
 
 
 def index(request):

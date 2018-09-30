@@ -31,12 +31,16 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if os.getenv('DEBUG', '').lower() == 'false' else True
 
-REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
+print('DEBUG: {}'.format(DEBUG))
 
-ALLOWED_HOSTS = ['*']
+REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
+print('REMOTE: {}'.format(REMOTE))
+
+#ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['.openimpute.com', '68.65.121.62']
 
 REMOTE_APP_NAME = os.getenv('REMOTE_APP_NAME', '')
-DEFAULT_BASE_URL = ('https://{}:8000'.format(REMOTE_APP_NAME) if
+DEFAULT_BASE_URL = ('http://{}'.format(REMOTE_APP_NAME) if
                     REMOTE else 'http://127.0.0.1:5000')
 
 #HEROKUCONFIG_APP_NAME = 'http://142.93.20.214'
@@ -185,19 +189,36 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s'
+        }
+    },
     'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
+        'gunicorn': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'verbose',
+            'filename': '/home/kevin/logs//gunicorn.errors',
+            'maxBytes': 1024 * 1024 * 200,  # 100 mb
         },
+	'console': {
+            'class': 'logging.StreamHandler',
+        },	
     },
     'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        'gunicorn.errors': {
+            'level': 'DEBUG',
+            'handlers': ['gunicorn'],
+            'propagate': True,
         },
-    },
+	'oh': {
+		'level': 'DEBUG',
+		'handlers': ['console'],
+		'propogate': True
+    }
 }
-
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
@@ -215,16 +236,18 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 INSTALLED_APPS += ['django_extensions']
 
-if not REMOTE:
-    BROKER_URL = 'redis://localhost:6379'
+# celery settings
+CELERY_BROKER_URL = os.getenv('REDIS_URL')
+

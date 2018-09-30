@@ -31,13 +31,13 @@ REF_FA = environ.get('REF_FA')
 OUT_DIR = environ.get('OUT_DIR')
 
 # Set up logging.
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('oh')
 
 import time
 
 
 @app.task(ignore_result=False)
-def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
+def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
     Build and run the genipe-launcher command in Popen.
     rate_limit='1/m' sets the number of tasks per minute.
@@ -114,14 +114,15 @@ def submit_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
     stdout, stderr = process.communicate()
 
 
-@app.task(ignore_result=True)
+#@app.task(ignore_result=True)
+@app.task()
 def get_vcf(data_source_id, oh_id):
     """Download member .vcf."""
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
     imputer_record.step = 'get_vcf'
     imputer_record.save()
-
+    logger.info('hi from get_vcf')
     user_details = api.exchange_oauth2_member(oh_member.get_access_token())
     for data_source in user_details['data']:
         if str(data_source['id']) == str(data_source_id):
@@ -138,9 +139,12 @@ def get_vcf(data_source_id, oh_id):
         else:
             for block in datafile.iter_content(1024):
                 handle.write(block)
+    time.sleep(5) # download takes a few seconds
+    logger.info(os.environ)
+    return
 
-
-@app.task(ignore_result=False)
+#@app.task(ignore_result=False)
+@app.task
 def prepare_data(oh_id):
     """Process the member's .vcf."""
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
@@ -153,7 +157,7 @@ def prepare_data(oh_id):
     ]
     process = Popen(command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
-
+    logger.info('finished preparing {} plink data'.format(oh_id))
 
 def _rreplace(s, old, new, occurrence):
     li = s.rsplit(old, occurrence)
@@ -161,7 +165,7 @@ def _rreplace(s, old, new, occurrence):
 
 
 @app.task(ignore_result=False)
-def process_chrom(chrom, oh_id, num_submit=0, logger=None, **kwargs):
+def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
     1. read .impute2 files (w/ genotype probabilities)
     2. read .impute2_info files (with "info" field for filtering)
@@ -298,7 +302,6 @@ def upload_to_oh(oh_id):
     imputer_record.save()
 
 
-@app.task
 def pipeline(vcf_id, oh_id):
     task1 = get_vcf.si(vcf_id, oh_id)
     task2 = prepare_data.si(oh_id)
@@ -306,4 +309,5 @@ def pipeline(vcf_id, oh_id):
     async_process = group(process_chrom.si(chrom, oh_id) for chrom in CHROMOSOMES)
     task3 = chain(async_chroms, async_process, upload_to_oh.si(oh_id))
 
-    pipeline = chain(task1, task2, task3)()
+    pipeline = chain(task1, task2, task3)
+    pipeline.apply_async()
