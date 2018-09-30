@@ -9,5 +9,5 @@ class ImputerMember(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return 'id: {}\noh_id: {}\nstep: {}\nactive: {}\nupdated_at:'.format(self.id,
+        return 'id: {}\noh_id: {}\nstep: {}\nactive: {}\ncreated_at: {}\nupdated_at: {}'.format(self.id,
             self.oh_id, self.step, self.active, self.created_at, self.updated_at)
