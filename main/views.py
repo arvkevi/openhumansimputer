@@ -9,7 +9,6 @@ from django.conf import settings
 from open_humans.models import OpenHumansMember
 from imputer.tasks import pipeline
 from ohapi import api
-from openhumansimputer.settings import CHROMOSOMES
 from imputer.models import ImputerMember
 
 
@@ -129,23 +128,18 @@ def about(request):
 
 def complete(request):
     """
-    Receive user from Open Humans. Store data, start upload.
+    Receive user from Open Humans. Redirect back to dashboard.
     """
     logger.debug("Received user returning from Open Humans.")
-    # Exchange code for token.
-    # This creates an OpenHumansMember and associated user account.
     code = request.GET.get('code', '')
     oh_member = oh_code_to_member(code=code)
 
     if oh_member:
         # Log in the user.
         user = oh_member.user
-        oh_id = oh_member.oh_id
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
 
-        context = {'oh_id': oh_member.oh_id,
-                   'oh_proj_page': settings.OH_ACTIVITY_PAGE}
         return redirect('/dashboard')
 
     logger.debug('Invalid code exchange. User returned to starting page.')
