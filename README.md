@@ -1,7 +1,7 @@
 # Imputer: Genotype imputation pipeline for Open Humans
 
 ## More Information
-This repository is the source code for the Imputer application for [Open Humans](https://www.openhumans.org/).
+This repository is the source code for the Imputer application for [Open Humans](https://www.openhumans.org/).  
 More information can be found at the homepage: [openimpute.com](http://www.openimpute.com)
 
 ## Notes
