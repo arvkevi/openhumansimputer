@@ -4,7 +4,7 @@
 This repository is the source code for the Imputer application for [Open Humans](https://www.openhumans.org/).
 More information can be found at the homepage: [openimpute.com](http://www.openimpute.com)
 
-## Notes:
+## Notes
 This app is currently hosted on a VPS [following the guidelines here](https://www.digitalocean.com/community/tutorials/how-to-use-the-django-one-click-install-image-for-ubuntu-16-04).
 
 ## Contribute

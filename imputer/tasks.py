@@ -54,9 +54,6 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     os.makedirs('{}/{}/chr{}'.format(OUT_DIR,
                                      oh_id, chrom), exist_ok=True)
     os.chdir('{}/{}/chr{}'.format(OUT_DIR, oh_id, chrom))
-    run_impute_test = ['{}/impute2'.format(IMP_BIN)]
-    Popen(run_impute_test, stdout=PIPE, stderr=PIPE)
-
     if chrom == '23':
         command = [
             'genipe-launcher',
