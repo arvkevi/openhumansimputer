@@ -7,7 +7,7 @@ These tasks:
 import os
 import logging
 import requests
-from celery import chord, chain, group
+from celery import chain, group
 from subprocess import Popen, PIPE
 from ohapi import api
 from os import environ
