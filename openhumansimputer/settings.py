@@ -251,3 +251,10 @@ INSTALLED_APPS += ['django_extensions']
 # celery settings
 CELERY_BROKER_URL = os.getenv('REDIS_URL')
 
+# Directory config, change these if you have a different setup.
+# Also make sure these are in /etc/default/celeryd
+IMP_BIN='/home/kevin/impbin'
+REF_PANEL='/home/kevin/1000GP_Phase3'
+DATA_DIR='/home/kevin/data'
+REF_FA='/home/kevin/hg19'
+OUT_DIR='/home/kevin/outdir'

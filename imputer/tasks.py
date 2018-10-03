@@ -119,7 +119,7 @@ def get_vcf(data_source_id, oh_id):
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
     imputer_record.step = 'get_vcf'
     imputer_record.save()
-    logger.info('hi from get_vcf')
+    logger.info('Downloading vcf for member {}'.format(oh_id))
     user_details = api.exchange_oauth2_member(oh_member.get_access_token())
     for data_source in user_details['data']:
         if str(data_source['id']) == str(data_source_id):
@@ -137,7 +137,6 @@ def get_vcf(data_source_id, oh_id):
             for block in datafile.iter_content(1024):
                 handle.write(block)
     time.sleep(5) # download takes a few seconds
-    logger.info(os.environ)
     return
 
 #@app.task(ignore_result=False)
@@ -154,6 +153,7 @@ def prepare_data(oh_id):
     ]
     process = Popen(command, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
+    logger.debug(stderr)
     logger.info('finished preparing {} plink data'.format(oh_id))
 
 def _rreplace(s, old, new, occurrence):
