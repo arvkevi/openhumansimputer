@@ -19,6 +19,6 @@ if __name__ == "__main__":
                 "forget to activate a virtual environment?"
             )
         raise
-    execute_from_command_line(sys.argv)    
+    execute_from_command_line(sys.argv) 
     current_path = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.join(current_path, "openhumansimputer"))

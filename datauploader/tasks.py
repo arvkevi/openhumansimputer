@@ -12,7 +12,7 @@ from datetime import datetime
 from ohapi import api
 
 # Set up logging.
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('oh')
 
 
 def process_source(oh_id):
@@ -34,8 +34,7 @@ def process_source(oh_id):
                     oh_member.oh_id,
                     file_basename="member.imputed.vcf.bz2")
     except FileNotFoundError :
-        """OK, just means new file"""
-        pass
+        logger.info('New Source File')
     api.upload_aws('{}/{}/member.imputed.vcf.bz2'.format(OUT_DIR, oh_id), metadata,
                    oh_access_token,
                    project_member_id=oh_member.oh_id, max_bytes=256000000)
