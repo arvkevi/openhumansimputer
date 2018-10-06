@@ -15,6 +15,9 @@ import dj_database_url
 from env_tools import apply_env
 from requests_respectful import RespectfulRequester
 import logging
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.celery import CeleryIntegration
 
 logger = logging.getLogger(__name__)
 
@@ -258,3 +261,9 @@ REF_PANEL='/home/kevin/1000GP_Phase3'
 DATA_DIR='/home/kevin/data'
 REF_FA='/home/kevin/hg19'
 OUT_DIR='/home/kevin/outdir'
+
+# Sentry
+sentry_sdk.init(
+    dsn="https://113d97f46e91488b91cc664e94a9d8e2@sentry.io/1294965",
+    integrations=[DjangoIntegration(), CeleryIntegration()]
+)
