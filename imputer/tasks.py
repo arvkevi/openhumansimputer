@@ -127,7 +127,7 @@ def get_vcf(data_source_id, oh_id):
     datafile = requests.get(data_file_url)
     os.makedirs('{}/{}'.format(DATA_DIR, oh_id), exist_ok=True)
     with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id), 'wb') as handle:
-        try: 
+        try:
             textobj = bz2.decompress(datafile.content)
             handle.write(textobj)
         except OSError:
