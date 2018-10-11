@@ -8,7 +8,7 @@ import os
 import logging
 import requests
 from celery import chain, group
-from subprocess import Popen, PIPE
+from subprocess import run, PIPE
 from ohapi import api
 from os import environ
 import pandas as pd
@@ -20,6 +20,8 @@ from imputer.models import ImputerMember
 import bz2
 import gzip
 from itertools import takewhile
+import time
+import datetime
 from openhumansimputer.celery import app
 
 
@@ -33,13 +35,11 @@ OUT_DIR = environ.get('OUT_DIR')
 # Set up logging.
 logger = logging.getLogger('oh')
 
-import time
-
 
 @app.task(ignore_result=False)
 def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
-    Build and run the genipe-launcher command in Popen.
+    Build and run the genipe-launcher command in subprocess run.
     rate_limit='1/m' sets the number of tasks per minute.
     This is important because impute2 writes a file to a shared directory that
     genipe-launcher tries to delete. If multiple tasks launch at the same time,
@@ -106,12 +106,9 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
             '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/{}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(
                 REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, oh_id, chrom, chrom, chrom)
         ]
-
-    process = Popen(command, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = process.communicate()
+    run(command, stdout=PIPE, stderr=PIPE)
 
 
-#@app.task(ignore_result=True)
 @app.task()
 def get_vcf(data_source_id, oh_id):
     """Download member .vcf."""
@@ -139,9 +136,8 @@ def get_vcf(data_source_id, oh_id):
         except:
             logger.critical('your data source file is malformated')
     time.sleep(5) # download takes a few seconds
-    return
 
-#@app.task(ignore_result=False)
+
 @app.task
 def prepare_data(oh_id):
     """Process the member's .vcf."""
@@ -153,10 +149,11 @@ def prepare_data(oh_id):
     command = [
         'imputer/prepare_genotypes.sh', '{}'.format(oh_id)
     ]
-    process = Popen(command, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = process.communicate()
-    logger.debug(stderr)
+    process = run(command, stdout=PIPE, stderr=PIPE)
+    if process.stderr:
+        logger.debug(process.stderr)
     logger.info('finished preparing {} plink data'.format(oh_id))
+
 
 def _rreplace(s, old, new, occurrence):
     li = s.rsplit(old, occurrence)
@@ -211,18 +208,19 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
               sep=' ')
     # don't need this huge dataframe anymore
     del df
-    #print('{} finished combining results, now converting to .vcf'.format(oh_id))
 
     # convert to vcf
     os.chdir(settings.BASE_DIR)
     output_vcf_cmd = [
         'imputer/output_vcf.sh', '{}'.format(oh_id), '{}'.format(chrom)
     ]
-    process = Popen(output_vcf_cmd, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = process.communicate()
+    process = run(output_vcf_cmd, stdout=PIPE, stderr=PIPE)
+    if process.stderr:
+        logger.debug(process.stderr)
 
     # annotate genotype probabilities and info metric
-    vcf_file = '{}/{}/chr{}/chr{}/final_impute2/chr{}.member.imputed.vcf'.format(OUT_DIR, oh_id, chrom, chrom, chrom)
+    vcf_file = '{}/{}/chr{}/chr{}/final_impute2/chr{}.member.imputed.vcf'.format(
+        OUT_DIR, oh_id, chrom, chrom, chrom)
     cols = ['CHROM', 'POS', 'ID', 'REF', 'ALT',
             'QUAL', 'FILTER', 'INFO', 'FORMAT', 'MEMBER']
     with open(vcf_file, 'r') as vcf:
@@ -248,16 +246,20 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     if chrom == 1:
         new_header = ['##FORMAT=<ID=GP,Number=3,Type=Float,Description="Estimated Posterior Probabilities (rounded to 3 digits) for Genotypes 0/0, 0/1 and 1/1">\n',
                       '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n'
+                      '##imputerdate={}'.format(datetime.date.today().strftime("%m-%d-%y"))
                       ]
         header.insert(-2, new_header[0])
         header.insert(-4, new_header[1])
+        header.insert(-1, new_header[2])
         with open(vcf_file, 'w') as vcf:
             for line in header:
                 vcf.write(line)
-        dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t', header=None, index=False, mode='a', compression='bz2')
+        dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t', header=None,
+                           index=False, mode='a', compression='bz2')
 
     else:
-        dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t', header=None, index=False, compression='bz2')
+        dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t',
+                           header=None, index=False, compression='bz2')
 
 
 @app.task(ignore_result=False)
@@ -269,8 +271,8 @@ def upload_to_oh(oh_id):
     clean_command = [
         'imputer/combine_chrom.sh', '{}'.format(oh_id)
     ]
-    process = Popen(clean_command, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = process.communicate()
+    process = run(clean_command, stdout=PIPE, stderr=PIPE)
+    logger.debug(process.stderr)
 
     # upload file to OpenHumans
     process_source(oh_id)
@@ -283,17 +285,16 @@ def upload_to_oh(oh_id):
                     project_page),
                 oh_member.access_token,
                 project_member_ids=[oh_id])
-    print('{} emailed member'.format(oh_id))
+    logger.info('{} emailed member'.format(oh_id))
 
     # clean users files
     os.chdir(settings.BASE_DIR)
     clean_command = [
         'imputer/clean_files.sh', '{}'.format(oh_id)
     ]
-    process = Popen(clean_command, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = process.communicate()
-
-    print('{} finished removing files'.format(oh_id))
+    process = run(clean_command, stdout=PIPE, stderr=PIPE)
+    logger.debug(process.stderr)
+    logger.info('{} finished removing files'.format(oh_id))
 
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
     imputer_record.step = 'complete'
@@ -304,8 +305,10 @@ def upload_to_oh(oh_id):
 def pipeline(vcf_id, oh_id):
     task1 = get_vcf.si(vcf_id, oh_id)
     task2 = prepare_data.si(oh_id)
-    async_chroms = group(submit_chrom.si(chrom, oh_id) for chrom in CHROMOSOMES)
-    async_process = group(process_chrom.si(chrom, oh_id) for chrom in CHROMOSOMES)
+    async_chroms = group(submit_chrom.si(chrom, oh_id)
+                         for chrom in CHROMOSOMES)
+    async_process = group(process_chrom.si(chrom, oh_id)
+                          for chrom in CHROMOSOMES)
     task3 = chain(async_chroms, async_process, upload_to_oh.si(oh_id))
 
     pipeline = chain(task1, task2, task3)
