@@ -9,7 +9,6 @@ uniq "$DATA_DIR"/"$1"/member."$1".vcf > "$DATA_DIR"/"$1"/member."$1".uniq.vcf
 --geno \
 --make-bed \
 --out "$DATA_DIR"/"$1"/member."$1".plink \
---silent
 # remove missing ids
 "$IMP_BIN"/plink \
 --bfile "$DATA_DIR"/"$1"/member."$1".plink \
@@ -18,4 +17,3 @@ uniq "$DATA_DIR"/"$1"/member."$1".vcf > "$DATA_DIR"/"$1"/member."$1".uniq.vcf
 --make-bed \
 --set-missing-var-ids @:\#[b37]\$1,\$2 \
 --out "$DATA_DIR"/"$1"/member."$1".plink.gt \
---silent

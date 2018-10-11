@@ -106,10 +106,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
             '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/{}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(
                 REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, oh_id, chrom, chrom, chrom)
         ]
-
-    process = run(command, stdout=PIPE, stderr=PIPE)
-    if process.stderr:
-        logger.debug(process.stderr)
+    run(command, stdout=PIPE, stderr=PIPE)
 
 
 @app.task()
