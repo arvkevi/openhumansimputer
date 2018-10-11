@@ -36,14 +36,6 @@ OUT_DIR = environ.get('OUT_DIR')
 logger = logging.getLogger('oh')
 
 
-def member_error(oh_id, msg=None):
-    """Log the error message and set the member to active = False"""
-    logger.debug(msg)
-    imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
-    imputer_record.active = False
-    imputer_record.save()
-
-
 @app.task(ignore_result=False)
 def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
@@ -117,7 +109,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
 
     process = run(command, stdout=PIPE, stderr=PIPE)
     if process.stderr:
-        member_error(oh_id, process.stderr)
+        logger.debug(process.stderr)
 
 
 @app.task()
@@ -161,9 +153,8 @@ def prepare_data(oh_id):
     ]
     process = run(command, stdout=PIPE, stderr=PIPE)
     if process.stderr:
-        member_error(oh_id, process.stderr)
-    else:
-        logger.info('finished preparing {} plink data'.format(oh_id))
+        logger.debug(process.stderr)
+    logger.info('finished preparing {} plink data'.format(oh_id))
 
 
 def _rreplace(s, old, new, occurrence):
@@ -227,50 +218,50 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     ]
     process = run(output_vcf_cmd, stdout=PIPE, stderr=PIPE)
     if process.stderr:
-        member_error(oh_id, process.stderr)
+        logger.debug(process.stderr)
+
+    # annotate genotype probabilities and info metric
+    vcf_file = '{}/{}/chr{}/chr{}/final_impute2/chr{}.member.imputed.vcf'.format(
+        OUT_DIR, oh_id, chrom, chrom, chrom)
+    cols = ['CHROM', 'POS', 'ID', 'REF', 'ALT',
+            'QUAL', 'FILTER', 'INFO', 'FORMAT', 'MEMBER']
+    with open(vcf_file, 'r') as vcf:
+        headiter = takewhile(lambda s: s.startswith('#'), vcf)
+        header = list(headiter)
+        dfvcf = pd.read_csv(vcf_file, sep='\t', header=None,
+                            comment='#', names=cols)
+
+    df_gp.rename(columns={'name': 'ID'}, inplace=True)
+    df_gp.set_index(['ID'], inplace=True)
+    dfvcf.set_index(['ID'], inplace=True)
+    dfvcf = dfvcf.merge(
+        df_gp[['a0a0_p', 'a0a1_p', 'a1a1_p', 'info']], left_index=True, right_index=True)
+    del df_gp
+    # currently using custom annotation for "dosage"
+    dfvcf['MEMBER'] = dfvcf['MEMBER'] + ':' + dfvcf['a0a0_p'].round(3).astype(
+        str) + ',' + dfvcf['a0a1_p'].round(3).astype(str) + ',' + dfvcf['a1a1_p'].round(3).astype(str)
+    dfvcf['FORMAT'] = dfvcf['FORMAT'].astype(str) + ':GP'
+    dfvcf['INFO'] = dfvcf['INFO'].astype(
+        str) + ';INFO=' + dfvcf['info'].round(3).astype(str)
+    dfvcf.reset_index(inplace=True)
+
+    if chrom == 1:
+        new_header = ['##FORMAT=<ID=GP,Number=3,Type=Float,Description="Estimated Posterior Probabilities (rounded to 3 digits) for Genotypes 0/0, 0/1 and 1/1">\n',
+                      '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n'
+                      '##imputerdate={}'.format(datetime.date.today().strftime("%m-%d-%y"))
+                      ]
+        header.insert(-2, new_header[0])
+        header.insert(-4, new_header[1])
+        header.insert(-1, new_header[2])
+        with open(vcf_file, 'w') as vcf:
+            for line in header:
+                vcf.write(line)
+        dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t', header=None,
+                           index=False, mode='a', compression='bz2')
+
     else:
-        # annotate genotype probabilities and info metric
-        vcf_file = '{}/{}/chr{}/chr{}/final_impute2/chr{}.member.imputed.vcf'.format(
-            OUT_DIR, oh_id, chrom, chrom, chrom)
-        cols = ['CHROM', 'POS', 'ID', 'REF', 'ALT',
-                'QUAL', 'FILTER', 'INFO', 'FORMAT', 'MEMBER']
-        with open(vcf_file, 'r') as vcf:
-            headiter = takewhile(lambda s: s.startswith('#'), vcf)
-            header = list(headiter)
-            dfvcf = pd.read_csv(vcf_file, sep='\t', header=None,
-                                comment='#', names=cols)
-
-        df_gp.rename(columns={'name': 'ID'}, inplace=True)
-        df_gp.set_index(['ID'], inplace=True)
-        dfvcf.set_index(['ID'], inplace=True)
-        dfvcf = dfvcf.merge(
-            df_gp[['a0a0_p', 'a0a1_p', 'a1a1_p', 'info']], left_index=True, right_index=True)
-        del df_gp
-        # currently using custom annotation for "dosage"
-        dfvcf['MEMBER'] = dfvcf['MEMBER'] + ':' + dfvcf['a0a0_p'].round(3).astype(
-            str) + ',' + dfvcf['a0a1_p'].round(3).astype(str) + ',' + dfvcf['a1a1_p'].round(3).astype(str)
-        dfvcf['FORMAT'] = dfvcf['FORMAT'].astype(str) + ':GP'
-        dfvcf['INFO'] = dfvcf['INFO'].astype(
-            str) + ';INFO=' + dfvcf['info'].round(3).astype(str)
-        dfvcf.reset_index(inplace=True)
-
-        if chrom == 1:
-            new_header = ['##FORMAT=<ID=GP,Number=3,Type=Float,Description="Estimated Posterior Probabilities (rounded to 3 digits) for Genotypes 0/0, 0/1 and 1/1">\n',
-                          '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n'
-                          '##imputerdate={}'.format(datetime.date.today().strftime("%m-%d-%y"))
-                          ]
-            header.insert(-2, new_header[0])
-            header.insert(-4, new_header[1])
-            header.insert(-1, new_header[2])
-            with open(vcf_file, 'w') as vcf:
-                for line in header:
-                    vcf.write(line)
-            dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t', header=None,
-                               index=False, mode='a', compression='bz2')
-
-        else:
-            dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t',
-                               header=None, index=False, compression='bz2')
+        dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t',
+                           header=None, index=False, compression='bz2')
 
 
 @app.task(ignore_result=False)
@@ -283,21 +274,20 @@ def upload_to_oh(oh_id):
         'imputer/combine_chrom.sh', '{}'.format(oh_id)
     ]
     process = run(clean_command, stdout=PIPE, stderr=PIPE)
-    if process.stderr:
-        member_error(oh_id, process.stderr)
-    else:
-        # upload file to OpenHumans
-        process_source(oh_id)
+    logger.debug(process.stderr)
 
-        # Message Member
-        oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
-        project_page = environ.get('OH_ACTIVITY_PAGE')
-        api.message('Open Humans Imputation Complete',
-                    'Check {} to see your imputed genotype results from Open Humans.'.format(
-                        project_page),
-                    oh_member.access_token,
-                    project_member_ids=[oh_id])
-        print('{} emailed member'.format(oh_id))
+    # upload file to OpenHumans
+    process_source(oh_id)
+
+    # Message Member
+    oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
+    project_page = environ.get('OH_ACTIVITY_PAGE')
+    api.message('Open Humans Imputation Complete',
+                'Check {} to see your imputed genotype results from Open Humans.'.format(
+                    project_page),
+                oh_member.access_token,
+                project_member_ids=[oh_id])
+    logger.info('{} emailed member'.format(oh_id))
 
     # clean users files
     os.chdir(settings.BASE_DIR)
@@ -305,15 +295,13 @@ def upload_to_oh(oh_id):
         'imputer/clean_files.sh', '{}'.format(oh_id)
     ]
     process = run(clean_command, stdout=PIPE, stderr=PIPE)
-    if process.stderr:
-        member_error(oh_id, process.stderr)
-    else:
-        print('{} finished removing files'.format(oh_id))
+    logger.debug(process.stderr)
+    logger.info('{} finished removing files'.format(oh_id))
 
-        imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
-        imputer_record.step = 'complete'
-        imputer_record.active = False
-        imputer_record.save()
+    imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
+    imputer_record.step = 'complete'
+    imputer_record.active = False
+    imputer_record.save()
 
 
 def pipeline(vcf_id, oh_id):
