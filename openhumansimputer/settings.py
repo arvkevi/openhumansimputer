@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 import dj_database_url
 from env_tools import apply_env
-from requests_respectful import RespectfulRequester
 import logging
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -73,27 +72,10 @@ TEST_CHROMS = True if os.environ.get(
 if TEST_CHROMS:
     print('using chr21 and chr22 for testing')
     CHROMOSOMES = ["{}".format(i)
-                   for i in list(range(21, 23))]  # + ["23"]
+                   for i in list(range(5, 8))]  # + ["23"]
 else:
     CHROMOSOMES = ["{}".format(i)
                    for i in list(range(1, 23))]  # + ["23"]
-
-# Requests Respectful (rate limiting, waiting)
-if REMOTE is True:
-    from urllib.parse import urlparse
-    url_object = urlparse(os.getenv('REDIS_URL'))
-    RespectfulRequester.configure(
-        redis={
-            "host": url_object.hostname,
-            "port": url_object.port,
-            "password": url_object.password,
-            "database": 0
-        },
-        safety_threshold=5)
-
-# This creates a Realm called "source" that allows 60 requests per minute maximum.
-rr = RespectfulRequester()
-rr.register_realm("Source", max_requests=60, timespan=60)
 
 # Applications installed
 INSTALLED_APPS = [
@@ -252,8 +234,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 INSTALLED_APPS += ['django_extensions']
 
 # celery settings
-CELERY_BROKER_URL = os.getenv('REDIS_URL')
-
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL') 
 # Directory config, change these if you have a different setup.
 # Also make sure these are in /etc/default/celeryd
 IMP_BIN='/home/kevin/impbin'

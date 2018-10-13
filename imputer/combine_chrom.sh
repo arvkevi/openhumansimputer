@@ -2,8 +2,9 @@
 
 if [[ $TEST_CHROMS = true ]]
 then
-cat "$OUT_DIR"/"$1"/chr21/chr21/final_impute2/chr21.member.imputed.vcf.bz2 \
-"$OUT_DIR"/"$1"/chr22/chr22/final_impute2/chr22.member.imputed.vcf.bz2 \
+cat "$OUT_DIR"/"$1"/chr5/chr5/final_impute2/chr5.member.imputed.vcf.bz2 \
+"$OUT_DIR"/"$1"/chr6/chr6/final_impute2/chr6.member.imputed.vcf.bz2 \
+"$OUT_DIR"/"$1"/chr7/chr7/final_imputer2/chr7.member.imputed.vcf.bz2 \
 >"$OUT_DIR"/"$1"/member.imputed.vcf.bz2
 fi
 
