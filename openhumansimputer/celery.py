@@ -19,13 +19,12 @@ from django.conf import settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE',
                       'openhumansimputer.settings')
 
-app = Celery('openhumansimputer', broker=settings.CELERY_BROKER_URL)
+app = Celery('openhumansimputer', broker=settings.CELERY_BROKER_URL, backend=settings.CELERY_BROKER_URL)
 #app.conf.CELERY_ALWAYS_EAGER = True
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.update({
-    'BROKER_URL': settings.CELERY_BROKER_URL,
     # Recommended settings. See: https://www.cloudamqp.com/docs/celery.html
     'BROKER_POOL_LIMIT': 1,
     'BROKER_HEARTBEAT': None,
