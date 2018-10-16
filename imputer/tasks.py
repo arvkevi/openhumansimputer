@@ -243,7 +243,7 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
         str) + ';INFO=' + dfvcf['info'].round(3).astype(str)
     dfvcf.reset_index(inplace=True)
 
-    if chrom == 1:
+    if chrom == '1':
         new_header = ['##FORMAT=<ID=GP,Number=3,Type=Float,Description="Estimated Posterior Probabilities (rounded to 3 digits) for Genotypes 0/0, 0/1 and 1/1">\n',
                       '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n',
                       '##imputerdate={}'.format(

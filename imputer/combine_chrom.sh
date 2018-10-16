@@ -4,7 +4,7 @@ if [[ $TEST_CHROMS = true ]]
 then
 cat "$OUT_DIR"/"$1"/chr5/chr5/final_impute2/chr5.member.imputed.vcf.bz2 \
 "$OUT_DIR"/"$1"/chr6/chr6/final_impute2/chr6.member.imputed.vcf.bz2 \
-"$OUT_DIR"/"$1"/chr7/chr7/final_imputer2/chr7.member.imputed.vcf.bz2 \
+"$OUT_DIR"/"$1"/chr7/chr7/final_impute2/chr7.member.imputed.vcf.bz2 \
 >"$OUT_DIR"/"$1"/member.imputed.vcf.bz2
 fi
 
