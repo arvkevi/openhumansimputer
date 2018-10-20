@@ -31,9 +31,9 @@ def process_source(oh_id):
     # this works below
     try:
         api.delete_file(oh_member.access_token,
-                    oh_member.oh_id,
-                    file_basename="member.imputed.vcf.bz2")
-    except FileNotFoundError :
+                        oh_member.oh_id,
+                        file_basename="member.imputed.vcf.bz2")
+    except FileNotFoundError:
         logger.info('New Source File')
     api.upload_aws('{}/{}/member.imputed.vcf.bz2'.format(OUT_DIR, oh_id), metadata,
                    oh_access_token,

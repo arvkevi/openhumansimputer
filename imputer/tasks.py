@@ -19,6 +19,7 @@ from openhumansimputer.settings import CHROMOSOMES
 from imputer.models import ImputerMember
 import bz2
 import gzip
+from shutil import copyfileobj
 from itertools import takewhile
 import time
 import datetime
@@ -243,37 +244,52 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
         str) + ';INFO=' + dfvcf['info'].round(3).astype(str)
     dfvcf.reset_index(inplace=True)
 
-    if chrom == '1':
-        new_header = ['##FORMAT=<ID=GP,Number=3,Type=Float,Description="Estimated Posterior Probabilities (rounded to 3 digits) for Genotypes 0/0, 0/1 and 1/1">\n',
-                      '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n',
-                      '##imputerdate={}'.format(
-                          datetime.date.today().strftime("%m-%d-%y"))
-                      ]
-        header.insert(-2, new_header[0])
-        header.insert(-4, new_header[1])
-        header.insert(1, new_header[2])
-        with open(vcf_file, 'w') as vcf:
-            for line in header:
-                vcf.write(line)
-        dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t', header=None,
-                           index=False, mode='a', compression='bz2')
-
-    else:
-        dfvcf[cols].to_csv(vcf_file + '.bz2', sep='\t',
-                           header=None, index=False, compression='bz2')
+    dfvcf[cols].to_csv(vcf_file, sep='\t',
+                       header=None, index=False)
 
 
 @app.task(ignore_result=False)
 def upload_to_oh(oh_id):
-    print('{} finished converting to .vcf.bz2, now uploading to OpenHumans'.format(oh_id))
+    logger.info('{}: now uploading to OpenHumans'.format(oh_id))
+
+    # 5 because it'll be available if TEST_CHROMS
+    chrom = 5
+    vcf_file = '{}/{}/chr{}/chr{}/final_impute2/chr{}.member.imputed.vcf'.format(
+        OUT_DIR, oh_id, chrom, chrom, chrom)
+    with open(vcf_file, 'r') as vcf:
+        headiter = takewhile(lambda s: s.startswith('#'), vcf)
+        header = list(headiter)
+
+    # construct the final header
+    new_header = ['##FORMAT=<ID=GP,Number=3,Type=Float,Description="Estimated Posterior Probabilities (rounded to 3 digits) for Genotypes 0/0, 0/1 and 1/1">\n',
+                  '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n',
+                  '##imputerdate={}'.format(
+                      datetime.date.today().strftime("%m-%d-%y"))
+                  ]
+    header.insert(-2, new_header[0])
+    header.insert(-4, new_header[1])
+    header.insert(1, new_header[2])
+    header = ''.join(header)
 
     # combine all vcfs
     os.chdir(settings.BASE_DIR)
-    clean_command = [
+    combine_command = [
         'imputer/combine_chrom.sh', '{}'.format(oh_id)
     ]
-    process = run(clean_command, stdout=PIPE, stderr=PIPE)
+    process = run(combine_command, stdout=PIPE, stderr=PIPE)
     logger.debug(process.stderr)
+
+    member_vcf_fp = '{}/{}/member.imputed.vcf'.format(OUT_DIR, oh_id)
+    # add the header to the combined vcf file.
+    with open(member_vcf_fp, 'r') as original:
+        data = original.read()
+    with open(member_vcf_fp, 'w') as modified:
+        modified.write(header + data)
+
+    # bzip the file
+    with open(member_vcf_fp, 'rb') as input_:
+        with bz2.BZ2File(member_vcf_fp + '.bz2', 'wb', compresslevel=9) as output:
+            copyfileobj(input_, output)
 
     # upload file to OpenHumans
     process_source(oh_id)
@@ -289,13 +305,14 @@ def upload_to_oh(oh_id):
     logger.info('{} emailed member'.format(oh_id))
 
     # clean users files
-    os.chdir(settings.BASE_DIR)
-    clean_command = [
-        'imputer/clean_files.sh', '{}'.format(oh_id)
-    ]
-    process = run(clean_command, stdout=PIPE, stderr=PIPE)
-    logger.debug(process.stderr)
-    logger.info('{} finished removing files'.format(oh_id))
+    if not settings.DEBUG:
+        os.chdir(settings.BASE_DIR)
+        clean_command = [
+            'imputer/clean_files.sh', '{}'.format(oh_id)
+        ]
+        process = run(clean_command, stdout=PIPE, stderr=PIPE)
+        logger.debug(process.stderr)
+        logger.info('{} finished removing files'.format(oh_id))
 
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
     imputer_record.step = 'complete'
