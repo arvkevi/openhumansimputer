@@ -224,11 +224,17 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
         OUT_DIR, oh_id, chrom, chrom, chrom)
     cols = ['CHROM', 'POS', 'ID', 'REF', 'ALT',
             'QUAL', 'FILTER', 'INFO', 'FORMAT', 'MEMBER']
-    with open(vcf_file, 'r') as vcf:
-        headiter = takewhile(lambda s: s.startswith('#'), vcf)
-        header = list(headiter)
-        dfvcf = pd.read_csv(vcf_file, sep='\t', header=None,
-                            comment='#', names=cols)
+
+    # capture header
+    if chrom == '5':
+        with open(vcf_file, 'r') as vcf:
+            headiter = takewhile(lambda s: s.startswith('#'), vcf)
+            header = list(headiter)
+            with open(OUT_DIR + 'header.txt', 'w') as headerobj:
+                headerobj.write('\n'.join(header))
+
+    dfvcf = pd.read_csv(vcf_file, sep='\t', header=None,
+                        comment='#', names=cols)
 
     df_gp.rename(columns={'name': 'ID'}, inplace=True)
     df_gp.set_index(['ID'], inplace=True)
@@ -252,12 +258,8 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
 def upload_to_oh(oh_id):
     logger.info('{}: now uploading to OpenHumans'.format(oh_id))
 
-    # 5 because it'll be available if TEST_CHROMS
-    chrom = 5
-    vcf_file = '{}/{}/chr{}/chr{}/final_impute2/chr{}.member.imputed.vcf'.format(
-        OUT_DIR, oh_id, chrom, chrom, chrom)
-    with open(vcf_file, 'r') as vcf:
-        headiter = takewhile(lambda s: s.startswith('#'), vcf)
+    with open(OUT_DIR + 'header.txt', 'r') as headerobj:
+        headiter = takewhile(lambda s: s.startswith('#'), headerobj)
         header = list(headiter)
 
     # construct the final header
@@ -269,7 +271,7 @@ def upload_to_oh(oh_id):
     header.insert(-2, new_header[0])
     header.insert(-4, new_header[1])
     header.insert(1, new_header[2])
-    header = ''.join(header)
+    header = '\n'.join(header)
 
     # combine all vcfs
     os.chdir(settings.BASE_DIR)
