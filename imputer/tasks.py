@@ -230,8 +230,8 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
         with open(vcf_file, 'r') as vcf:
             headiter = takewhile(lambda s: s.startswith('#'), vcf)
             header = list(headiter)
-            with open(OUT_DIR + 'header.txt', 'w') as headerobj:
-                headerobj.write('\n'.join(header))
+            with open('{}/{}/header.txt'.format(OUT_DIR, oh_id), 'w') as headerobj:
+                headerobj.write(''.join(header))
 
     dfvcf = pd.read_csv(vcf_file, sep='\t', header=None,
                         comment='#', names=cols)
@@ -258,20 +258,20 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
 def upload_to_oh(oh_id):
     logger.info('{}: now uploading to OpenHumans'.format(oh_id))
 
-    with open(OUT_DIR + 'header.txt', 'r') as headerobj:
+    with open('{}/{}/header.txt'.format(OUT_DIR, oh_id), 'r') as headerobj:
         headiter = takewhile(lambda s: s.startswith('#'), headerobj)
         header = list(headiter)
 
     # construct the final header
     new_header = ['##FORMAT=<ID=GP,Number=3,Type=Float,Description="Estimated Posterior Probabilities (rounded to 3 digits) for Genotypes 0/0, 0/1 and 1/1">\n',
                   '##INFO=<ID=INFO,Number=1,Type=Float,Description="Impute2 info metric">\n',
-                  '##imputerdate={}'.format(
+                  '##imputerdate={}\n'.format(
                       datetime.date.today().strftime("%m-%d-%y"))
                   ]
     header.insert(-2, new_header[0])
     header.insert(-4, new_header[1])
     header.insert(1, new_header[2])
-    header = '\n'.join(header)
+    header = ''.join(header)
 
     # combine all vcfs
     os.chdir(settings.BASE_DIR)
