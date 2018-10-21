@@ -59,7 +59,11 @@
         {% else %}
         <tr class="table-secondary">
         <th scope="row">{{ matching_sources|get_item_proj:key }}</th>
+        {% if matching_sources|get_item_proj:key == "openSNP" %}}
+        <td class="text-warning">The openSNP data source is currently a work in progress.</td>
+        {% else %}
         <td>{{ matching_sources|get_item_proj:key }} not connected or no .vcf data.</td>
+        {% endif %}
         <td></td>
       </tr>
         {% endif %}
