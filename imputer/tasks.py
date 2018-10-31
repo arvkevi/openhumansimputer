@@ -29,6 +29,7 @@ from openhumansimputer.celery import app
 HOME = environ.get('HOME')
 IMP_BIN = environ.get('IMP_BIN')
 REF_PANEL = environ.get('REF_PANEL')
+REF_PANEL_X = environ.get('REF_PANEL_X')
 DATA_DIR = environ.get('DATA_DIR')
 REF_FA = environ.get('REF_FA')
 OUT_DIR = environ.get('OUT_DIR')
@@ -65,16 +66,19 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
             '--reference', '{}/hg19.fasta'.format(REF_FA),
-            '--hap-nonPAR', '{}_chrX/1000GP_Phase3_chrX_NONPAR.hap.gz'.format(REF_PANEL),
-            '--hap-PAR1', '{}_chrX/1000GP_Phase3_chrX_PAR1.hap.gz'.format(REF_PANEL),
-            '--hap-PAR2', '{}_chrX/1000GP_Phase3_chrX_PAR2.hap.gz'.format(REF_PANEL),
-            '--legend-nonPAR', '{}_chrX/1000GP_Phase3_chrX_NONPAR.legend.gz'.format(REF_PANEL),
-            '--legend-PAR1', '{}_chrX/1000GP_Phase3_chrX_PAR1.legend.gz'.format(REF_PANEL),
-            '--legend-PAR2', '{}_chrX/1000GP_Phase3_chrX_PAR2.legend.gz'.format(REF_PANEL),
-            '--map-nonPAR', '{}_chrX/genetic_map_chrX_nonPAR_combined_b37.txt'.format(REF_PANEL),
-            '--map-PAR1', '{}_chrX/genetic_map_chrX_PAR1_combined_b37.txt'.format(REF_PANEL),
-            '--map-PAR2', '{}_chrX/genetic_map_chrX_PAR2_combined_b37.txt'.format(REF_PANEL),
+            '--hap-nonPAR', '{}/1000GP_Phase3_chrX_NONPAR.hap.gz'.format(REF_PANEL_X),
+            '--hap-PAR1', '{}/1000GP_Phase3_chrX_PAR1.hap.gz'.format(REF_PANEL_X),
+            '--hap-PAR2', '{}/1000GP_Phase3_chrX_PAR2.hap.gz'.format(REF_PANEL_X),
+            '--legend-nonPAR', '{}/1000GP_Phase3_chrX_NONPAR.legend.gz'.format(REF_PANEL_X),
+            '--legend-PAR1', '{}/1000GP_Phase3_chrX_PAR1.legend.gz'.format(REF_PANEL_X),
+            '--legend-PAR2', '{}/1000GP_Phase3_chrX_PAR2.legend.gz'.format(REF_PANEL_X),
+            '--map-nonPAR', '{}/genetic_map_chrX_nonPAR_combined_b37.txt'.format(REF_PANEL_X),
+            '--map-PAR1', '{}/genetic_map_chrX_PAR1_combined_b37.txt'.format(REF_PANEL_X),
+            '--map-PAR2', '{}/genetic_map_chrX_PAR2_combined_b37.txt'.format(REF_PANEL_X),
             '--sample-file', '{}/1000GP_Phase3.sample'.format(REF_PANEL),
+            '--map-template', '{}/genetic_map_chrX_nonPAR_combined_b37.txt'.format(REF_PANEL_X),
+            '--legend-template', '{}/1000GP_Phase3_chrX_NONPAR.legend.gz'.format(REF_PANEL_X),
+            '--hap-template', '{}/1000GP_Phase3_chrX_NONPAR.hap.gz'.format(REF_PANEL_X),
             '--filtering-rules', 'ALL<0.01', 'ALL>0.99',
             '--segment-length', '5e+06',
             '--impute2-extra', '-nind 1',
@@ -82,8 +86,8 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
             '--report-number', '"Test Report"',
             '--output-dir', '{}/{}/chr{}'.format(OUT_DIR,
                                                  oh_id, chrom),
-            '--shapeit-extra', '-R {}/1000GP_Phase3_chr{}.hap.gz {}/1000GP_Phase3_chr{}.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/{}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(
-                REF_PANEL, chrom, REF_PANEL, chrom, REF_PANEL, OUT_DIR, oh_id, chrom, chrom, chrom)
+            '--shapeit-extra', '-R {}/1000GP_Phase3_chrX_NONPAR.hap.gz {}/1000GP_Phase3_chrX_NONPAR.legend.gz {}/1000GP_Phase3.sample --exclude-snp {}/{}/chr{}/chr{}/chr{}.alignments.snp.strand.exclude'.format(
+                REF_PANEL_X, REF_PANEL_X, REF_PANEL, OUT_DIR, oh_id, chrom, chrom, chrom)
         ]
     else:
         command = [
