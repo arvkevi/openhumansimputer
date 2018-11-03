@@ -72,10 +72,10 @@ TEST_CHROMS = True if os.environ.get(
 if TEST_CHROMS:
     print('using chr21 and chr22 for testing')
     CHROMOSOMES = ["{}".format(i)
-                   for i in list(range(5, 8))]  # + ["23"]
+                   for i in list(range(5, 8))]  + ["23"]
 else:
     CHROMOSOMES = ["{}".format(i)
-                   for i in list(range(1, 23))]  # + ["23"]
+                   for i in list(range(1, 24))]
 
 # Applications installed
 INSTALLED_APPS = [
@@ -189,7 +189,7 @@ LOGGING = {
         },
 	'console': {
             'class': 'logging.StreamHandler',
-        },	
+        },
     },
     'loggers': {
         'gunicorn.errors': {
@@ -234,7 +234,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 INSTALLED_APPS += ['django_extensions']
 
 # celery settings
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL') 
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 # Directory config, change these if you have a different setup.
 # Also make sure these are in /etc/default/celeryd
 IMP_BIN='/home/kevin/impbin'
