@@ -5,6 +5,7 @@ then
 cat "$OUT_DIR"/"$1"/chr5/chr5/final_impute2/chr5.member.imputed.vcf \
 "$OUT_DIR"/"$1"/chr6/chr6/final_impute2/chr6.member.imputed.vcf \
 "$OUT_DIR"/"$1"/chr7/chr7/final_impute2/chr7.member.imputed.vcf \
+"$OUT_DIR"/"$1"/chr23/chr23/final_impute2/chr23.member.imputed.vcf \
 >"$OUT_DIR"/"$1"/member.imputed.vcf
 fi
 
@@ -32,5 +33,6 @@ cat "$OUT_DIR"/"$1"/chr1/chr1/final_impute2/chr1.member.imputed.vcf \
 "$OUT_DIR"/"$1"/chr20/chr20/final_impute2/chr20.member.imputed.vcf \
 "$OUT_DIR"/"$1"/chr21/chr21/final_impute2/chr21.member.imputed.vcf \
 "$OUT_DIR"/"$1"/chr22/chr22/final_impute2/chr22.member.imputed.vcf \
+"$OUT_DIR"/"$1"/chr23/chr23/final_impute2/chr23.member.imputed.vcf \
 >"$OUT_DIR"/"$1"/member.imputed.vcf
 fi
