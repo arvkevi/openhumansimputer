@@ -38,8 +38,8 @@ if [ ! -d "$REF_PANEL" ]; then
   echo DOWNLOADING 1kG HAPLOTYPES...
   mkdir -p $REF_PANEL
 
-  curl https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3.tgz -o $TMP_DIR
-  tar -xvzf -C $REF_PANEL $TMP_DIR/1000GP_Phase3.tgz
+  curl https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3.tgz -o $TMP_DIR/1000GP_Phase3.tgz
+  tar -xvzf $TMP_DIR/1000GP_Phase3.tgz -C $REF_PANEL
   rm -f $TMP_DIR/1000GP_Phase3.tgz
 
   # uncomment below when implementing X chromosome imputation
