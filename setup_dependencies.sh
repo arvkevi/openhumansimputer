@@ -22,12 +22,12 @@ if [ ! -d "$IMP_BIN" ]; then
   # plink 1.x
   curl https://www.cog-genomics.org/static/bin/plink181012/plink_linux_x86_64.zip -o $TMP_DIR/plink_linux_x86_64.zip
   unzip $TMP_DIR/plink_linux_x86_64.zip plink -d $IMP_BIN
-  rm $TMP_DIR/plink_linux_x86_64.zip
+  rm -f $TMP_DIR/plink_linux_x86_64.zip
 
   # plink 2.x for recoding .gen to .vcf
   curl http://s3.amazonaws.com/plink2-assets/alpha1/plink2_linux_x86_64.zip -o $TMP_DIR/plink2_linux_x86_64.zip
   unzip $TMP_DIR/plink2_linux_x86_64.zip plink2 -d $IMP_BIN
-  rm $TMP_DIR/plink2_linux_x86_64.zip
+  rm -f $TMP_DIR/plink2_linux_x86_64.zip
 
   echo DOWNLOADING SHAPEIT...
   curl https://mathgen.stats.ox.ac.uk/genetics_software/shapeit/shapeit.v2.r837.GLIBCv2.12.Linux.static.tgz | \
@@ -40,6 +40,7 @@ if [ ! -d "$REF_PANEL" ]; then
 
   curl https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3.tgz -o $TMP_DIR
   tar -xvzf -C $REF_PANEL $TMP_DIR/1000GP_Phase3.tgz
+  rm -f $TMP_DIR/1000GP_Phase3.tgz
 
   # uncomment below when implementing X chromosome imputation
   #echo DOWNLOADING 1kG chrX HAPLOTYPES...
@@ -52,6 +53,7 @@ fi
 
 if [ ! -d "$REF_FA" ]; then
   echo DOWNLOADING HG19...
+  mkdir -p $REF_FA
   wget -P $REF_FA http://statgen.org/wp-content/uploads/Softwares/genipe/supp_files/hg19.tar.bz2
   bzip2 -d $REF_FA/hg19.tar.bz2
   tar xvf $REF_FA/hg19.tar
