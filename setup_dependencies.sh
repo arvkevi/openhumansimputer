@@ -2,43 +2,44 @@
 # this file gets sourced at the start of the app
 # after the heroku config vars.
 
-IMP_BIN="$HOME"/impbin
-REF_PANEL="$HOME"/1000GP_Phase3
-DATA_DIR="$HOME"/data
-REF_FA="$HOME"/hg19
-OUT_DIR="$HOME"/genipe_output
+source .env
+
+IMP_BIN="$BASE_DATA_DIR"/impbin
+REF_PANEL="$BASE_DATA_DIR"/1000GP_Phase3
+DATA_DIR="$BASE_DATA_DIR"/data
+REF_FA="$BASE_DATA_DIR"/hg19
+OUT_DIR="$BASE_DATA_DIR"/genipe_output
+
 
 if [ ! -d "$IMP_BIN" ]; then
-  mkdir $IMP_BIN
+  mkdir -p $IMP_BIN
 
   echo DOWNLOADING IMPUTE2...
-  wget https://mathgen.stats.ox.ac.uk/impute/impute_v2.3.2_x86_64_static.tgz
-  tar -xvzf impute_v2.3.2_x86_64_static.tgz
-  mv impute_v2.3.2_x86_64_static/impute2 $IMP_BIN/impute2
+  curl https://mathgen.stats.ox.ac.uk/impute/impute_v2.3.2_x86_64_static.tgz | \
+  tar -xz -C $IMP_BIN --no-anchored --strip-components=1 impute_v2.3.2_x86_64_static/impute2
 
   echo DOWNLOADING PLINK...
   # plink 1.x
-  wget https://www.cog-genomics.org/static/bin/plink180717/plink_linux_x86_64.zip
-  unzip plink_linux_x86_64.zip
-  mv plink $IMP_BIN/plink
+  curl https://www.cog-genomics.org/static/bin/plink181012/plink_linux_x86_64.zip -o $TMP_DIR/plink_linux_x86_64.zip
+  unzip $TMP_DIR/plink_linux_x86_64.zip plink -d $IMP_BIN
+  rm $TMP_DIR/plink_linux_x86_64.zip
 
   # plink 2.x for recoding .gen to .vcf
-  wget http://s3.amazonaws.com/plink2-assets/alpha1/plink2_linux_avx2.zip
-  unzip plink2_linux_avx2.zip
-  mv plink2 $IMP_BIN/plink2
+  curl http://s3.amazonaws.com/plink2-assets/alpha1/plink2_linux_x86_64.zip -o $TMP_DIR/plink2_linux_x86_64.zip
+  unzip $TMP_DIR/plink2_linux_x86_64.zip plink2 -d $IMP_BIN
+  rm $TMP_DIR/plink2_linux_x86_64.zip
 
   echo DOWNLOADING SHAPEIT...
-  wget https://mathgen.stats.ox.ac.uk/genetics_software/shapeit/shapeit.v2.r837.GLIBCv2.12.Linux.static.tgz
-  tar -xvzf shapeit.v2.r837.GLIBCv2.12.Linux.static.tgz
-  mv bin/shapeit $IMP_BIN/shapeit
+  curl https://mathgen.stats.ox.ac.uk/genetics_software/shapeit/shapeit.v2.r837.GLIBCv2.12.Linux.static.tgz | \
+  tar -xz -C $IMP_BIN --no-anchored --strip-components=1 bin/shapeit
 fi
 
 if [ ! -d "$REF_PANEL" ]; then
   echo DOWNLOADING 1kG HAPLOTYPES...
-  cd $REF_PANEL
-  wget https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3.tgz
-  tar -xvzf 1000GP_Phase3.tgz
-  cd
+  mkdir -p $REF_PANEL
+
+  curl https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3.tgz -o $TMP_DIR
+  tar -xvzf -C $REF_PANEL $TMP_DIR/1000GP_Phase3.tgz
 
   # uncomment below when implementing X chromosome imputation
   #echo DOWNLOADING 1kG chrX HAPLOTYPES...
