@@ -26,6 +26,8 @@ apply_env()
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Directory where we log to
+LOG_DIR = os.getenv('LOGDIR')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -184,7 +186,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'verbose',
-            'filename': '/home/kevin/logs//gunicorn.errors',
+            'filename': os.path.join(LOG_DIR, 'gunicorn.errors'),
             'maxBytes': 1024 * 1024 * 200,  # 100 mb
         },
 	'console': {
