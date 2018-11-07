@@ -26,6 +26,11 @@ apply_env()
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Directory for helpers and data
+BASE_DATA_DIR = os.getenv('BASE_DATA_DIR')
+
+# Directory where we log to
+LOG_DIR = os.getenv('LOGDIR')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -184,7 +189,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'verbose',
-            'filename': '/home/kevin/logs//gunicorn.errors',
+            'filename': os.path.join(LOG_DIR, 'gunicorn.errors'),
             'maxBytes': 1024 * 1024 * 200,  # 100 mb
         },
 	'console': {
@@ -237,11 +242,11 @@ INSTALLED_APPS += ['django_extensions']
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 # Directory config, change these if you have a different setup.
 # Also make sure these are in /etc/default/celeryd
-IMP_BIN='/home/kevin/impbin'
-REF_PANEL='/home/kevin/1000GP_Phase3'
-DATA_DIR='/home/kevin/data'
-REF_FA='/home/kevin/hg19'
-OUT_DIR='/home/kevin/outdir'
+IMP_BIN = os.path.join(BASE_DATA_DIR, os.getenv('IMP_BIN'))
+REF_PANEL = os.path.join(BASE_DATA_DIR, os.getenv('REF_PANEL'))
+DATA_DIR = os.path.join(BASE_DATA_DIR, os.getenv('DATA_DIR'))
+REF_FA = os.path.join(BASE_DATA_DIR, os.getenv('REF_FA'))
+OUT_DIR = os.path.join(BASE_DATA_DIR, os.getenv('OUT_DIR'))
 
 # Sentry
 sentry_sdk.init(
