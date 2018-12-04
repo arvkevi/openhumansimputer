@@ -242,11 +242,12 @@ INSTALLED_APPS += ['django_extensions']
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 # Directory config, change these if you have a different setup.
 # Also make sure these are in /etc/default/celeryd
-IMP_BIN = os.path.join(BASE_DATA_DIR, os.getenv('IMP_BIN'))
-REF_PANEL = os.path.join(BASE_DATA_DIR, os.getenv('REF_PANEL'))
-DATA_DIR = os.path.join(BASE_DATA_DIR, os.getenv('DATA_DIR'))
-REF_FA = os.path.join(BASE_DATA_DIR, os.getenv('REF_FA'))
-OUT_DIR = os.path.join(BASE_DATA_DIR, os.getenv('OUT_DIR'))
+IMP_BIN = os.getenv('IMP_BIN')
+REF_PANEL = os.getenv('REF_PANEL')
+REF_PANEL_X = os.getenv('REF_PANEL_X')
+DATA_DIR = os.getenv('DATA_DIR')
+REF_FA = os.getenv('REF_FA')
+OUT_DIR = os.getenv('OUT_DIR')
 
 # Sentry
 sentry_sdk.init(

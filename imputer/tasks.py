@@ -27,12 +27,12 @@ from openhumansimputer.celery import app
 
 
 HOME = environ.get('HOME')
-IMP_BIN = environ.get('IMP_BIN')
-REF_PANEL = environ.get('REF_PANEL')
-REF_PANEL_X = environ.get('REF_PANEL_X')
-DATA_DIR = environ.get('DATA_DIR')
-REF_FA = environ.get('REF_FA')
-OUT_DIR = environ.get('OUT_DIR')
+IMP_BIN = settings.IMP_BIN
+REF_PANEL = settings.REF_PANEL
+REF_PANEL_X = settings.REF_PANEL_X
+DATA_DIR = settings.DATA_DIR
+REF_FA = settings.REF_FA
+OUT_DIR = settings.OUT_DIR
 
 # Set up logging.
 logger = logging.getLogger('oh')
