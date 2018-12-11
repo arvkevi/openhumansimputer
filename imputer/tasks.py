@@ -185,7 +185,7 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     4. merge on right (.impute2_info), acts like a filter for the left.
     """
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
-    while imputer_record.step != 'imputed_chrom_23':
+    while not all([os.path.isfile('{}/{}/chr{}/chr{}/final_impute2/chr{}.imputed.impute2'.format(OUT_DIR, oh_id, c, c, c)), for c in settings.CHROMOSOMES])
         time.sleep(10)
         imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
 
