@@ -4,12 +4,12 @@
 
 source .env
 
-IMP_BIN="$BASE_DATA_DIR"/impbin
-REF_PANEL="$BASE_DATA_DIR"/1000GP_Phase3
-DATA_DIR="$BASE_DATA_DIR"/data
-REF_FA="$BASE_DATA_DIR"/hg19
-OUT_DIR="$BASE_DATA_DIR"/genipe_output
-
+IMP_BIN=/usr/share/imputer/impbin
+REF_PANEL=/usr/share/imputer/1000GP_Phase3
+DATA_DIR=/usr/share/imputer/data
+REF_FA=/usr/share/imputer/hg19
+OUT_DIR=/usr/share/imputer//outdir
+TMP_DIR=/usr/tmp
 
 if [ ! -d "$IMP_BIN" ]; then
   mkdir -p $IMP_BIN
@@ -43,12 +43,12 @@ if [ ! -d "$REF_PANEL" ]; then
   rm -f $TMP_DIR/1000GP_Phase3.tgz
 
   # uncomment below when implementing X chromosome imputation
-  #echo DOWNLOADING 1kG chrX HAPLOTYPES...
-  #mkdir "$REF_PANEL"_chrX
-  #cd "$REF_PANEL"_chrX
-  #wget https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3_chrX.tgz
-  #tar -xvzf 1000GP_Phase3_chrX.tgz
-  #cd
+  echo DOWNLOADING 1kG chrX HAPLOTYPES...
+  mkdir "$REF_PANEL"_chrX
+  cd "$REF_PANEL"_chrX
+  wget https://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3_chrX.tgz
+  tar -xvzf 1000GP_Phase3_chrX.tgz
+  cd
 fi
 
 if [ ! -d "$REF_FA" ]; then
