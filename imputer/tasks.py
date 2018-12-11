@@ -120,6 +120,10 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
         ]
     run(command, stdout=PIPE, stderr=PIPE)
 
+    imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
+    imputer_record.step = 'imputed_chrom_{}'.format(chrom)
+    imputer_record.save()
+
 
 @app.task()
 def get_vcf(data_source_id, oh_id):
@@ -181,7 +185,7 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     4. merge on right (.impute2_info), acts like a filter for the left.
     """
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
-    while imputer_record.step == 'submit_chrom':
+    while imputer_record.step != 'imputed_chrom_23':
         time.sleep(10)
         imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
 
