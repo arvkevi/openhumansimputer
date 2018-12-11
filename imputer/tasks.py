@@ -60,6 +60,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
         command = [
             'genipe-launcher',
             '--chrom', '{}'.format(chrom),
+            '--thread', '4',
             '--bfile', '{}/{}/member.{}.plink.gt'.format(
                 DATA_DIR, oh_id, oh_id),
             '--shapeit-bin', '{}/shapeit'.format(IMP_BIN),
@@ -92,6 +93,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     else:
         command = [
             'genipe-launcher',
+            'thread', '4',
             '--chrom', '{}'.format(chrom),
             '--bfile', '{}/{}/member.{}.plink.gt'.format(
                 DATA_DIR, oh_id, oh_id),
@@ -178,6 +180,11 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     3. filter the genotypes in .impute2_info
     4. merge on right (.impute2_info), acts like a filter for the left.
     """
+    imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
+    while imputer_record.step == 'submit_chrom':
+        time.sleep(10)
+        imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
+
     print('{} Imputation has completed, now processing results.'.format(oh_id))
     impute_cols = ['chr', 'name', 'position',
                    'a0', 'a1', 'a0a0_p', 'a0a1_p', 'a1a1_p']
