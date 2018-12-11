@@ -93,7 +93,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     else:
         command = [
             'genipe-launcher',
-            'thread', '4',
+            '--thread', '4',
             '--chrom', '{}'.format(chrom),
             '--bfile', '{}/{}/member.{}.plink.gt'.format(
                 DATA_DIR, oh_id, oh_id),
