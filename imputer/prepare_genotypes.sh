@@ -10,6 +10,9 @@ cat "$DATA_DIR"/"$1"/member."$1".header "$DATA_DIR"/"$1"/member."$1".uniq.nohead
 #sort the uniq vcf
 grep "^#" "$DATA_DIR"/"$1"/member."$1".uniq.unsorted.vcf > "$DATA_DIR"/"$1"/member."$1".uniq.vcf && grep -v "^#" "$DATA_DIR"/"$1"/member."$1".uniq.unsorted.vcf | \
   sort -V -k1,1 -k2,2n >> "$DATA_DIR"/"$1"/member."$1".uniq.vcf
+# only keep PASS FILTER variants or not evaluated '.'
+gawk -i -F '\t' '{if($0 ~ /\#/) print; else if($7 == "PASS" || $7 == ".") print}' "$DATA_DIR"/"$1"/member."$1".uniq.vcf
+
 # convert to plink format
 "$IMP_BIN"/plink \
 --vcf "$DATA_DIR"/"$1"/member."$1".uniq.vcf \
