@@ -38,7 +38,7 @@ OUT_DIR = settings.OUT_DIR
 logger = logging.getLogger('oh')
 
 
-@app.task(ignore_result=False)
+@app.task(ignore_result=False, time_limit=5400)
 def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
     Build and run the genipe-launcher command in subprocess run.
@@ -125,7 +125,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     imputer_record.save()
 
 
-@app.task()
+@app.task(time_limit=300)
 def get_vcf(data_source_id, oh_id):
     """Download member .vcf."""
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
@@ -154,7 +154,7 @@ def get_vcf(data_source_id, oh_id):
     time.sleep(5)  # download takes a few seconds
 
 
-@app.task
+@app.task(time_limit=600)
 def prepare_data(oh_id):
     """Process the member's .vcf."""
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
@@ -176,7 +176,7 @@ def _rreplace(s, old, new, occurrence):
     return new.join(li)
 
 
-@app.task(ignore_result=False)
+@app.task(ignore_result=False, time_limit=600)
 def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
     1. read .impute2 files (w/ genotype probabilities)
@@ -274,7 +274,7 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
                        header=None, index=False)
 
 
-@app.task(ignore_result=False)
+@app.task(ignore_result=False, time_limit=1200)
 def upload_to_oh(oh_id):
     logger.info('{}: now uploading to OpenHumans'.format(oh_id))
 
