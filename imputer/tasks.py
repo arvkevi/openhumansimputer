@@ -47,8 +47,10 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     genipe-launcher tries to delete. If multiple tasks launch at the same time,
     celery task silently fails.
     """
-    # this silly block of code runs impute2 because genipe-launcher deletes
-    # two unneccesary files before they are available.
+    # Before launching imputation, make sure the prepare_data function finished.
+    while not os.path.isfile('{}/{}/member.{}.plink.bed'.format(DATA_DIR, oh_id, oh_id)):
+        time.sleep(10)
+
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
     imputer_record.step = 'submit_chrom'
     imputer_record.save()
