@@ -178,7 +178,7 @@ def _rreplace(s, old, new, occurrence):
     return new.join(li)
 
 
-@app.task(ignore_result=False, time_limit=600)
+@app.task(ignore_result=False, time_limit=1800)
 def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
     1. read .impute2 files (w/ genotype probabilities)
