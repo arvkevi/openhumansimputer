@@ -17,6 +17,7 @@ import logging
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +78,7 @@ TEST_CHROMS = True if os.environ.get(
 if TEST_CHROMS:
     print('using chr21 and chr22 for testing')
     CHROMOSOMES = ["{}".format(i)
-                   for i in list(range(5, 8))]  + ["23"]
+                   for i in list(range(5, 8))] + ["23"]
 else:
     CHROMOSOMES = ["{}".format(i)
                    for i in list(range(1, 24))]
@@ -192,7 +193,7 @@ LOGGING = {
             'filename': os.path.join(LOG_DIR, 'gunicorn.errors'),
             'maxBytes': 1024 * 1024 * 200,  # 100 mb
         },
-	'console': {
+        'console': {
             'class': 'logging.StreamHandler',
         },
     },
@@ -202,12 +203,12 @@ LOGGING = {
             'handlers': ['gunicorn'],
             'propagate': True,
         },
-	'oh': {
-		'level': 'DEBUG',
-		'handlers': ['console'],
-		'propogate': True
+        'oh': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propogate': True
+        }
     }
-}
 }
 
 # Internationalization

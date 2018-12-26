@@ -8,6 +8,8 @@ import os
 import logging
 import requests
 from celery import chain, group
+from celery import Task
+from celery.worker.request import Request
 from subprocess import run, PIPE
 from ohapi import api
 from os import environ
@@ -25,7 +27,6 @@ import time
 import datetime
 from openhumansimputer.celery import app
 
-
 HOME = environ.get('HOME')
 IMP_BIN = settings.IMP_BIN
 REF_PANEL = settings.REF_PANEL
@@ -38,7 +39,36 @@ OUT_DIR = settings.OUT_DIR
 logger = logging.getLogger('oh')
 
 
-@app.task(ignore_result=False, time_limit=5400)
+class MyRequest(Request):
+    """A minimal custom request to log failures and hard time limits."""
+
+    def on_timeout(self, soft, timeout):
+        """will send to timeout errors to sentry."""
+        super(MyRequest, self).on_timeout(soft, timeout)
+        if not soft:
+            logging.error(
+                'A hard timeout was enforced for task %s',
+                self.task.name
+            )
+
+    def on_failure(self, exc_info, send_failed_event=True, return_ok=False):
+        """will send error to sentry, this method might be redundant."""
+        super(Request, self).on_failure(
+            exc_info,
+            send_failed_event=send_failed_event,
+            return_ok=return_ok
+        )
+        logging.error(
+            'Failure detected for task %s',
+            self.task.name
+        )
+
+
+class LogErrorsTask(Task):
+    Request = MyRequest
+
+
+@app.task(base=LogErrorsTask, ignore_result=False, time_limit=5400)
 def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
     Build and run the genipe-launcher command in subprocess run.
@@ -69,19 +99,31 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
             '--impute2-bin', '{}/impute2'.format(IMP_BIN),
             '--plink-bin', '{}/plink'.format(IMP_BIN),
             '--reference', '{}/hg19.fasta'.format(REF_FA),
-            '--hap-nonPAR', '{}/1000GP_Phase3_chrX_NONPAR.hap.gz'.format(REF_PANEL_X),
-            '--hap-PAR1', '{}/1000GP_Phase3_chrX_PAR1.hap.gz'.format(REF_PANEL_X),
-            '--hap-PAR2', '{}/1000GP_Phase3_chrX_PAR2.hap.gz'.format(REF_PANEL_X),
-            '--legend-nonPAR', '{}/1000GP_Phase3_chrX_NONPAR.legend.gz'.format(REF_PANEL_X),
-            '--legend-PAR1', '{}/1000GP_Phase3_chrX_PAR1.legend.gz'.format(REF_PANEL_X),
-            '--legend-PAR2', '{}/1000GP_Phase3_chrX_PAR2.legend.gz'.format(REF_PANEL_X),
-            '--map-nonPAR', '{}/genetic_map_chrX_nonPAR_combined_b37.txt'.format(REF_PANEL_X),
-            '--map-PAR1', '{}/genetic_map_chrX_PAR1_combined_b37.txt'.format(REF_PANEL_X),
-            '--map-PAR2', '{}/genetic_map_chrX_PAR2_combined_b37.txt'.format(REF_PANEL_X),
+            '--hap-nonPAR', '{}/1000GP_Phase3_chrX_NONPAR.hap.gz'.format(
+                REF_PANEL_X),
+            '--hap-PAR1', '{}/1000GP_Phase3_chrX_PAR1.hap.gz'.format(
+                REF_PANEL_X),
+            '--hap-PAR2', '{}/1000GP_Phase3_chrX_PAR2.hap.gz'.format(
+                REF_PANEL_X),
+            '--legend-nonPAR', '{}/1000GP_Phase3_chrX_NONPAR.legend.gz'.format(
+                REF_PANEL_X),
+            '--legend-PAR1', '{}/1000GP_Phase3_chrX_PAR1.legend.gz'.format(
+                REF_PANEL_X),
+            '--legend-PAR2', '{}/1000GP_Phase3_chrX_PAR2.legend.gz'.format(
+                REF_PANEL_X),
+            '--map-nonPAR', '{}/genetic_map_chrX_nonPAR_combined_b37.txt'.format(
+                REF_PANEL_X),
+            '--map-PAR1', '{}/genetic_map_chrX_PAR1_combined_b37.txt'.format(
+                REF_PANEL_X),
+            '--map-PAR2', '{}/genetic_map_chrX_PAR2_combined_b37.txt'.format(
+                REF_PANEL_X),
             '--sample-file', '{}/1000GP_Phase3.sample'.format(REF_PANEL),
-            '--map-template', '{}/genetic_map_chrX_nonPAR_combined_b37.txt'.format(REF_PANEL_X),
-            '--legend-template', '{}/1000GP_Phase3_chrX_NONPAR.legend.gz'.format(REF_PANEL_X),
-            '--hap-template', '{}/1000GP_Phase3_chrX_NONPAR.hap.gz'.format(REF_PANEL_X),
+            '--map-template', '{}/genetic_map_chrX_nonPAR_combined_b37.txt'.format(
+                REF_PANEL_X),
+            '--legend-template', '{}/1000GP_Phase3_chrX_NONPAR.legend.gz'.format(
+                REF_PANEL_X),
+            '--hap-template', '{}/1000GP_Phase3_chrX_NONPAR.hap.gz'.format(
+                REF_PANEL_X),
             '--filtering-rules', 'ALL<0.01', 'ALL>0.99',
             '--segment-length', '5e+06',
             '--impute2-extra', '-nind 1',
@@ -127,7 +169,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     imputer_record.save()
 
 
-@app.task(time_limit=300)
+@app.task(base=LogErrorsTask, time_limit=300)
 def get_vcf(data_source_id, oh_id):
     """Download member .vcf."""
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
@@ -156,7 +198,7 @@ def get_vcf(data_source_id, oh_id):
     time.sleep(5)  # download takes a few seconds
 
 
-@app.task(time_limit=600)
+@app.task(base=LogErrorsTask, time_limit=600)
 def prepare_data(oh_id):
     """Process the member's .vcf."""
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
@@ -178,7 +220,7 @@ def _rreplace(s, old, new, occurrence):
     return new.join(li)
 
 
-@app.task(ignore_result=False, time_limit=1800)
+@app.task(base=LogErrorsTask, ignore_result=False, time_limit=3600)
 def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
     1. read .impute2 files (w/ genotype probabilities)
@@ -276,7 +318,7 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
                        header=None, index=False)
 
 
-@app.task(ignore_result=False, time_limit=1200)
+@app.task(base=LogErrorsTask, ignore_result=False, time_limit=1200)
 def upload_to_oh(oh_id):
     logger.info('{}: now uploading to OpenHumans'.format(oh_id))
 
@@ -327,6 +369,11 @@ def upload_to_oh(oh_id):
                 oh_member.access_token,
                 project_member_ids=[oh_id])
     logger.info('{} emailed member'.format(oh_id))
+
+    oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
+    user_details = api.exchange_oauth2_member(oh_member.get_access_token())
+    username = user_details['username']
+    logging.info('Pipeline finished for member user name: {}'.format(username))
 
     # clean users files
     if not settings.DEBUG:
