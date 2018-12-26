@@ -16,7 +16,7 @@
 <div class="alert alert-dismissible alert-light">
   <button type="button" class="close" data-dismiss="alert">&times;</button>
   <h4 class="alert-heading">Imputation Pipeline Queue &emsp; <i class="fa fa-list-ol fa-xl"></i></h4>
-  <p class="mb-0">There are <strong>{{queue_position}}</strong> members in front of you. Each job completes in approximately 7 hours.</p>
+  <p class="mb-0">There are <strong>{{queue_position}}</strong> members in front of you. Each job completes in approximately 4 hours.</p>
 </div>
 {% endif %}
 
@@ -30,9 +30,13 @@
 {% endif %}
 {%if all_datasources%}
   <div class="card mb-3" style="width: 60rem;">
-    <h3 class="card-header">Data sources which <b class="text-warning">Imputer</b> can access &emsp; <i class="fa fa-rocket fa-xl"></i></h3>
+    <h3 class="card-header">Data sources which Imputer can access &emsp; <i class="fa fa-rocket fa-xl"></i></h3>
   <div class="card-body">
-    <h5 class="card-title">Choose a data source to impute, after clicking "Impute!" you will be redirected to a confirmation page.</h5>
+    <h5 class="card-title">Choose a data source to impute, after clicking <strong>Impute!</strong> you will be redirected to a confirmation page.<br></br>
+      Once finished, results will be made available here: <a href="https://www.openhumans.org/activity/imputer/">https://www.openhumans.org/activity/imputer/</a><br></br>
+      If you do not receive an email in the estimated timeframe (4 hours * number of users in queue),
+      please create a new issue on the <a href="https://github.com/arvkevi/openhumansimputer/issues">GitHub page</a>.
+    </h5>
   </div>
   <table class='table table-hover' style='width: 50rem;'>
     <thead class="thead-light">
