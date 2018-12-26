@@ -253,7 +253,7 @@ OUT_DIR = os.getenv('OUT_DIR')
 # Sentry
 sentry_logging = LoggingIntegration(
     level=logging.INFO,        # Capture info and above as breadcrumbs
-    event_level=logging.WARNING  # Send warnings as events
+    event_level=logging.INFO  # Send warnings as events
 )
 
 sentry_sdk.init(
