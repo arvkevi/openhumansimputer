@@ -373,7 +373,7 @@ def upload_to_oh(oh_id):
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
     user_details = api.exchange_oauth2_member(oh_member.get_access_token())
     username = user_details['username']
-    logging.info('Pipeline finished for member user name: {}'.format(username))
+    logging.warning('Pipeline finished for member user name: {}, oh_id: {}'.format(username, oh_id))
 
     # clean users files
     if not settings.DEBUG:

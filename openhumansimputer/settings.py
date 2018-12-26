@@ -251,7 +251,12 @@ REF_FA = os.getenv('REF_FA')
 OUT_DIR = os.getenv('OUT_DIR')
 
 # Sentry
+sentry_logging = LoggingIntegration(
+    level=logging.INFO,        # Capture info and above as breadcrumbs
+    event_level=logging.WARNING  # Send warnings as events
+)
+
 sentry_sdk.init(
     dsn="https://113d97f46e91488b91cc664e94a9d8e2@sentry.io/1294965",
-    integrations=[DjangoIntegration(), CeleryIntegration()]
+    integrations=[DjangoIntegration(), CeleryIntegration(), sentry_logging]
 )
