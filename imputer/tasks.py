@@ -185,14 +185,16 @@ def get_vcf(data_source_id, oh_id):
     os.makedirs('{}/{}'.format(DATA_DIR, oh_id), exist_ok=True)
     with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id), 'wb') as handle:
         try:
-            textobj = bz2.decompress(datafile.content)
-            handle.write(textobj)
-        except OSError:
-            textobj = gzip.decompress(datafile.content)
-            handle.write(textobj)
-        except OSError:
-            for block in datafile.iter_content(1024):
-                handle.write(block)
+            try:
+                try:
+                    textobj = bz2.decompress(datafile.content)
+                    handle.write(textobj)
+                except OSError:
+            	    textobj = gzip.decompress(datafile.content)
+            	    handle.write(textobj)
+            except OSError:
+                for block in datafile.iter_content(1024):
+                    handle.write(block)
         except:
             logger.critical('your data source file is malformated')
     time.sleep(5)  # download takes a few seconds
