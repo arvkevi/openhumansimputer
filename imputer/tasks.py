@@ -372,11 +372,19 @@ def upload_to_oh(oh_id):
                 project_member_ids=[oh_id])
     logger.info('{} emailed member'.format(oh_id))
 
-    oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
+    # check that the vcf file was uploaded.
     user_details = api.exchange_oauth2_member(oh_member.get_access_token())
     username = user_details['username']
-    # this is not really any error...properly log me please!
-    logging.error('Pipeline finished for member user name: {}, oh_id: {}'.format(username, oh_id))
+    imputed = False
+    for data in user_details['data']:
+        if data['basename'] == 'member.imputed.vcf.bz2':
+            imputed = True
+    # alert the sentry admin that the pipeline has completed
+    if imputed:
+        # this is not really any error...properly log me please!
+        logging.error('Pipeline finished for member user name: {}, oh_id: {}'.format(username, oh_id))
+    else:
+        logging.error('Error uploading imputed vcf for member -- user name: {}, oh_id: {}'.format(username, oh_id))
 
     # clean users files
     if not settings.DEBUG:
