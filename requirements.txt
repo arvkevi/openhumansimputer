@@ -6,7 +6,7 @@ billiard==3.5.0.5
 celery==4.2.1
 certifi==2018.11.29
 chardet==3.0.4
-click==6.7
+click==7.0
 configparser==3.5.0
 decorator==4.3.0
 dj-database-url==0.5.0
