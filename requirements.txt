@@ -25,7 +25,7 @@ Jinja2==2.10
 kombu==4.2.2.post1
 MarkupSafe==1.1.0
 numpy==1.16.0
-oauthlib==2.1.0
+oauthlib==3.0.1
 open-humans-api==0.2.4
 pandas==0.23.4
 parso==0.3.1
