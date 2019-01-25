@@ -30,7 +30,7 @@ open-humans-api==0.2.5
 pandas==0.23.4
 parso==0.3.2
 pexpect==4.6.0
-pickleshare==0.7.4
+pickleshare==0.7.5
 prompt-toolkit==1.0.15
 psycopg2==2.7.5
 ptyprocess==0.6.0
