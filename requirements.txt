@@ -36,7 +36,7 @@ psycopg2==2.7.7
 ptyprocess==0.6.0
 Pygments==2.3.1
 python-dateutil==2.7.5
-pytz==2018.5
+pytz==2018.9
 PyYAML==3.13
 redis==2.10.6
 requests==2.19.1
