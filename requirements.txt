@@ -41,7 +41,7 @@ PyYAML==3.13
 redis==3.0.1
 requests==2.21.0
 requests-oauthlib==1.2.0
-sentry-sdk==0.3.9
+sentry-sdk==0.6.9
 simplegeneric==0.8.1
 six==1.11.0
 tini==3.0.1
