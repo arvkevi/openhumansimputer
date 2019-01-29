@@ -238,6 +238,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 INSTALLED_APPS += ['django_extensions']
 
+CSRF_COOKIE_SECURE = True
+
+SESSION_COOKIE_SECURE = True
+
 # celery settings
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 # Directory config, change these if you have a different setup.
