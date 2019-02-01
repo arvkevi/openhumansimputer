@@ -3,16 +3,32 @@
 {% block content %}
 
   <div class="jumbotron jumbotron-fluid">
-      <div class="container container-fluid">
-      <h1 class="display-4">Genotype Imputation for Open Humans</h1>
-    <p class="lead">
-     This is the homepage for the
-      <a href="https://www.openhumans.org/">Open Humans</a> genotype imputation app.
-    </p>
-    <p class="lead">
-      Learn more by visiting the project page:<br>
-      <a href="{{ oh_proj_page }}">{{ oh_proj_page }}</a>
-    </p>
+    <div class="container container-fluid">
+      <h1 class="display-4">Imputer</h1>
+    <dl class="row">
+    <dt class="col-sm-3">Project Maintainer</dt>
+    <dd class="col-sm-9">Kevin Arvai
+      <a href="https://github.com/arvkevi" target="_blank">
+        <span class="octicon octicon-mark-github"></span>
+      </a>
+    </dd>
+
+    <dt class="col-sm-3">Description</dt>
+    <dd class="col-sm-9">The goal of Imputer is to provide users with a more comprehensive picture of their genome. Direct-to-consumer genetics companies, like 23andMe, only genotype a small fraction of the genome.
+      Researchers are finding new genetic locations, not covered by direct-to-consumer genetic tests, that associated with traits and diseases at a rapid pace.
+      Imputer leverages the 1000 Genomes Project reference data to provide users with genotype estimates at additional locations in their genome.
+    </dd>
+
+    <dt class="col-sm-3">Data Access</dt>
+    <dd class="col-sm-9">Requests access to your genetic data in Open Humans (e.g. 23andMe)</dd>
+
+    <dt class="col-sm-3">More Information</dt>
+    <dd class="col-sm-9"><a href="/about">About Imputer</a></dd>
+
+    <dt class="col-sm-3">Open Humans Project Page</dt>
+    <dd class="col-sm-9"><a href="{{ oh_proj_page }}">{{ oh_proj_page }}</a></dd>
+
+    </dl>
   </div>
 </div>
   <h2>How to impute your Open Humans genotype data:</h2>

@@ -116,7 +116,7 @@ def dashboard(request):
         'all_datasources': requested_sources,
         'matching_sources': matching_sources,
         'queue_position': queue_position
-        }
+    }
 
     return render(request, 'main/dashboard.html',
                   context=context)
@@ -124,6 +124,10 @@ def dashboard(request):
 
 def about(request):
     return render(request, 'main/about.html', {'section': 'about'})
+
+
+def terms(request):
+    return render(request, 'main/terms.html', {'section': 'terms'})
 
 
 def complete(request):
@@ -174,7 +178,7 @@ def launch_imputation(request):
             context = {'oh_member': oh_member,
                        'oh_proj_page': settings.OH_ACTIVITY_PAGE}
             return render(request, 'main/complete.html',
-                      context=context)
+                          context=context)
 
     logger.debug('Oops! User returned to starting page.')
     return redirect('/')

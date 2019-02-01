@@ -10,4 +10,5 @@ urlpatterns = [
     path('delete-user/', views.delete_user, name='delete-user'),
     path('launch_imputation/', views.launch_imputation, name='launch-imputation'),
     path('complete/', views.complete, name='complete'),
+    path('terms/', views.terms, name='terms'),
 ]
