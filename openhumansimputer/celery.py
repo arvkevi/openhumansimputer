@@ -19,8 +19,8 @@ from django.conf import settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE',
                       'openhumansimputer.settings')
 
-app = Celery('openhumansimputer', broker=settings.CELERY_BROKER_URL, backend=settings.CELERY_BROKER_URL)
-#app.conf.CELERY_ALWAYS_EAGER = True
+app = Celery('openhumansimputer', broker=settings.CELERY_BROKER_URL,
+             backend=settings.CELERY_RESULT_BACKEND_URL)
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
@@ -29,7 +29,7 @@ app.conf.update({
     'BROKER_POOL_LIMIT': 1,
     'BROKER_HEARTBEAT': None,
     'BROKER_CONNECTION_TIMEOUT': 30,
-    'CELERY_RESULT_BACKEND': settings.CELERY_BROKER_URL,
+    'CELERY_RESULT_BACKEND': settings.CELERY_RESULT_BACKEND_URL,
     'CELERY_SEND_EVENTS': True,
     'CELERY_EVENT_QUEUE_EXPIRES': 60,
     'CELERYD_PREFETCH_MULTIPLIER': 0,

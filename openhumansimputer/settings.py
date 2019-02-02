@@ -244,6 +244,8 @@ SESSION_COOKIE_SECURE = True
 
 # celery settings
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND_URL = os.getenv('CELERY_RESULT_BACKEND_URL')
+
 # Directory config, change these if you have a different setup.
 # Also make sure these are in /etc/default/celeryd
 IMP_BIN = os.getenv('IMP_BIN')

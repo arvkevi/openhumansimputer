@@ -190,8 +190,8 @@ def get_vcf(data_source_id, oh_id):
                     textobj = bz2.decompress(datafile.content)
                     handle.write(textobj)
                 except OSError:
-            	    textobj = gzip.decompress(datafile.content)
-            	    handle.write(textobj)
+                    textobj = gzip.decompress(datafile.content)
+                    handle.write(textobj)
             except OSError:
                 for block in datafile.iter_content(1024):
                     handle.write(block)
@@ -384,7 +384,8 @@ def upload_to_oh(oh_id):
         # this is not really any error...properly log me please!
         logging.error('Pipeline finished for member user name: {}, oh_id: {}'.format(username, oh_id))
     else:
-        logging.error('Error uploading imputed vcf for member -- user name: {}, oh_id: {}'.format(username, oh_id))
+        logging.error(
+            'Error uploading imputed vcf for member -- user name: {}, oh_id: {}'.format(username, oh_id))
 
     # clean users files
     if not settings.DEBUG:
