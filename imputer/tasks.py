@@ -297,7 +297,11 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
             headiter = takewhile(lambda s: s.startswith('#'), vcf)
             header = list(headiter)
             with open('{}/{}/header.txt'.format(OUT_DIR, oh_id), 'w') as headerobj:
-                headerobj.write(''.join(header))
+                for line in header:
+                    if line.startswith('##contig'):
+                        continue
+                    else:
+                        headerobj.write(line)
 
     dfvcf = pd.read_csv(vcf_file, sep='\t', header=None,
                         comment='#', names=cols)
@@ -337,6 +341,15 @@ def upload_to_oh(oh_id):
     header.insert(-2, new_header[0])
     header.insert(-4, new_header[1])
     header.insert(1, new_header[2])
+    # get all the contig info from the fasta index file
+    fai = 'hg19.fasta.fai'
+    contigs = pd.read_csv('{}/{}'.format(REF_FA, fai), sep='\t',
+                          names=['ID', 'length'], usecols=[0, 1])
+    contigs['ID'] = contigs['ID'].str.replace('chr', '')
+    for row in contigs.itertuples():
+        chrom = row[1]
+        length = row[2]
+        header.insert(-1, f'##contig=<ID={chrom},length={length}>\n')
     header = ''.join(header)
 
     # combine all vcfs
