@@ -17,7 +17,7 @@ gawk -F '\t' '{if($0 ~ /\#/) print; else if($7 == "PASS" || $7 == ".") print}' "
 --vcf "$DATA_DIR"/"$1"/member."$1".uniq.vcf \
 --geno \
 --make-bed \
---id-delim '_' \
+--const-fid member_"$1" \
 --vcf-half-call 'r' \
 --set-all-var-ids @:#[b37]\$r,\$a \
 --new-id-max-allele-len 1000 'truncate' \
