@@ -35,6 +35,9 @@ app.conf.update({
     'CELERYD_PREFETCH_MULTIPLIER': 0,
     'CELERY_IGNORE_RESULT': True,
     'CELERYD_TASK_SOFT_TIME_LIMIT': 5400,
+    'CELERY_ROUTES': {
+        'imputer.tasks.upload_to_oh': {'queue': 'uploader'}
+        }
 })
 
 

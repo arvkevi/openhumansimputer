@@ -324,7 +324,7 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
                        header=None, index=False)
 
 
-@app.task(base=LogErrorsTask, ignore_result=False, time_limit=1200)
+@app.task(base=LogErrorsTask, ignore_result=False, time_limit=1200, queue='uploader')
 def upload_to_oh(oh_id):
     logger.info('{}: now uploading to OpenHumans'.format(oh_id))
 
