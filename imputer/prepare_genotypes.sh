@@ -26,6 +26,7 @@ gawk -F '\t' '{if($0 ~ /\#/) print; else if($7 == "PASS" || $7 == ".") print}' "
 --fa "$REF_FA"/hg19.fasta \
 --ref-from-fa 'force' \
 --normalize \
+--sort-vars \
 --out "$DATA_DIR"/"$1"/member."$1".plink
 
 sed -i 's/X\t/23\t/g' "$DATA_DIR"/"$1"/member."$1".plink.bim
