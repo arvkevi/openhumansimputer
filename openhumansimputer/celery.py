@@ -34,9 +34,11 @@ app.conf.update({
     'CELERY_EVENT_QUEUE_EXPIRES': 60,
     'CELERYD_PREFETCH_MULTIPLIER': 0,
     'CELERY_IGNORE_RESULT': True,
-    'CELERYD_TASK_SOFT_TIME_LIMIT': 5400,
+    'CELERYD_TASK_SOFT_TIME_LIMIT': 21600,
     'CELERY_ROUTES': {
-        'imputer.tasks.upload_to_oh': {'queue': 'uploader'}
+        'imputer.tasks.pipeline': {'queue': 'pipelineq'},
+        'imputer.tasks.submit_chrom': {'queue': 'imputeq'},
+        'imputer.tasks.process_chrom': {'queue': 'imputeq'}
         }
 })
 
