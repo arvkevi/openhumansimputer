@@ -68,7 +68,7 @@ class LogErrorsTask(Task):
     Request = MyRequest
 
 
-@app.task(base=LogErrorsTask, ignore_result=False, time_limit=5400)
+@app.task(base=LogErrorsTask, ignore_result=False, time_limit=5400, queue='imputeq')
 def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
     Build and run the genipe-launcher command in subprocess run.
@@ -77,9 +77,6 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     genipe-launcher tries to delete. If multiple tasks launch at the same time,
     celery task silently fails.
     """
-    # Before launching imputation, make sure the prepare_data function finished.
-    while not os.path.isfile('{}/{}/member.{}.plink.bed'.format(DATA_DIR, oh_id, oh_id)):
-        time.sleep(10)
 
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
     imputer_record.step = 'submit_chrom'
@@ -169,7 +166,6 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     imputer_record.save()
 
 
-@app.task(base=LogErrorsTask, time_limit=300)
 def get_vcf(data_source_id, oh_id):
     """Download member .vcf."""
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
@@ -200,7 +196,6 @@ def get_vcf(data_source_id, oh_id):
     time.sleep(5)  # download takes a few seconds
 
 
-@app.task(base=LogErrorsTask, time_limit=600)
 def prepare_data(oh_id):
     """Process the member's .vcf."""
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
@@ -221,8 +216,7 @@ def _rreplace(s, old, new, occurrence):
     li = s.rsplit(old, occurrence)
     return new.join(li)
 
-
-@app.task(base=LogErrorsTask, ignore_result=False, time_limit=3600)
+@app.task(base=LogErrorsTask, ignore_result=False, time_limit=3600, queue='imputeq')
 def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
     1. read .impute2 files (w/ genotype probabilities)
@@ -231,9 +225,6 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     4. merge on right (.impute2_info), acts like a filter for the left.
     """
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
-    while not all([os.path.isfile('{}/{}/chr{}/chr{}/final_impute2/chr{}.imputed.impute2'.format(OUT_DIR, oh_id, c, c, c)) for c in settings.CHROMOSOMES]):
-        time.sleep(10)
-        imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
 
     print('{} Imputation has completed, now processing results.'.format(oh_id))
     impute_cols = ['chr', 'name', 'position',
@@ -324,7 +315,6 @@ def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
                        header=None, index=False)
 
 
-@app.task(base=LogErrorsTask, ignore_result=False, time_limit=1200, queue='uploader')
 def upload_to_oh(oh_id):
     logger.info('{}: now uploading to OpenHumans'.format(oh_id))
 
@@ -416,14 +406,33 @@ def upload_to_oh(oh_id):
     imputer_record.save()
 
 
+@app.task(base=LogErrorsTask, ignore_result=False, time_limit=21600, queue='pipelineq')
 def pipeline(vcf_id, oh_id):
-    task1 = get_vcf.si(vcf_id, oh_id)
-    task2 = prepare_data.si(oh_id)
+    """asyncyronous pipeline"""
+    get_vcf(vcf_id, oh_id)
+
+    while not os.path.isfile('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id)):
+        time.sleep(5)
+
+    prepare_data(oh_id)
+
+    # Before launching imputation, make sure the prepare_data function finished.
+    while not os.path.isfile('{}/{}/member.{}.plink.bed'.format(DATA_DIR, oh_id, oh_id)):
+        time.sleep(5)
+
     async_chroms = group(submit_chrom.si(chrom, oh_id)
                          for chrom in CHROMOSOMES)
+    async_chroms.apply_async()
+
+    while not all([os.path.isfile('{}/{}/chr{}/chr{}/final_impute2/chr{}.imputed.impute2'.format(OUT_DIR, oh_id, c, c, c)) for c in CHROMOSOMES]):
+        time.sleep(5)
+
     async_process = group(process_chrom.si(chrom, oh_id)
                           for chrom in CHROMOSOMES)
-    task3 = chain(async_chroms, async_process, upload_to_oh.si(oh_id))
+    async_process.apply_async()
 
-    pipeline = chain(task1, task2, task3)
-    pipeline.apply_async()
+    member_vcf_fp = '{}/{}/member.imputed.vcf'.format(OUT_DIR, oh_id)
+    while not os.path.isifle(member_vcf_fp):
+        time.sleep(5)
+
+    upload_to_oh(oh_id)
