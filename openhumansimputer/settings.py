@@ -43,15 +43,15 @@ print('DEBUG: {}'.format(DEBUG))
 REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 print('REMOTE: {}'.format(REMOTE))
 
-#ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['.openimpute.com', '68.65.121.62']
+if REMOTE:
+    ALLOWED_HOSTS = ['.openimpute.com', '68.65.121.62']
+else:
+    ALLOWED_HOSTS = ['*']
 
 REMOTE_APP_NAME = os.getenv('REMOTE_APP_NAME', '')
 DEFAULT_BASE_URL = ('http://{}'.format(REMOTE_APP_NAME) if
                     REMOTE else 'http://127.0.0.1:5000')
 
-#HEROKUCONFIG_APP_NAME = 'http://142.93.20.214'
-#DEFAULT_BASE_URL = 'http://142.93.20.214:8000'
 
 OPENHUMANS_APP_BASE_URL = os.getenv('APP_BASE_URL', DEFAULT_BASE_URL)
 if OPENHUMANS_APP_BASE_URL[-1] == "/":
@@ -238,9 +238,12 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 INSTALLED_APPS += ['django_extensions']
 
-CSRF_COOKIE_SECURE = True
-
-SESSION_COOKIE_SECURE = True
+if REMOTE:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+else:
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
 
 # celery settings
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')

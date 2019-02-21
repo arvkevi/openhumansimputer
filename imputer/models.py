@@ -2,7 +2,7 @@ from django.db import models
 
 
 class ImputerMember(models.Model):
-    oh_id = models.IntegerField()
+    oh_id = models.CharField(max_length=16)
     step = models.CharField(max_length=10)
     active = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)

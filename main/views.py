@@ -121,7 +121,6 @@ def dashboard(request):
     return render(request, 'main/dashboard.html',
                   context=context)
 
-
 def about(request):
     return render(request, 'main/about.html', {'section': 'about'})
 
@@ -173,7 +172,8 @@ def launch_imputation(request):
 
             logger.debug("Launching {}'s pipeline.".format(oh_member.oh_id))
 
-            pipeline(vcf_id, oh_id)
+            async_pipeline = pipeline.si(vcf_id, oh_id)
+            async_pipeline.apply_async()
 
             context = {'oh_member': oh_member,
                        'oh_proj_page': settings.OH_ACTIVITY_PAGE}
