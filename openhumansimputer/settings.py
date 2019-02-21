@@ -44,7 +44,7 @@ REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 print('REMOTE: {}'.format(REMOTE))
 
 if REMOTE:
-    ALLOWED_HOSTS = ['.openimpute.com', '68.65.121.62']    
+    ALLOWED_HOSTS = ['.openimpute.com', '68.65.121.62']
 else:
     ALLOWED_HOSTS = ['*']
 
