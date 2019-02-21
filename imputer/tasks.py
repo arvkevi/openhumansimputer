@@ -1,13 +1,7 @@
-"""
-Asynchronous tasks that update data in Open Humans.
-These tasks:
-  1. delete any current files in OH if they match the planned upload filename
-  2. adds a data file
-"""
 import os
 import logging
 import requests
-from celery import chain, group
+from celery import group
 from celery import Task
 from celery.worker.request import Request
 from subprocess import run, PIPE
@@ -406,11 +400,12 @@ def upload_to_oh(oh_id):
     imputer_record.save()
 
 
-@app.task(base=LogErrorsTask, ignore_result=False, time_limit=21600, queue='pipelineq')
+@app.task(base=LogErrorsTask, time_limit=21600, queue='pipelineq')
 def pipeline(vcf_id, oh_id):
     """asyncyronous pipeline"""
     get_vcf(vcf_id, oh_id)
 
+    # Before preparing the data, make sure the vcf has been downloaded.
     while not os.path.isfile('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id)):
         time.sleep(5)
 
@@ -431,8 +426,7 @@ def pipeline(vcf_id, oh_id):
                           for chrom in CHROMOSOMES)
     async_process.apply_async()
 
-    member_vcf_fp = '{}/{}/member.imputed.vcf'.format(OUT_DIR, oh_id)
-    while not os.path.isifle(member_vcf_fp):
+    while not all([os.path.isfile('{}/{}/chr{}/chr{}/final_impute2/chr{}.member.imputed.vcf'.format(OUT_DIR, oh_id, c, c, c)) for c in CHROMOSOMES]):
         time.sleep(5)
 
     upload_to_oh(oh_id)
