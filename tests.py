@@ -10,7 +10,7 @@ class PipelineTestCase(TestCase):
         pass
 
     def test_pipeline(self):
-        for vcf_id, oh_id in zip([29230, 474017, 1039979], ['77687130', '32187646', '80804240']):
+        for vcf_id, oh_id in zip([29230, 474017, 466912], ['77687130', '32187646', '02080045']):
             new_imputer = ImputerMember(
                 oh_id=oh_id, active=True, step='launch')
             new_imputer.save()
