@@ -32,37 +32,7 @@ OUT_DIR = settings.OUT_DIR
 # Set up logging.
 logger = logging.getLogger('oh')
 
-
-class MyRequest(Request):
-    """A minimal custom request to log failures and hard time limits."""
-
-    def on_timeout(self, soft, timeout):
-        """will send to timeout errors to sentry."""
-        super(MyRequest, self).on_timeout(soft, timeout)
-        if not soft:
-            logging.error(
-                'A hard timeout was enforced for task %s',
-                self.task.name
-            )
-
-    def on_failure(self, exc_info, send_failed_event=True, return_ok=False):
-        """will send error to sentry, this method might be redundant."""
-        super(Request, self).on_failure(
-            exc_info,
-            send_failed_event=send_failed_event,
-            return_ok=return_ok
-        )
-        logging.error(
-            'Failure detected for task %s',
-            self.task.name
-        )
-
-
-class LogErrorsTask(Task):
-    Request = MyRequest
-
-
-@app.task(base=LogErrorsTask, ignore_result=False, time_limit=5400, queue='imputeq')
+@app.task(ignore_result=False, time_limit=5400, queue='imputeq')
 def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
     Build and run the genipe-launcher command in subprocess run.
@@ -210,7 +180,7 @@ def _rreplace(s, old, new, occurrence):
     li = s.rsplit(old, occurrence)
     return new.join(li)
 
-@app.task(base=LogErrorsTask, ignore_result=False, time_limit=3600, queue='imputeq')
+@app.task(ignore_result=False, time_limit=3600, queue='imputeq')
 def process_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
     1. read .impute2 files (w/ genotype probabilities)
@@ -400,7 +370,7 @@ def upload_to_oh(oh_id):
     imputer_record.save()
 
 
-@app.task(base=LogErrorsTask, time_limit=21600, queue='pipelineq')
+@app.task(time_limit=21600, queue='pipelineq')
 def pipeline(vcf_id, oh_id):
     """asyncyronous pipeline"""
     get_vcf(vcf_id, oh_id)
