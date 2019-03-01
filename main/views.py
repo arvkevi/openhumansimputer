@@ -107,7 +107,7 @@ def dashboard(request):
     active_sorted = ImputerMember.objects.filter(active=True).order_by('id')
     queue_position = None
     for index, active in enumerate(active_sorted):
-        if int(oh_member.oh_id) == int(active.oh_id):
+        if oh_member.oh_id == active.oh_id:
             queue_position = index
 
     context = {
