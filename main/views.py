@@ -149,6 +149,7 @@ def complete(request):
     return redirect('/')
 
 
+@login_required(login_url="/")
 def launch_imputation(request):
     """
     Logic to check whether user exists:
