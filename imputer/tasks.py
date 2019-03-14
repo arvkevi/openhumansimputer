@@ -399,4 +399,11 @@ def pipeline(vcf_id, oh_id):
     while not all([os.path.isfile('{}/{}/chr{}/chr{}/final_impute2/chr{}.member.imputed.vcf'.format(OUT_DIR, oh_id, c, c, c)) for c in CHROMOSOMES]):
         time.sleep(5)
 
-    upload_to_oh(oh_id)
+    # try to upload a few times
+    retry_count = 0
+    while retry_count < 3:
+        try:
+            upload_to_oh(oh_id)
+            break
+        except Exception as e:
+            retry_count += 1

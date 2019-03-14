@@ -38,5 +38,14 @@ sed -i 's/X:/23:/g' "$DATA_DIR"/"$1"/member."$1".plink.bim
 --impute-sex ycount \
 --allow-extra-chr \
 --make-bed \
+--out "$DATA_DIR"/"$1"/member."$1".plink.sorted \
+
+# set missing var ids
+"$IMP_BIN"/plink \
+--bfile "$DATA_DIR"/"$1"/member."$1".plink.sorted \
+--geno \
+--impute-sex ycount \
+--allow-extra-chr \
+--make-bed \
 --set-missing-var-ids @:\#[b37]\$1,\$2 \
 --out "$DATA_DIR"/"$1"/member."$1".plink.gt \
