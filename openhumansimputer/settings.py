@@ -70,6 +70,8 @@ OH_DIRECT_UPLOAD = OH_API_BASE + '/project/files/upload/direct/'
 OH_DIRECT_UPLOAD_COMPLETE = OH_API_BASE + '/project/files/upload/complete/'
 OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 
+SENTRY_DSN = os.getenv('SENTRY_DSN')
+
 # Imputer Settings
 # in production this should be False
 TEST_CHROMS = True if os.environ.get(
@@ -267,6 +269,6 @@ OUT_DIR = os.getenv('OUT_DIR')
 
 # Sentry
 sentry_sdk.init(
-    dsn="https://113d97f46e91488b91cc664e94a9d8e2@sentry.io/1294965",
+    dsn=SENTRY_DSN,
     integrations=[DjangoIntegration(), CeleryIntegration()]
 )
