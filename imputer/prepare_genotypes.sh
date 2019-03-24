@@ -3,7 +3,7 @@
 echo "$DATA_DIR"
 
 
-# Check for 10 columns in the vcf
+# Check for 11 columns in the vcf header row
 NCOL=$(grep '^#CHROM' "$DATA_DIR"/"$1"/member."$1".vcf | awk '{print NF}' - | sort -nu | tail -n 1)
 if [ "$NCOL" -eq "11" ]; then
  TENCOLHEADER=$(grep '^#CHROM' "$DATA_DIR"/"$1"/member."$1".vcf | awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$9,$10$11}')
