@@ -32,6 +32,7 @@ OUT_DIR = settings.OUT_DIR
 # Set up logging.
 logger = logging.getLogger('oh')
 
+
 @app.task(ignore_result=False, time_limit=5400, queue='imputeq')
 def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     """
@@ -141,6 +142,8 @@ def get_vcf(data_source_id, oh_id):
     for data_source in user_details['data']:
         if str(data_source['id']) == str(data_source_id):
             data_file_url = data_source['download_url']
+            imputer_record.data_source_id = data_source['id']
+            imputer_record.save()
     datafile = requests.get(data_file_url)
     os.makedirs('{}/{}'.format(DATA_DIR, oh_id), exist_ok=True)
     with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id), 'wb') as handle:
