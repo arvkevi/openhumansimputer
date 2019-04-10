@@ -4,7 +4,7 @@
 INPUT_CHROMS=$(grep -v '^#' "$DATA_DIR"/"$1"/member."$1".vcf | awk '{ print $1 }' | sort | uniq)
 MISSING_X=false
 if not [[ $INPUT_CHROMS == *"23"* || $INPUT_CHROMS == *"X"* || $INPUT_CHROMS == *"chrX"* ]];
-then MISSING_X = true
+then MISSING_X=true
 fi
 
 # Check for 11 columns in the vcf header row
