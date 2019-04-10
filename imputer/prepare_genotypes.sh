@@ -2,9 +2,9 @@
 
 # Check if chr23 or chrX is included.
 INPUT_CHROMS=$(grep -v '^#' "$DATA_DIR"/"$1"/member."$1".vcf | awk '{ print $1 }' | sort | uniq)
-MISSING_X=false
-if not [[ $INPUT_CHROMS == *"23"* || $INPUT_CHROMS == *"X"* || $INPUT_CHROMS == *"chrX"* ]];
-then MISSING_X=true
+MISSING_X=true
+if [[ $INPUT_CHROMS == *"23"* || $INPUT_CHROMS == *"X"* || $INPUT_CHROMS == *"chrX"* ]];
+then MISSING_X=false
 fi
 
 # Check for 11 columns in the vcf header row
@@ -43,7 +43,7 @@ gawk -F '\t' '{if($0 ~ /\#/) print; else if($7 == "PASS" || $7 == ".") print}' "
 sed -i 's/X\t/23\t/g' "$DATA_DIR"/"$1"/member."$1".plink.bim
 sed -i 's/X:/23:/g' "$DATA_DIR"/"$1"/member."$1".plink.bim
 
-if not $MISSING_X ; then
+if ! $MISSING_X ; then
     # convert to plink 1
     "$IMP_BIN"/plink \
     --bfile "$DATA_DIR"/"$1"/member."$1".plink \

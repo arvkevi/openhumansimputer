@@ -347,9 +347,15 @@ def upload_to_oh(oh_id):
     # Message Member
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
     project_page = environ.get('OH_ACTIVITY_PAGE')
+    explore_url = 'https://exploratory.openhumans.org/notebook/21/'
+    visualization_url = 'https://exploratory.openhumans.org/notebook/26/'
+    body = "Check {} to see your imputed genotype results from Open Humans.\nVisualize your results here: {}\nFurther explore your results here: {}".format(
+        project_page,
+        visualization_url,
+        explore_url
+        )
     api.message('Open Humans Imputation Complete',
-                'Check {} to see your imputed genotype results from Open Humans.'.format(
-                    project_page),
+                body,
                 oh_member.access_token,
                 project_member_ids=[oh_id])
     logger.info('{} emailed member'.format(oh_id))
