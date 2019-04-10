@@ -162,6 +162,18 @@ def get_vcf(data_source_id, oh_id):
             logger.critical('your data source file is malformated')
     time.sleep(5)  # download takes a few seconds
 
+    # set CHROMOSOMES variable appropriately by checking which were submitted for imputation.
+    with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id)) as vcf:
+        member_chroms = set()
+        for line in vcf:
+            if not line.startswith('#'):
+                member_chroms.add(str(line.split('\t')[0]))
+    global CHROMOSOMES
+    default_chroms = set(CHROMOSOMES)
+    CHROMOSOMES = default_chroms.intersection(member_chroms)
+    if "X" in member_chroms or "chrX" in member_chroms:
+        CHROMOSOMES.add('23')
+    CHROMOSOMES = list(CHROMOSOMES)
 
 def prepare_data(oh_id):
     """Process the member's .vcf."""
