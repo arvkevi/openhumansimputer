@@ -1,7 +1,11 @@
 #!/bin/bash
 
-echo "$DATA_DIR"
-
+# Check if chr23 or chrX is included.
+INPUT_CHROMS=$(grep -v '^#' "$DATA_DIR"/"$1"/member."$1".vcf | awk '{ print $1 }' | sort | uniq)
+MISSING_X=true
+if [[ $INPUT_CHROMS == *"23"* || $INPUT_CHROMS == *"X"* || $INPUT_CHROMS == *"chrX"* ]];
+then MISSING_X=false
+fi
 
 # Check for 11 columns in the vcf header row
 NCOL=$(grep '^#CHROM' "$DATA_DIR"/"$1"/member."$1".vcf | awk '{print NF}' - | sort -nu | tail -n 1)
@@ -39,21 +43,41 @@ gawk -F '\t' '{if($0 ~ /\#/) print; else if($7 == "PASS" || $7 == ".") print}' "
 sed -i 's/X\t/23\t/g' "$DATA_DIR"/"$1"/member."$1".plink.bim
 sed -i 's/X:/23:/g' "$DATA_DIR"/"$1"/member."$1".plink.bim
 
-# convert to plink 1
-"$IMP_BIN"/plink \
---bfile "$DATA_DIR"/"$1"/member."$1".plink \
---geno \
---impute-sex ycount \
---allow-extra-chr \
---make-bed \
---out "$DATA_DIR"/"$1"/member."$1".plink.sorted \
+if ! $MISSING_X ; then
+    # convert to plink 1
+    "$IMP_BIN"/plink \
+    --bfile "$DATA_DIR"/"$1"/member."$1".plink \
+    --geno \
+    --impute-sex ycount \
+    --allow-extra-chr \
+    --make-bed \
+    --out "$DATA_DIR"/"$1"/member."$1".plink.sorted \
 
-# set missing var ids
-"$IMP_BIN"/plink \
---bfile "$DATA_DIR"/"$1"/member."$1".plink.sorted \
---geno \
---impute-sex ycount \
---allow-extra-chr \
---make-bed \
---set-missing-var-ids @:\#[b37]\$1,\$2 \
---out "$DATA_DIR"/"$1"/member."$1".plink.gt \
+    # set missing var ids
+    "$IMP_BIN"/plink \
+    --bfile "$DATA_DIR"/"$1"/member."$1".plink.sorted \
+    --geno \
+    --impute-sex ycount \
+    --allow-extra-chr \
+    --make-bed \
+    --set-missing-var-ids @:\#[b37]\$1,\$2 \
+    --out "$DATA_DIR"/"$1"/member."$1".plink.gt
+else
+    # No Sex Imputation
+    # convert to plink 1
+    "$IMP_BIN"/plink \
+    --bfile "$DATA_DIR"/"$1"/member."$1".plink \
+    --geno \
+    --allow-extra-chr \
+    --make-bed \
+    --out "$DATA_DIR"/"$1"/member."$1".plink.sorted \
+
+    # set missing var ids
+    "$IMP_BIN"/plink \
+    --bfile "$DATA_DIR"/"$1"/member."$1".plink.sorted \
+    --geno \
+    --allow-extra-chr \
+    --make-bed \
+    --set-missing-var-ids @:\#[b37]\$1,\$2 \
+    --out "$DATA_DIR"/"$1"/member."$1".plink.gt
+fi
