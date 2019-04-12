@@ -167,7 +167,7 @@ def get_vcf(data_source_id, oh_id):
         member_chroms = set()
         for line in vcf:
             if not line.startswith('#'):
-                member_chroms.add(str(line.split('\t')[0]))
+                member_chroms.add(str(line.split('\t')[0]).replace("chr", ""))
     global CHROMOSOMES
     default_chroms = set(CHROMOSOMES)
     CHROMOSOMES = default_chroms.intersection(member_chroms)
