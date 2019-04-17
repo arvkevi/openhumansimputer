@@ -323,11 +323,12 @@ def upload_to_oh(oh_id):
 
     # combine all vcfs
     os.chdir(settings.BASE_DIR)
-    combine_command = [
-        'imputer/combine_chrom.sh', '{}'.format(oh_id)
-    ]
-    process = run(combine_command, stdout=PIPE, stderr=PIPE)
-    logger.debug(process.stderr)
+    with open('{}/{}/member.imputed.vcf'.format(OUT_DIR, oh_id), 'w') as outfile:
+        for chrom in CHROMOSOMES:
+            fname = '{}/{}/chr{}/chr{}/final_impute2/chr{}.member.imputed.vcf'.format(OUT_DIR, oh_id, chrom, chrom, chrom)
+            with open(fname) as infile:
+                for line in infile:
+                    outfile.write(line)
 
     member_vcf_fp = '{}/{}/member.imputed.vcf'.format(OUT_DIR, oh_id)
     # add the header to the combined vcf file.
