@@ -173,7 +173,7 @@ def get_vcf(data_source_id, oh_id):
     CHROMOSOMES = default_chroms.intersection(member_chroms)
     if "X" in member_chroms or "chrX" in member_chroms:
         CHROMOSOMES.add('23')
-    CHROMOSOMES = sorted(CHROMOSOMES)
+    CHROMOSOMES = sorted(CHROMOSOMES, key=int)
 
 def prepare_data(oh_id):
     """Process the member's .vcf."""
