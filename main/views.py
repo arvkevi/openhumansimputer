@@ -1,6 +1,5 @@
 import requests
 import logging
-from django.template.defaulttags import register
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -47,21 +46,6 @@ def delete_user(request):
     return redirect('index')
 
 
-@register.filter
-def get_item_proj(dictionary, key):
-    return dictionary.get(key, {}).get('project')
-
-
-@register.filter
-def get_item_id(dictionary, key):
-    return dictionary.get(key, {}).get('id')
-
-
-@register.filter
-def get_item_source_id(dictionary, key):
-    return dictionary.get(key, {}).get('source_id')
-
-
 @login_required(login_url='/')
 def dashboard(request):
     oh_member = request.user.oh_member
@@ -86,29 +70,25 @@ def dashboard(request):
         'direct-sharing-55': 'openSNP'
     }
 
-    matching_sources = {}
-    found_source_ids = []
-    for data_source in oh_member_data['data']:
-        if (data_source['source'] in requested_sources and
-                'vcf' in data_source['basename']
-                and 'metadata' not in data_source['basename']):
-            matching_sources[data_source['basename']] = {'project': requested_sources[data_source['source']],
-                                                         'id': data_source['id'],
-                                                         'source_id': data_source['source']}
-            found_source_ids.append(data_source['source'])
-
-    for source_id, source_name in requested_sources.items():
-        if source_id not in found_source_ids:
-            matching_sources[source_id] = {'project': source_name,
-                                           'id': None,
-                                           'source_id': source_id}
-
     # check position in queue
     active_sorted = ImputerMember.objects.filter(active=True).order_by('id')
     queue_position = None
     for index, active in enumerate(active_sorted):
         if oh_member.oh_id == active.oh_id:
             queue_position = index
+
+    matching_sources = {}
+    for data_source in oh_member_data['data']:
+        matching_source = requested_sources.get(data_source['source'], )
+        vcf_in_name = 'vcf' in data_source['basename']
+        metadata_in_name = 'metadata' in data_source['basename']
+        if matching_source is not None and vcf_in_name is True and metadata_in_name is False:
+            # check if the data source id has been imputed
+            imputed = ImputerMember.objects.filter(active=False, oh_id=oh_member.oh_id, data_source_id=data_source['id'])
+            matching_sources[data_source['id']] = {'project': requested_sources[data_source['source']],
+                                                   'source_id': data_source['source'],
+                                                   'basename': data_source['basename'],
+                                                   'already_imputed': True if len(imputed) > 0 else False}
 
     context = {
         'base_url': request.build_absolute_uri("/").rstrip('/'),
