@@ -50,12 +50,12 @@
     </thead>
       <tbody>
       {% for file_id, file_values in matching_sources.items %}
-       {% if file_values.imputed %}
+       {% if file_values.already_imputed is True %}
            <tr class="table-secondary">
                <td scope="row">{{ file_values.project }}</td>
                <td>{{ file_values.basename }}</td>
                <td scope="row">{{ file_id }}</td>
-               <td align="center"><i class="fa fa-check-cirle fa-xl"></i></td>
+               <td align="center"><i class="fa fa-check-square"></i></td>
                <td><a href="{% url 'launch-imputation'%}?id={{ file_id }}" class="confirmation"><button type="button" class="btn btn-warning btn-sm float-right">Reimpute</button></a></td>
        {% else %}
            <tr class="table-default">
