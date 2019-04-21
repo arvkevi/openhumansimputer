@@ -41,18 +41,30 @@
   <table class='table table-hover' style='width: 50rem;'>
     <thead class="thead-light">
       <tr>
-        <th scope="col">OH Data Source</th>
-        <th scope="col">Connected Filename</th>
-        <th scope="col">Impute?</th>
+          <th scope="col">Connected Data Source</th>
+          <th scope="col">Connected Filename</th>
+          <th scope="col">Data Source Id </th>
+          <th scope="col">Previously Imputed</th>
+          <th scope="col">Impute?</th>
       </tr>
     </thead>
       <tbody>
-      {% for key in matching_sources %}
-        {% if matching_sources|get_item_id:key != None %}
-        <tr class="table-success">
-        <th scope="row">{{ matching_sources|get_item_proj:key }}</th>
-        <td>{{ key }}</td>
-        <td><a href="{% url 'launch-imputation'%}?id={{matching_sources|get_item_id:key}}" class="confirmation"><button type="button" class="btn btn-primary btn-sm float-right">Impute!</button></a></td>
+      {% for file_id, file_values in matching_sources.items %}
+       {% if file_values.imputed %}
+           <tr class="table-secondary">
+               <td scope="row">{{ file_values.project }}</td>
+               <td>{{ file_values.basename }}</td>
+               <td scope="row">{{ file_id }}</td>
+               <td align="center"><i class="fa fa-check-cirle fa-xl"></i></td>
+               <td><a href="{% url 'launch-imputation'%}?id={{ file_id }}" class="confirmation"><button type="button" class="btn btn-warning btn-sm float-right">Reimpute</button></a></td>
+       {% else %}
+           <tr class="table-default">
+           <td scope="row">{{ file_values.project }}</td>
+           <td>{{ file_values.basename }}</td>
+           <td scope="row">{{ file_id }}</td>
+           <td></td>
+           <td><a href="{% url 'launch-imputation'%}?id={{ file_id }}" class="confirmation"><button type="button" class="btn btn-primary btn-sm float-right">Impute</button></a></td>
+       {% endif %}
       </tr>
         <script type="text/javascript">
             var elems = document.getElementsByClassName('confirmation');
@@ -63,19 +75,6 @@
                 elems[i].addEventListener('click', confirmIt, false);
             }
         </script>
-        {% else %}
-        <tr class="table-secondary">
-        <th scope="row">{{ matching_sources|get_item_proj:key }}</th>
-        {% if matching_sources|get_item_proj:key == "openSNP" %}
-        <td class="text-warning">The openSNP data source is currently a work in progress.</td>
-        {% else %}
-        <td>{{ matching_sources|get_item_proj:key }} not connected or no .vcf data.</td>
-        {% endif %}
-        <td></td>
-      </tr>
-        {% endif %}
-        </td>
-      </tr>
       {%endfor%}
     </tbody>
 </table>
