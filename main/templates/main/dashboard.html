@@ -62,7 +62,7 @@
            <td scope="row">{{ file_values.project }}</td>
            <td>{{ file_values.basename }}</td>
            <td scope="row">{{ file_id }}</td>
-           <td></td>
+           <td>This file has not been imputed.</td>
            <td><a href="{% url 'launch-imputation'%}?id={{ file_id }}" class="confirmation"><button type="button" class="btn btn-primary btn-sm float-right">Impute</button></a></td>
        {% endif %}
       </tr>
