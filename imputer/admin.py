@@ -19,6 +19,8 @@ class ImputerMemberAdmin(admin.ModelAdmin):
     def reset_pipeline(self, request, queryset):
         for member in queryset:
             logger.critical(f'Launching pipeline for {member.oh_id}')
-            async_pipeline = pipeline.si(member.data_source_id, member.oh_id)
+            member.active = True
+            member.save()
+            async_pipeline = pipeline.si(member.data_source_id, str(member.oh_id))
             async_pipeline.apply_async()
             time.sleep(5)
