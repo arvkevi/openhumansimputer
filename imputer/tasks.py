@@ -177,7 +177,7 @@ def get_vcf(data_source_id, oh_id, calculate_variant_length=True):
         # store the variant length, but only if less than 1000
         if longest_variant <= 990:
             imputer_record.variant_length = longest_variant + 10
-        imputer_record.save()
+            imputer_record.save()
     elif calculate_variant_length is False:
         with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id)) as vcf:
             member_chroms = set()
