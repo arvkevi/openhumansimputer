@@ -23,6 +23,7 @@ class ImputerMemberAdmin(admin.ModelAdmin):
             logger.critical(f'Launching pipeline for {member.oh_id}')
             member.active = True
             member.save()
-            async_pipeline = pipeline.si(member.data_source_id, str(member.oh_id))
+            # don't calculate variant_length here, let admin specify by manually editing user in model.
+            async_pipeline = pipeline.si(member.data_source_id, str(member.oh_id), calcualte_variant_length=False)
             async_pipeline.apply_async()
             time.sleep(5)
