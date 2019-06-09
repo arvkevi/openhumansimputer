@@ -1,3 +1,4 @@
+import getpass
 import logging
 import time
 
@@ -17,6 +18,7 @@ class ImputerMemberAdmin(admin.ModelAdmin):
     actions = ['reset_pipeline']
 
     def reset_pipeline(self, request, queryset):
+        logger.critical(f'The user launching this pipeline is {getpass.getuser()}')
         for member in queryset:
             logger.critical(f'Launching pipeline for {member.oh_id}')
             member.active = True
