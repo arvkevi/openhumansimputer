@@ -8,6 +8,7 @@ class ImputerMember(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     data_source_id = models.CharField(max_length=30, default='', null=True, blank=True)
+    variant_length = models.IntegerField(default=1000)
 
     def __str__(self):
         return 'id: {}\noh_id: {}\nstep: {}\nactive: {}\ncreated_at: {}\nupdated_at: {}'.format(self.id,

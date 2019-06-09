@@ -165,9 +165,18 @@ def get_vcf(data_source_id, oh_id):
     # set CHROMOSOMES variable appropriately by checking which were submitted for imputation.
     with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id)) as vcf:
         member_chroms = set()
+        longest_variant = 0
         for line in vcf:
             if not line.startswith('#'):
                 member_chroms.add(str(line.split('\t')[0]).replace("chr", ""))
+                reflen = len(str(line.split('\t')[3]))
+                altlen = len(str(line.split('\t')[4]))
+                if reflen + altlen > longest_variant:
+                    longest_variant = reflen + altlen
+    # store the variant length
+    imputer_record.variant_length = longest_variant + 10
+    imputer_record.save()
+
     global CHROMOSOMES
     default_chroms = set(CHROMOSOMES)
     CHROMOSOMES = default_chroms.intersection(member_chroms)
@@ -183,7 +192,7 @@ def prepare_data(oh_id):
     os.chdir(settings.BASE_DIR)
 
     command = [
-        'imputer/prepare_genotypes.sh', '{}'.format(oh_id)
+        'imputer/prepare_genotypes.sh', '{}'.format(oh_id), '{}'.format(imputer_record.variant_length)
     ]
     process = run(command, stdout=PIPE, stderr=PIPE)
     if process.stderr:

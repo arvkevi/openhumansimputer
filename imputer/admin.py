@@ -10,9 +10,9 @@ logger = logging.getLogger('oh')
 # Register your models here.
 @admin.register(ImputerMember)
 class ImputerMemberAdmin(admin.ModelAdmin):
-    fields = ('oh_id', 'step', 'active', 'data_source_id')
+    fields = ('oh_id', 'step', 'active', 'data_source_id', 'variant_length')
 
-    list_display = ('oh_id', 'step', 'active', 'data_source_id', 'created_at', 'updated_at')
+    list_display = ('oh_id', 'step', 'active', 'data_source_id', 'variant_length', 'created_at', 'updated_at')
 
     actions = ['reset_pipeline']
 
