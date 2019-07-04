@@ -153,7 +153,7 @@ def launch_imputation(request):
 
             logger.debug("Launching {}'s pipeline.".format(oh_member.oh_id))
 
-            async_pipeline = pipeline.si(vcf_id, oh_id)
+            async_pipeline = pipeline.si(vcf_id, oh_id, False)
             async_pipeline.apply_async()
 
             context = {'oh_member': oh_member,
