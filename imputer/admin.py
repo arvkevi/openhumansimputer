@@ -1,3 +1,4 @@
+import getpass
 import logging
 import time
 
@@ -10,17 +11,19 @@ logger = logging.getLogger('oh')
 # Register your models here.
 @admin.register(ImputerMember)
 class ImputerMemberAdmin(admin.ModelAdmin):
-    fields = ('oh_id', 'step', 'active', 'data_source_id')
+    fields = ('oh_id', 'step', 'active', 'data_source_id', 'variant_length')
 
-    list_display = ('oh_id', 'step', 'active', 'data_source_id', 'created_at', 'updated_at')
+    list_display = ('oh_id', 'step', 'active', 'data_source_id', 'variant_length', 'created_at', 'updated_at')
 
     actions = ['reset_pipeline']
 
     def reset_pipeline(self, request, queryset):
+        logger.critical(f'The user launching this pipeline is {getpass.getuser()}')
         for member in queryset:
             logger.critical(f'Launching pipeline for {member.oh_id}')
             member.active = True
             member.save()
-            async_pipeline = pipeline.si(member.data_source_id, str(member.oh_id))
+            # don't calculate variant_length here, let admin specify by manually editing user in model.
+            async_pipeline = pipeline.si(member.data_source_id, str(member.oh_id), calculate_variant_length=False)
             async_pipeline.apply_async()
             time.sleep(5)

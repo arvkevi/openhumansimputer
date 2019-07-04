@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Variant Length
+VARLEN="$2"
+
 # Check if chr23 or chrX is included.
 INPUT_CHROMS=$(grep -v '^#' "$DATA_DIR"/"$1"/member."$1".vcf | awk '{ print $1 }' | sort | uniq)
 MISSING_X=true
@@ -32,7 +35,7 @@ gawk -F '\t' '{if($0 ~ /\#/) print; else if($7 == "PASS" || $7 == ".") print}' "
 --const-fid member_"$1" \
 --vcf-half-call 'r' \
 --set-all-var-ids @:#[b37]\$r,\$a \
---new-id-max-allele-len 1000 'truncate' \
+--new-id-max-allele-len "$VARLEN" 'truncate' \
 --rm-dup 'force-first' \
 --max-alleles 2 \
 --fa "$REF_FA"/hg19.fasta \

@@ -148,12 +148,12 @@ def launch_imputation(request):
         if exists >= 1:
             return redirect('/dashboard?duplicate')
         else:
-            new_imputer = ImputerMember(oh_id=oh_id, active=True, step='launch')
+            new_imputer = ImputerMember(oh_id=oh_id, active=True, step='launch', variant_length=1000)
             new_imputer.save()
 
             logger.debug("Launching {}'s pipeline.".format(oh_member.oh_id))
 
-            async_pipeline = pipeline.si(vcf_id, oh_id)
+            async_pipeline = pipeline.si(vcf_id, oh_id, False)
             async_pipeline.apply_async()
 
             context = {'oh_member': oh_member,

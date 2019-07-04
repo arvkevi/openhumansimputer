@@ -131,7 +131,7 @@ def submit_chrom(chrom, oh_id, num_submit=0, **kwargs):
     imputer_record.save()
 
 
-def get_vcf(data_source_id, oh_id):
+def get_vcf(data_source_id, oh_id, calculate_variant_length=True):
     """Download member .vcf."""
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
     imputer_record = ImputerMember.objects.get(oh_id=oh_id, active=True)
@@ -163,11 +163,28 @@ def get_vcf(data_source_id, oh_id):
     time.sleep(5)  # download takes a few seconds
 
     # set CHROMOSOMES variable appropriately by checking which were submitted for imputation.
-    with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id)) as vcf:
-        member_chroms = set()
-        for line in vcf:
-            if not line.startswith('#'):
-                member_chroms.add(str(line.split('\t')[0]).replace("chr", ""))
+    if calculate_variant_length is True:
+        with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id)) as vcf:
+            member_chroms = set()
+            longest_variant = 0
+            for line in vcf:
+                if not line.startswith('#'):
+                    member_chroms.add(str(line.split('\t')[0]).replace("chr", ""))
+                    reflen = len(str(line.split('\t')[3]))
+                    altlen = len(str(line.split('\t')[4]))
+                    if reflen + altlen > longest_variant:
+                        longest_variant = reflen + altlen
+        # store the variant length, but only if less than 1000
+        if longest_variant <= 990:
+            imputer_record.variant_length = longest_variant + 10
+            imputer_record.save()
+    elif calculate_variant_length is False:
+        with open('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id)) as vcf:
+            member_chroms = set()
+            for line in vcf:
+                if not line.startswith('#'):
+                    member_chroms.add(str(line.split('\t')[0]).replace("chr", ""))
+
     global CHROMOSOMES
     default_chroms = set(CHROMOSOMES)
     CHROMOSOMES = default_chroms.intersection(member_chroms)
@@ -183,7 +200,7 @@ def prepare_data(oh_id):
     os.chdir(settings.BASE_DIR)
 
     command = [
-        'imputer/prepare_genotypes.sh', '{}'.format(oh_id)
+        'imputer/prepare_genotypes.sh', '{}'.format(oh_id), '{}'.format(imputer_record.variant_length)
     ]
     process = run(command, stdout=PIPE, stderr=PIPE)
     if process.stderr:
@@ -393,9 +410,9 @@ def upload_to_oh(oh_id):
 
 
 @app.task(time_limit=21600, queue='pipelineq')
-def pipeline(vcf_id, oh_id):
+def pipeline(vcf_id, oh_id, calculate_variant_length):
     """asyncyronous pipeline"""
-    get_vcf(vcf_id, oh_id)
+    get_vcf(vcf_id, oh_id, calculate_variant_length)
 
     # Before preparing the data, make sure the vcf has been downloaded.
     while not os.path.isfile('{}/{}/member.{}.vcf'.format(DATA_DIR, oh_id, oh_id)):
