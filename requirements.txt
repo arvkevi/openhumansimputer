@@ -24,7 +24,7 @@ jedi==0.13.2
 Jinja2>=2.10.1
 kombu==5.2.4
 MarkupSafe==1.1.0
-numpy==1.16.1
+numpy==1.22.2
 oauthlib==3.0.1
 open-humans-api==0.2.5
 pandas==0.24.0
