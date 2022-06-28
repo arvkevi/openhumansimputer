@@ -1,5 +1,5 @@
 amqp==2.4.0
-arrow==0.13.0
+arrow==0.15.1
 Babel==2.6.0
 backcall==0.1.0
 billiard==3.5.0.5
