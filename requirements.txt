@@ -39,7 +39,7 @@ python-dateutil==2.7.5
 pytz==2018.9
 pyyaml>=4.2b1
 redis==4.5.5
-requests==2.21.0
+requests==2.31.0
 requests-oauthlib==1.2.0
 sentry-sdk==0.9.5
 simplegeneric==0.8.1
