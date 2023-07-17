@@ -27,7 +27,7 @@ MarkupSafe==1.1.0
 numpy==1.25.1
 oauthlib==3.0.1
 open-humans-api==0.2.5
-pandas==0.24.0
+pandas==2.0.3
 parso==0.3.2
 pexpect==4.6.0
 pickleshare==0.7.5
