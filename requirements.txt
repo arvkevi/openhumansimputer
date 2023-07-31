@@ -45,7 +45,7 @@ sentry-sdk==1.29.0
 simplegeneric==0.8.1
 six==1.12.0
 tini==3.0.1
-tornado==5.1.1
+tornado==6.3.2
 traitlets==4.3.2
 urllib3==1.24.2
 vine==1.2.0
