@@ -3,7 +3,7 @@ arrow==0.13.0
 Babel==2.12.1
 backcall==0.1.0
 billiard==3.5.0.5
-celery==4.2.1
+celery==5.3.4
 certifi==2018.11.29
 chardet==3.0.4
 click==7.0
