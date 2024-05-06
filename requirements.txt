@@ -18,7 +18,7 @@ genipe==1.4.2
 gunicorn==22.0.0
 humanfriendly==4.17
 idna==3.7
-ipython==7.2.0
+ipython==8.24.0
 ipython-genutils==0.2.0
 jedi==0.13.2
 Jinja2>=2.10.1
